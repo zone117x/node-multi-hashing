@@ -285,4 +285,8 @@ detect_cpu(void) {
 }
 #else
 #include "scrypt-jane-portable-x86.h"
+
+#endif
+#if !defined(asm_calling_convention)
+#define asm_calling_convention
 #endif

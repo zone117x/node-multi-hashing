@@ -25,7 +25,7 @@ var hashedData = algorithms.map(function(algo){
     if (algo === 'scryptjane'){
         //scryptjane needs block.nTime and nChainStartTime (found in coin source)
         var yaCoinChainStartTime = 1367991200;
-        var timestamp = Math.round(Date.now() / 1000);
+        var nTime = Math.round(Date.now() / 1000);
         return multiHashing[algo](data, nTime, yaCoinChainStartTime);
     }
     else{

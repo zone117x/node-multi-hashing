@@ -7,12 +7,12 @@
 #include "sha3/sph_skein.h"
 
 
-void keccak_hash(const char* input, char* output)
+void skein_hash(const char* input, char* output)
 {
-    sph_keccak512_context    ctx_keccak;
-    sph_keccak512_init(&ctx_keccak);
-    sph_keccak512 (&ctx_keccak, input, 64);
-    sph_keccak512_close(&ctx_keccak, output);
+    sph_skein512_context    ctx_skien;
+    sph_skein512_init(&ctx_skien);
+    sph_skeink512 (&ctx_skien, input, 64);
+    sph_skein512_close(&ctx_skien, output);
 
 }
 

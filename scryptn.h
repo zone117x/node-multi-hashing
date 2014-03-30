@@ -1,6 +1,6 @@
 #ifndef SCRYPTN_H
 #define SCRYPTN_H
-
+#include <stdint.h>
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -26,10 +26,10 @@ var hashedData = algorithms.map(function(algo){
         //scryptjane needs block.nTime and nChainStartTime (found in coin source)
         var yaCoinChainStartTime = 1367991200;
         var timestamp = Math.round(Date.now() / 1000);
-        return algorithms[algo](data, nTime, yaCoinChainStartTime);
+        return multiHashing[algo](data, nTime, yaCoinChainStartTime);
     }
     else{
-        return return algorithms[algo](data);
+        return return multiHashing[algo](data);
     }
 });
 

@@ -193,8 +193,8 @@ Handle<Value> scryptjane(const Arguments& args) {
     Local<Number> num = args[1]->ToNumber();
     int timestamp = num->Value();
 
-    Local<Number> num = args[2]->ToNumber();
-    int nChainStarTime = num->Value();
+    Local<Number> num2 = args[2]->ToNumber();
+    int nChainStarTime = num2->Value();
 
 
     char * input = Buffer::Data(target);

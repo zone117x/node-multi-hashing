@@ -194,13 +194,13 @@ Handle<Value> scryptjane(const Arguments& args) {
     int timestamp = num->Value();
 
     Local<Number> num2 = args[2]->ToNumber();
-    int nChainStarTime = num2->Value();
+    int nChainStartTime = num2->Value();
 
 
     char * input = Buffer::Data(target);
     char * output = new char[32];
 
-    scryptjane_hash(input, 80, (uint32_t *)output, GetNfactorJane(timestamp, nChainStarTime));
+    scryptjane_hash(input, 80, (uint32_t *)output, GetNfactorJane(timestamp, nChainStartTime));
 
     Buffer* buff = Buffer::New(output, 32);
     return scope.Close(buff->handle_);

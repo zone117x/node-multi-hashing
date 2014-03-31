@@ -13,7 +13,7 @@ extern "C" {
     #include "x11.h"
 
 
-    static unsigned char getNfactor(char* blockheader) {
+    /*static unsigned char getNfactor(char* blockheader) {
         int n,l = 0;
         unsigned long nTimestamp = *(unsigned int*)(&blockheader[68]);
         unsigned char minNfactor = 10;
@@ -42,7 +42,7 @@ extern "C" {
         N = n < maxNfactor ? n : maxNfactor;
 
         return N;
-    }
+    }*/
 
     #define max(a,b)            (((a) > (b)) ? (a) : (b))
     #define min(a,b)            (((a) < (b)) ? (a) : (b))
@@ -158,22 +158,23 @@ Handle<Value> scrypt(const Arguments& args) {
 Handle<Value> scryptn(const Arguments& args) {
    HandleScope scope;
 
-   if (args.Length() < 1)
-       return except("You must provide one argument.");
+   if (args.Length() < 2)
+       return except("You must provide buffer to hash and N factor.");
 
    Local<Object> target = args[0]->ToObject();
 
    if(!Buffer::HasInstance(target))
        return except("Argument should be a buffer object.");
 
-
+    Local<Number> num = args[1]->ToNumber();
+    int nFactor = num->Value();
 
    char * input = Buffer::Data(target);
    char * output = new char[32];
 
-   unsigned int N = 1 << (getNfactor(input) + 1);
+   //unsigned int N = 1 << (getNfactor(input) + 1);
 
-   scrypt_N_1_1_256(input, output, N);
+   scrypt_N_1_1_256(input, output, nFactor);
 
    Buffer* buff = Buffer::New(output, 32);
    return scope.Close(buff->handle_);

@@ -46,10 +46,10 @@ extern "C" {
 
     #define max(a,b)            (((a) > (b)) ? (a) : (b))
     #define min(a,b)            (((a) < (b)) ? (a) : (b))
-    unsigned char GetNfactorJane(int nTimestamp, int nChainStartTime) {
+    unsigned char GetNfactorJane(int nTimestamp, int nChainStartTime, int nMin, int nMax) {
 
-            const unsigned char minNfactor = 4;
-            const unsigned char maxNfactor = 30;
+            const unsigned char minNfactor = nMin;//4;
+            const unsigned char maxNfactor = nMax;//30;
 
             int l = 0, s, n;
             unsigned char N;
@@ -166,15 +166,17 @@ Handle<Value> scryptn(const Arguments& args) {
    if(!Buffer::HasInstance(target))
        return except("Argument should be a buffer object.");
 
-    Local<Number> num = args[1]->ToNumber();
-    int nFactor = num->Value();
+   Local<Number> num = args[1]->ToNumber();
+   unsigned int nFactor = num->Value();
 
    char * input = Buffer::Data(target);
    char * output = new char[32];
 
    //unsigned int N = 1 << (getNfactor(input) + 1);
+   unsigned int N = 1 << nFactor;
 
-   scrypt_N_1_1_256(input, output, nFactor);
+   scrypt_N_1_1_256(input, output, N);
+
 
    Buffer* buff = Buffer::New(output, 32);
    return scope.Close(buff->handle_);
@@ -183,8 +185,8 @@ Handle<Value> scryptn(const Arguments& args) {
 Handle<Value> scryptjane(const Arguments& args) {
     HandleScope scope;
 
-    if (args.Length() < 3)
-        return except("You must provide two argument: buffer, timestamp as number, and nChainStarTime as number");
+    if (args.Length() < 5)
+        return except("You must provide two argument: buffer, timestamp as number, and nChainStarTime as number, nMin, and nMax");
 
     Local<Object> target = args[0]->ToObject();
 
@@ -197,11 +199,16 @@ Handle<Value> scryptjane(const Arguments& args) {
     Local<Number> num2 = args[2]->ToNumber();
     int nChainStartTime = num2->Value();
 
+    Local<Number> num3 = args[3]->ToNumber();
+    int nMin = num3->Value();
+
+    Local<Number> num4 = args[4]->ToNumber();
+    int nMax = num4->Value();
 
     char * input = Buffer::Data(target);
     char * output = new char[32];
 
-    scryptjane_hash(input, 80, (uint32_t *)output, GetNfactorJane(timestamp, nChainStartTime));
+    scryptjane_hash(input, 80, (uint32_t *)output, GetNfactorJane(timestamp, nChainStartTime, nMin, nMax));
 
     Buffer* buff = Buffer::New(output, 32);
     return scope.Close(buff->handle_);

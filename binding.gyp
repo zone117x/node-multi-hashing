@@ -11,6 +11,7 @@
                 "skein.c",
                 "x11.c",
                 "quark.c",
+                "bcrypt.c",
                 "sha3/aes_helper.c",
                 "sha3/blake.c",
                 "sha3/bmw.c",

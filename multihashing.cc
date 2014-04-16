@@ -13,37 +13,6 @@ extern "C" {
     #include "x11.h"
 
 
-    /*static unsigned char getNfactor(char* blockheader) {
-        int n,l = 0;
-        unsigned long nTimestamp = *(unsigned int*)(&blockheader[68]);
-        unsigned char minNfactor = 10;
-        unsigned char maxNfactor = 30;
-        unsigned char N;
-        uint64_t s;
-
-        if (nTimestamp <= 1389306217) {
-            return minNfactor;
-        }
-
-        s = nTimestamp - 1389306217;
-        while ((s >> 1) > 3) {
-          l += 1;
-          s >>= 1;
-        }
-
-        s &= 3;
-
-        n = (l * 158 + s * 28 - 2670) / 100;
-
-        if (n < 0) n = 0;
-
-        N = (unsigned char) n;
-        n = N > minNfactor ? N : minNfactor;
-        N = n < maxNfactor ? n : maxNfactor;
-
-        return N;
-    }*/
-
     #define max(a,b)            (((a) > (b)) ? (a) : (b))
     #define min(a,b)            (((a) < (b)) ? (a) : (b))
     unsigned char GetNfactorJane(int nTimestamp, int nChainStartTime, int nMin, int nMax) {
@@ -228,7 +197,9 @@ Handle<Value> keccak(const Arguments& args) {
     char * input = Buffer::Data(target);
     char * output = new char[32];
 
-    keccak_hash(input, output);
+    int* dSize = (int*)Buffer::Length(target);
+
+    keccak_hash(input, output, dSize);
 
     Buffer* buff = Buffer::New(output, 32);
     return scope.Close(buff->handle_);

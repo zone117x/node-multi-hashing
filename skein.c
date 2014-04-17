@@ -7,11 +7,11 @@
 #include "sha3/sph_skein.h"
 
 
-void skein_hash(const char* input, char* output)
+void skein_hash(const char* input, char* output, unsigned int len)
 {
-    sph_skein512_context ctx_skien;
-    sph_skein512_init(&ctx_skien);
-    sph_skein512(&ctx_skien, input, 64);
-    sph_skein512_close(&ctx_skien, output);
+    sph_skein256_context ctx_skien;
+    sph_skein256_init(&ctx_skien);
+    sph_skein256(&ctx_skien, input, len);
+    sph_skein256_close(&ctx_skien, output);
 }
 

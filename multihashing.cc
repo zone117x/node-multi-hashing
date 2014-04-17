@@ -11,6 +11,8 @@ extern "C" {
     #include "scryptn.h"
     #include "skein.h"
     #include "x11.h"
+    #include "groestl.h"
+    #include "blake.h"
 
 
     #define max(a,b)            (((a) > (b)) ? (a) : (b))
@@ -197,7 +199,7 @@ Handle<Value> keccak(const Arguments& args) {
     char * input = Buffer::Data(target);
     char * output = new char[32];
 
-    int* dSize = (int*)Buffer::Length(target);
+    unsigned int dSize = Buffer::Length(target);
 
     keccak_hash(input, output, dSize);
 
@@ -226,6 +228,70 @@ Handle<Value> bcrypt(const Arguments& args) {
     return scope.Close(buff->handle_);
 }
 
+Handle<Value> skein(const Arguments& args) {
+    HandleScope scope;
+
+    if (args.Length() < 1)
+        return except("You must provide one argument.");
+
+    Local<Object> target = args[0]->ToObject();
+
+    if(!Buffer::HasInstance(target))
+        return except("Argument should be a buffer object.");
+
+    char * input = Buffer::Data(target);
+    unsigned int input_len = Buffer::Length(target);
+    char * output = new char[32];
+    
+    skein_hash(input, output, input_len);
+
+    Buffer* buff = Buffer::New(output, 32);
+    return scope.Close(buff->handle_);
+}
+
+
+Handle<Value> groestl(const Arguments& args) {
+    HandleScope scope;
+
+    if (args.Length() < 1)
+        return except("You must provide one argument.");
+
+    Local<Object> target = args[0]->ToObject();
+
+    if(!Buffer::HasInstance(target))
+        return except("Argument should be a buffer object.");
+
+    char * input = Buffer::Data(target);
+    unsigned int input_len = Buffer::Length(target);
+    char * output = new char[32];
+    
+    groestl_hash(input, output, input_len);
+
+    Buffer* buff = Buffer::New(output, 32);
+    return scope.Close(buff->handle_);
+}
+
+
+Handle<Value> blake(const Arguments& args) {
+    HandleScope scope;
+
+    if (args.Length() < 1)
+        return except("You must provide one argument.");
+
+    Local<Object> target = args[0]->ToObject();
+
+    if(!Buffer::HasInstance(target))
+        return except("Argument should be a buffer object.");
+
+    char * input = Buffer::Data(target);
+    unsigned int input_len = Buffer::Length(target);
+    char * output = new char[32];
+    
+    blake_hash(input, output, input_len);
+
+    Buffer* buff = Buffer::New(output, 32);
+    return scope.Close(buff->handle_);
+}
 void init(Handle<Object> exports) {
     exports->Set(String::NewSymbol("quark"), FunctionTemplate::New(quark)->GetFunction());
     exports->Set(String::NewSymbol("x11"), FunctionTemplate::New(x11)->GetFunction());
@@ -234,6 +300,9 @@ void init(Handle<Object> exports) {
     exports->Set(String::NewSymbol("scryptjane"), FunctionTemplate::New(scryptjane)->GetFunction());
     exports->Set(String::NewSymbol("keccak"), FunctionTemplate::New(keccak)->GetFunction());
     exports->Set(String::NewSymbol("bcrypt"), FunctionTemplate::New(bcrypt)->GetFunction());
+    exports->Set(String::NewSymbol("skein"), FunctionTemplate::New(skein)->GetFunction());
+    exports->Set(String::NewSymbol("groestl"), FunctionTemplate::New(groestl)->GetFunction());
+    exports->Set(String::NewSymbol("blake"), FunctionTemplate::New(blake)->GetFunction());
 }
 
 NODE_MODULE(multihashing, init)

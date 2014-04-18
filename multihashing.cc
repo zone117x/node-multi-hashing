@@ -77,8 +77,10 @@ Handle<Value> quark(const Arguments& args) {
 
     char * input = Buffer::Data(target);
     char * output = new char[32];
+    
+    unsigned int input_len = Buffer::Length(target);
 
-    quark_hash(input, output);
+    quark_hash(input, output, input_len);
 
     Buffer* buff = Buffer::New(output, 32);
     return scope.Close(buff->handle_);
@@ -98,7 +100,9 @@ Handle<Value> x11(const Arguments& args) {
     char * input = Buffer::Data(target);
     char * output = new char[32];
 
-    x11_hash(input, output);
+    unsigned int input_len = Buffer::Length(target);
+
+    x11_hash(input, output, input_len);
 
     Buffer* buff = Buffer::New(output, 32);
     return scope.Close(buff->handle_);
@@ -240,8 +244,9 @@ Handle<Value> skein(const Arguments& args) {
         return except("Argument should be a buffer object.");
 
     char * input = Buffer::Data(target);
-    unsigned int input_len = Buffer::Length(target);
     char * output = new char[32];
+
+    unsigned int input_len = Buffer::Length(target);
     
     skein_hash(input, output, input_len);
 
@@ -262,9 +267,10 @@ Handle<Value> groestl(const Arguments& args) {
         return except("Argument should be a buffer object.");
 
     char * input = Buffer::Data(target);
-    unsigned int input_len = Buffer::Length(target);
     char * output = new char[32];
     
+    unsigned int input_len = Buffer::Length(target);
+
     groestl_hash(input, output, input_len);
 
     Buffer* buff = Buffer::New(output, 32);
@@ -284,9 +290,10 @@ Handle<Value> blake(const Arguments& args) {
         return except("Argument should be a buffer object.");
 
     char * input = Buffer::Data(target);
-    unsigned int input_len = Buffer::Length(target);
     char * output = new char[32];
     
+    unsigned int input_len = Buffer::Length(target);
+
     blake_hash(input, output, input_len);
 
     Buffer* buff = Buffer::New(output, 32);

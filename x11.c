@@ -17,7 +17,7 @@
 #include "sha3/sph_echo.h"
 
 
-void x11_hash(const char* input, char* output)
+void x11_hash(const char* input, char* output, unsigned int len)
 {
     sph_blake512_context     ctx_blake;
     sph_bmw512_context       ctx_bmw;
@@ -36,7 +36,7 @@ void x11_hash(const char* input, char* output)
     uint32_t hashA[16], hashB[16];	
 
     sph_blake512_init(&ctx_blake);
-    sph_blake512 (&ctx_blake, input, 80);
+    sph_blake512 (&ctx_blake, input, len);
     sph_blake512_close (&ctx_blake, hashA);
 
     sph_bmw512_init(&ctx_bmw);

@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-void skein_hash(const char* input, char* output);
+void skein_hash(const char* input, char* output, unsigned int len);
 
 #ifdef __cplusplus
 }

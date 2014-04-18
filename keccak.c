@@ -8,7 +8,7 @@
 #include "sha3/sph_keccak.h"
 
 
-void keccak_hash(const char* input, char* output, int * size)
+void keccak_hash(const char* input, char* output, unsigned int size)
 {
     sph_keccak256_context ctx_keccak;
     sph_keccak256_init(&ctx_keccak);

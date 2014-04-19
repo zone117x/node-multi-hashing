@@ -1,6 +1,7 @@
 #include <node.h>
 #include <node_buffer.h>
 #include <v8.h>
+#include <stdint.h>
 
 extern "C" {
     #include "bcrypt.h"
@@ -13,48 +14,6 @@ extern "C" {
     #include "x11.h"
     #include "groestl.h"
     #include "blake.h"
-
-
-    #define max(a,b)            (((a) > (b)) ? (a) : (b))
-    #define min(a,b)            (((a) < (b)) ? (a) : (b))
-    unsigned char GetNfactorJane(int nTimestamp, int nChainStartTime, int nMin, int nMax) {
-
-            const unsigned char minNfactor = nMin;//4;
-            const unsigned char maxNfactor = nMax;//30;
-
-            int l = 0, s, n;
-            unsigned char N;
-
-            if (nTimestamp <= nChainStartTime)
-                    return 4;
-
-            s = nTimestamp - nChainStartTime;
-            while ((s >> 1) > 3) {
-                    l += 1;
-                    s >>= 1;
-            }
-
-            s &= 3;
-
-            n = (l * 170 + s * 25 - 2320) / 100;
-
-            if (n < 0) n = 0;
-
-            if (n > 255)
-                    printf("GetNfactor(%d) - something wrong(n == %d)\n", nTimestamp, n);
-
-            N = (unsigned char)n;
-            //printf("GetNfactor: %d -> %d %d : %d / %d\n", nTimestamp - nChainStartTime, l, s, n, min(max(N, minNfactor), maxNfactor));
-
-            return min(max(N, minNfactor), maxNfactor);
-    }
-
-    void scryptjane_hash(const void* input, size_t inputlen, uint32_t *res, unsigned char Nfactor)
-    {
-            return scrypt((const unsigned char*)input, inputlen,
-                    (const unsigned char*)input, inputlen,
-                    Nfactor, 0, 0, (unsigned char*)res, 32);
-    }
 }
 
 using namespace node;
@@ -78,7 +37,7 @@ Handle<Value> quark(const Arguments& args) {
     char * input = Buffer::Data(target);
     char * output = new char[32];
     
-    unsigned int input_len = Buffer::Length(target);
+    uint32_t input_len = Buffer::Length(target);
 
     quark_hash(input, output, input_len);
 
@@ -100,7 +59,7 @@ Handle<Value> x11(const Arguments& args) {
     char * input = Buffer::Data(target);
     char * output = new char[32];
 
-    unsigned int input_len = Buffer::Length(target);
+    uint32_t input_len = Buffer::Length(target);
 
     x11_hash(input, output, input_len);
 
@@ -122,7 +81,9 @@ Handle<Value> scrypt(const Arguments& args) {
    char * input = Buffer::Data(target);
    char * output = new char[32];
 
-   scrypt_1024_1_1_256(input, output);
+   uint32_t input_len = Buffer::Length(target);
+
+   scrypt_1024_1_1_256(input, output, input_len);
 
    Buffer* buff = Buffer::New(output, 32);
    return scope.Close(buff->handle_);
@@ -147,10 +108,12 @@ Handle<Value> scryptn(const Arguments& args) {
    char * input = Buffer::Data(target);
    char * output = new char[32];
 
+   uint32_t input_len = Buffer::Length(target);
+
    //unsigned int N = 1 << (getNfactor(input) + 1);
    unsigned int N = 1 << nFactor;
 
-   scrypt_N_1_1_256(input, output, N);
+   scrypt_N_1_1_256(input, output, N, input_len);
 
 
    Buffer* buff = Buffer::New(output, 32);
@@ -183,7 +146,9 @@ Handle<Value> scryptjane(const Arguments& args) {
     char * input = Buffer::Data(target);
     char * output = new char[32];
 
-    scryptjane_hash(input, 80, (uint32_t *)output, GetNfactorJane(timestamp, nChainStartTime, nMin, nMax));
+    uint32_t input_len = Buffer::Length(target);
+
+    scryptjane_hash(input, input_len, (uint32_t *)output, GetNfactorJane(timestamp, nChainStartTime, nMin, nMax));
 
     Buffer* buff = Buffer::New(output, 32);
     return scope.Close(buff->handle_);
@@ -246,7 +211,7 @@ Handle<Value> skein(const Arguments& args) {
     char * input = Buffer::Data(target);
     char * output = new char[32];
 
-    unsigned int input_len = Buffer::Length(target);
+    uint32_t input_len = Buffer::Length(target);
     
     skein_hash(input, output, input_len);
 
@@ -269,7 +234,7 @@ Handle<Value> groestl(const Arguments& args) {
     char * input = Buffer::Data(target);
     char * output = new char[32];
     
-    unsigned int input_len = Buffer::Length(target);
+    uint32_t input_len = Buffer::Length(target);
 
     groestl_hash(input, output, input_len);
 
@@ -292,7 +257,7 @@ Handle<Value> groestl_myriad(const Arguments& args) {
     char * input = Buffer::Data(target);
     char * output = new char[32];
     
-    unsigned int input_len = Buffer::Length(target);
+    uint32_t input_len = Buffer::Length(target);
 
     groestl_myriad_hash(input, output, input_len);
 
@@ -315,7 +280,7 @@ Handle<Value> blake(const Arguments& args) {
     char * input = Buffer::Data(target);
     char * output = new char[32];
     
-    unsigned int input_len = Buffer::Length(target);
+    uint32_t input_len = Buffer::Length(target);
 
     blake_hash(input, output, input_len);
 

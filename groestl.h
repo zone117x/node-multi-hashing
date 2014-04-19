@@ -5,8 +5,10 @@
 extern "C" {
 #endif
 
-void groestl_hash(const char* input, char* output, unsigned int len);
-void groestl_myriad_hash(const char* input, char* output, unsigned int len);
+#include <stdint.h>
+
+void groestl_hash(const char* input, char* output, uint32_t len);
+void groestl_myriad_hash(const char* input, char* output, uint32_t len);
 
 #ifdef __cplusplus
 }

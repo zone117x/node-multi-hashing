@@ -180,3 +180,44 @@ scrypt(const uint8_t *password, size_t password_len, const uint8_t *salt, size_t
 	scrypt_free(&V);
 	scrypt_free(&YX);
 }
+
+#define max(a,b)            (((a) > (b)) ? (a) : (b))
+#define min(a,b)            (((a) < (b)) ? (a) : (b))
+unsigned char GetNfactorJane(int nTimestamp, int nChainStartTime, int nMin, int nMax) {
+
+        const unsigned char minNfactor = nMin;//4;
+        const unsigned char maxNfactor = nMax;//30;
+
+        int l = 0, s, n;
+        unsigned char N;
+
+        if (nTimestamp <= nChainStartTime)
+                return 4;
+
+        s = nTimestamp - nChainStartTime;
+        while ((s >> 1) > 3) {
+            l += 1;
+            s >>= 1;
+        }
+
+        s &= 3;
+
+        n = (l * 170 + s * 25 - 2320) / 100;
+
+        if (n < 0) n = 0;
+
+        if (n > 255)
+            printf("GetNfactor(%d) - something wrong(n == %d)\n", nTimestamp, n);
+
+        N = (unsigned char)n;
+        //printf("GetNfactor: %d -> %d %d : %d / %d\n", nTimestamp - nChainStartTime, l, s, n, min(max(N, minNfactor), maxNfactor));
+
+        return min(max(N, minNfactor), maxNfactor);
+}
+
+void scryptjane_hash(const void* input, size_t inputlen, uint32_t *res, unsigned char Nfactor)
+{
+    return scrypt((const unsigned char*)input, inputlen,
+                  (const unsigned char*)input, inputlen,
+                   Nfactor, 0, 0, (unsigned char*)res, 32);
+}

@@ -7,7 +7,7 @@
 #include "sha3/sph_groestl.h"
 #include "sha256.h"
 
-void groestl_hash(const char* input, char* output, unsigned int len)
+void groestl_hash(const char* input, char* output, uint32_t len)
 {
     char* hash1 = (char*) malloc(64);
     char* hash2 = (char*) malloc(64);
@@ -27,7 +27,7 @@ void groestl_hash(const char* input, char* output, unsigned int len)
     free(hash2);
 }
 
-void groestl_myriad_hash(const char* input, char* output, unsigned int len)
+void groestl_myriad_hash(const char* input, char* output, uint32_t len)
 {
     char* temp = (char*) malloc(64);
     

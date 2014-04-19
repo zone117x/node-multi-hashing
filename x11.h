@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-void x11_hash(const char* input, char* output, unsigned int len);
+void x11_hash(const char* input, char* output, uint32_t len);
 
 #ifdef __cplusplus
 }

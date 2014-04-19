@@ -1,6 +1,7 @@
 #ifndef SCRYPT_JANE_H
 #define SCRYPT_JANE_H
 
+#include <stdint.h>
 
 #define SCRYPT_KECCAK512
 #define SCRYPT_CHACHA
@@ -28,5 +29,8 @@ typedef void (*scrypt_fatal_errorfn)(const char *msg);
 void scrypt_set_fatal_error(scrypt_fatal_errorfn fn);
 
 void scrypt(const unsigned char *password, size_t password_len, const unsigned char *salt, size_t salt_len, unsigned char Nfactor, unsigned char rfactor, unsigned char pfactor, unsigned char *out, size_t bytes);
+
+unsigned char GetNfactorJane(int nTimestamp, int nChainStartTime, int nMin, int nMax);
+void scryptjane_hash(const void* input, size_t inputlen, uint32_t *res, unsigned char Nfactor);
 
 #endif /* SCRYPT_JANE_H */

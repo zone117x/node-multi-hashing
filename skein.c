@@ -9,7 +9,7 @@
 
 #include <stdlib.h>
 
-void skein_hash(const char* input, char* output, unsigned int len)
+void skein_hash(const char* input, char* output, uint32_t len)
 {
     char* temp = (char*) malloc(64);
 

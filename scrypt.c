@@ -223,7 +223,7 @@ smix(uint8_t * B, size_t r, uint64_t N, uint32_t * V, uint32_t * XY)
 /* cpu and memory intensive function to transform a 80 byte buffer into a 32 byte output
    scratchpad size needs to be at least 63 + (128 * r * p) + (256 * r + 64) + (128 * r * N) bytes
  */
-void scrypt_1024_1_1_256_sp(const char* input, char* output, char* scratchpad, size_t len)
+void scrypt_1024_1_1_256_sp(const char* input, char* output, char* scratchpad, uint32_t len)
 {
 	uint8_t * B;
 	uint32_t * V;
@@ -248,10 +248,10 @@ void scrypt_1024_1_1_256_sp(const char* input, char* output, char* scratchpad, s
 	}
 
 	/* 5: DK <-- PBKDF2(P, B, 1, dkLen) */
-	PBKDF2_SHA256((const uint8_t*)input, 80, B, p * 128 * r, 1, (uint8_t*)output, 32);
+	PBKDF2_SHA256((const uint8_t*)input, len, B, p * 128 * r, 1, (uint8_t*)output, 32);
 }
 
-void scrypt_1024_1_1_256(const char* input, char* output, size_t len)
+void scrypt_1024_1_1_256(const char* input, char* output, uint32_t len)
 {
 	char scratchpad[131583];
 	scrypt_1024_1_1_256_sp(input, output, scratchpad, len);

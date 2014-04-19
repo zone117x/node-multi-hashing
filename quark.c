@@ -114,7 +114,6 @@ void quark_hash(const char* input, char* output, uint32_t len)
     sph_jh512_context        ctx_jh;
     sph_keccak512_context    ctx_keccak;
     sph_skein512_context     ctx_skein;
-    static unsigned char pblank[1];
 
     uint32_t mask = 8;
     uint32_t zero = 0;

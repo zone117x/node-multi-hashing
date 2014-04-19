@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 void groestl_hash(const char* input, char* output, unsigned int len);
+void groestl_myriad_hash(const char* input, char* output, unsigned int len);
 
 #ifdef __cplusplus
 }

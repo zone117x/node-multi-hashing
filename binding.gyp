@@ -15,6 +15,7 @@
                 "groestl.c",
                 "blake.c",
                 "fugue.c",
+                "qubit.c",
                 "sha3/sph_fugue.c",
                 "sha3/aes_helper.c",
                 "sha3/sph_blake.c",

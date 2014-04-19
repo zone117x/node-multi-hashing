@@ -16,6 +16,7 @@ extern "C" {
     #include "blake.h"
     #include "fugue.h"
     #include "qubit.h"
+    #include "hefty1.h"
 }
 
 using namespace node;
@@ -336,6 +337,29 @@ Handle<Value> qubit(const Arguments& args) {
     return scope.Close(buff->handle_);
 }
 
+
+Handle<Value> hefty1(const Arguments& args) {
+    HandleScope scope;
+
+    if (args.Length() < 1)
+        return except("You must provide one argument.");
+
+    Local<Object> target = args[0]->ToObject();
+
+    if(!Buffer::HasInstance(target))
+        return except("Argument should be a buffer object.");
+
+    char * input = Buffer::Data(target);
+    char * output = new char[32];
+    
+    uint32_t input_len = Buffer::Length(target);
+
+    hefty1_hash(input, output, input_len);
+
+    Buffer* buff = Buffer::New(output, 32);
+    return scope.Close(buff->handle_);
+}
+
 void init(Handle<Object> exports) {
     exports->Set(String::NewSymbol("quark"), FunctionTemplate::New(quark)->GetFunction());
     exports->Set(String::NewSymbol("x11"), FunctionTemplate::New(x11)->GetFunction());
@@ -350,6 +374,7 @@ void init(Handle<Object> exports) {
     exports->Set(String::NewSymbol("blake"), FunctionTemplate::New(blake)->GetFunction());
     exports->Set(String::NewSymbol("fugue"), FunctionTemplate::New(fugue)->GetFunction());
     exports->Set(String::NewSymbol("qubit"), FunctionTemplate::New(qubit)->GetFunction());
+    exports->Set(String::NewSymbol("hefty1"), FunctionTemplate::New(hefty1)->GetFunction());
 }
 
 NODE_MODULE(multihashing, init)

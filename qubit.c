@@ -19,7 +19,7 @@ void qubit_hash(const char* input, char* output, uint32_t len)
     
     sph_luffa512_init(&ctx_luffa);
     sph_luffa512(&ctx_luffa, (const void*) input, len);
-    sph_luffa512_close(&ctx_luffa, (void*) hash1); //1
+    sph_luffa512_close(&ctx_luffa, (void*) hash1); // 1
     
     sph_cubehash512_init(&ctx_cubehash);
     sph_cubehash512(&ctx_cubehash, (const void*) hash1, 64); // 1

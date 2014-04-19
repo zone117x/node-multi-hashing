@@ -5,7 +5,9 @@
 extern "C" {
 #endif
 
-void keccak_hash(const char* input, char* output, unsigned int size);
+#include <stdint.h>
+
+void keccak_hash(const char* input, char* output, uint32_t size);
 
 #ifdef __cplusplus
 }

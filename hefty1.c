@@ -51,10 +51,12 @@ void hefty1_hash(const char* input, char* output, uint32_t len)
     uint32_t i;
     uint32_t j;
     
+    #define OUTPUT_BIT (i * 4 + j)
+    
     for(i = 0; i < 64; i++) {
         for(j = 0; j < 4; j++) {
-            if((*(hash[j] + i) & 0x80) != 0)
-                output[((i * 4 + j) - (i * 4 + j) % 8) / 8] |= 1 << (i * 4 + j) % 8;
+            if((*(hash[j] + (i / 8)) & (0x80 >> (i % 8))) != 0)
+                *(output + (OUTPUT_BIT / 8)) |= 0x80 >> (OUTPUT_BIT % 8);
         }
     }
     

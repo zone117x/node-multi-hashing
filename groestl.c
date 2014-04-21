@@ -23,7 +23,7 @@ void groestl_hash(const char* input, char* output, uint32_t len)
     memcpy(output, &hash2, 32);
 }
 
-void groestl_myriad_hash(const char* input, char* output, uint32_t len)
+void groestlmyriad_hash(const char* input, char* output, uint32_t len)
 {
     char temp[64];
     

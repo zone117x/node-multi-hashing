@@ -8,7 +8,7 @@ extern "C" {
 #include <stdint.h>
 
 void groestl_hash(const char* input, char* output, uint32_t len);
-void groestl_myriad_hash(const char* input, char* output, uint32_t len);
+void groestlmyriad_hash(const char* input, char* output, uint32_t len);
 
 #ifdef __cplusplus
 }

@@ -247,7 +247,7 @@ Handle<Value> groestl(const Arguments& args) {
 }
 
 
-Handle<Value> groestl_myriad(const Arguments& args) {
+Handle<Value> groestlmyriad(const Arguments& args) {
     HandleScope scope;
 
     if (args.Length() < 1)
@@ -263,7 +263,7 @@ Handle<Value> groestl_myriad(const Arguments& args) {
     
     uint32_t input_len = Buffer::Length(target);
 
-    groestl_myriad_hash(input, output, input_len);
+    groestlmyriad_hash(input, output, input_len);
 
     Buffer* buff = Buffer::New(output, 32);
     return scope.Close(buff->handle_);
@@ -394,7 +394,7 @@ void init(Handle<Object> exports) {
     exports->Set(String::NewSymbol("bcrypt"), FunctionTemplate::New(bcrypt)->GetFunction());
     exports->Set(String::NewSymbol("skein"), FunctionTemplate::New(skein)->GetFunction());
     exports->Set(String::NewSymbol("groestl"), FunctionTemplate::New(groestl)->GetFunction());
-    exports->Set(String::NewSymbol("groestl_myriad"), FunctionTemplate::New(groestl_myriad)->GetFunction());
+    exports->Set(String::NewSymbol("groestlmyriad"), FunctionTemplate::New(groestlmyriad)->GetFunction());
     exports->Set(String::NewSymbol("blake"), FunctionTemplate::New(blake)->GetFunction());
     exports->Set(String::NewSymbol("fugue"), FunctionTemplate::New(fugue)->GetFunction());
     exports->Set(String::NewSymbol("qubit"), FunctionTemplate::New(qubit)->GetFunction());

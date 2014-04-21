@@ -39,7 +39,7 @@ Handle<Value> quark(const Arguments& args) {
         return except("Argument should be a buffer object.");
 
     char * input = Buffer::Data(target);
-    char * output = new char[32];
+    char output[32];
     
     uint32_t input_len = Buffer::Length(target);
 
@@ -61,7 +61,7 @@ Handle<Value> x11(const Arguments& args) {
         return except("Argument should be a buffer object.");
 
     char * input = Buffer::Data(target);
-    char * output = new char[32];
+    char output[32];
 
     uint32_t input_len = Buffer::Length(target);
 
@@ -83,7 +83,7 @@ Handle<Value> scrypt(const Arguments& args) {
        return except("Argument should be a buffer object.");
 
    char * input = Buffer::Data(target);
-   char * output = new char[32];
+   char output[32];
 
    uint32_t input_len = Buffer::Length(target);
 
@@ -110,7 +110,7 @@ Handle<Value> scryptn(const Arguments& args) {
    unsigned int nFactor = num->Value();
 
    char * input = Buffer::Data(target);
-   char * output = new char[32];
+   char output[32];
 
    uint32_t input_len = Buffer::Length(target);
 
@@ -148,7 +148,7 @@ Handle<Value> scryptjane(const Arguments& args) {
     int nMax = num4->Value();
 
     char * input = Buffer::Data(target);
-    char * output = new char[32];
+    char output[32];
 
     uint32_t input_len = Buffer::Length(target);
 
@@ -170,7 +170,7 @@ Handle<Value> keccak(const Arguments& args) {
         return except("Argument should be a buffer object.");
 
     char * input = Buffer::Data(target);
-    char * output = new char[32];
+    char output[32];
 
     unsigned int dSize = Buffer::Length(target);
 
@@ -193,7 +193,7 @@ Handle<Value> bcrypt(const Arguments& args) {
         return except("Argument should be a buffer object.");
 
     char * input = Buffer::Data(target);
-    char * output = new char[32];
+    char output[32];
 
     bcrypt_hash(input, output);
 
@@ -213,7 +213,7 @@ Handle<Value> skein(const Arguments& args) {
         return except("Argument should be a buffer object.");
 
     char * input = Buffer::Data(target);
-    char * output = new char[32];
+    char output[32];
 
     uint32_t input_len = Buffer::Length(target);
     
@@ -236,7 +236,7 @@ Handle<Value> groestl(const Arguments& args) {
         return except("Argument should be a buffer object.");
 
     char * input = Buffer::Data(target);
-    char * output = new char[32];
+    char output[32];
     
     uint32_t input_len = Buffer::Length(target);
 
@@ -259,7 +259,7 @@ Handle<Value> groestl_myriad(const Arguments& args) {
         return except("Argument should be a buffer object.");
 
     char * input = Buffer::Data(target);
-    char * output = new char[32];
+    char output[32];
     
     uint32_t input_len = Buffer::Length(target);
 
@@ -282,7 +282,7 @@ Handle<Value> blake(const Arguments& args) {
         return except("Argument should be a buffer object.");
 
     char * input = Buffer::Data(target);
-    char * output = new char[32];
+    char output[32];
     
     uint32_t input_len = Buffer::Length(target);
 
@@ -305,7 +305,7 @@ Handle<Value> fugue(const Arguments& args) {
         return except("Argument should be a buffer object.");
 
     char * input = Buffer::Data(target);
-    char * output = new char[32];
+    char output[32];
     
     uint32_t input_len = Buffer::Length(target);
 
@@ -328,7 +328,7 @@ Handle<Value> qubit(const Arguments& args) {
         return except("Argument should be a buffer object.");
 
     char * input = Buffer::Data(target);
-    char * output = new char[32];
+    char output[32];
     
     uint32_t input_len = Buffer::Length(target);
 
@@ -351,7 +351,7 @@ Handle<Value> hefty1(const Arguments& args) {
         return except("Argument should be a buffer object.");
 
     char * input = Buffer::Data(target);
-    char * output = new char[32];
+    char output[32];
     
     uint32_t input_len = Buffer::Length(target);
 
@@ -374,7 +374,7 @@ Handle<Value> shavite3(const Arguments& args) {
         return except("Argument should be a buffer object.");
 
     char * input = Buffer::Data(target);
-    char * output = new char[32];
+    char output[32];
     
     uint32_t input_len = Buffer::Length(target);
 

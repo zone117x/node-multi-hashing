@@ -1,6 +1,7 @@
 #include <node.h>
 #include <node_buffer.h>
 #include <v8.h>
+#include <stdint.h>
 
 extern "C" {
     #include "bcrypt.h"
@@ -13,48 +14,10 @@ extern "C" {
     #include "x11.h"
     #include "groestl.h"
     #include "blake.h"
-
-
-    #define max(a,b)            (((a) > (b)) ? (a) : (b))
-    #define min(a,b)            (((a) < (b)) ? (a) : (b))
-    unsigned char GetNfactorJane(int nTimestamp, int nChainStartTime, int nMin, int nMax) {
-
-            const unsigned char minNfactor = nMin;//4;
-            const unsigned char maxNfactor = nMax;//30;
-
-            int l = 0, s, n;
-            unsigned char N;
-
-            if (nTimestamp <= nChainStartTime)
-                    return 4;
-
-            s = nTimestamp - nChainStartTime;
-            while ((s >> 1) > 3) {
-                    l += 1;
-                    s >>= 1;
-            }
-
-            s &= 3;
-
-            n = (l * 170 + s * 25 - 2320) / 100;
-
-            if (n < 0) n = 0;
-
-            if (n > 255)
-                    printf("GetNfactor(%d) - something wrong(n == %d)\n", nTimestamp, n);
-
-            N = (unsigned char)n;
-            //printf("GetNfactor: %d -> %d %d : %d / %d\n", nTimestamp - nChainStartTime, l, s, n, min(max(N, minNfactor), maxNfactor));
-
-            return min(max(N, minNfactor), maxNfactor);
-    }
-
-    void scryptjane_hash(const void* input, size_t inputlen, uint32_t *res, unsigned char Nfactor)
-    {
-            return scrypt((const unsigned char*)input, inputlen,
-                    (const unsigned char*)input, inputlen,
-                    Nfactor, 0, 0, (unsigned char*)res, 32);
-    }
+    #include "fugue.h"
+    #include "qubit.h"
+    #include "hefty1.h"
+    #include "shavite3.h"
 }
 
 using namespace node;
@@ -76,9 +39,9 @@ Handle<Value> quark(const Arguments& args) {
         return except("Argument should be a buffer object.");
 
     char * input = Buffer::Data(target);
-    char * output = new char[32];
+    char output[32];
     
-    unsigned int input_len = Buffer::Length(target);
+    uint32_t input_len = Buffer::Length(target);
 
     quark_hash(input, output, input_len);
 
@@ -98,9 +61,9 @@ Handle<Value> x11(const Arguments& args) {
         return except("Argument should be a buffer object.");
 
     char * input = Buffer::Data(target);
-    char * output = new char[32];
+    char output[32];
 
-    unsigned int input_len = Buffer::Length(target);
+    uint32_t input_len = Buffer::Length(target);
 
     x11_hash(input, output, input_len);
 
@@ -120,9 +83,11 @@ Handle<Value> scrypt(const Arguments& args) {
        return except("Argument should be a buffer object.");
 
    char * input = Buffer::Data(target);
-   char * output = new char[32];
+   char output[32];
 
-   scrypt_1024_1_1_256(input, output);
+   uint32_t input_len = Buffer::Length(target);
+
+   scrypt_1024_1_1_256(input, output, input_len);
 
    Buffer* buff = Buffer::New(output, 32);
    return scope.Close(buff->handle_);
@@ -145,12 +110,14 @@ Handle<Value> scryptn(const Arguments& args) {
    unsigned int nFactor = num->Value();
 
    char * input = Buffer::Data(target);
-   char * output = new char[32];
+   char output[32];
+
+   uint32_t input_len = Buffer::Length(target);
 
    //unsigned int N = 1 << (getNfactor(input) + 1);
    unsigned int N = 1 << nFactor;
 
-   scrypt_N_1_1_256(input, output, N);
+   scrypt_N_1_1_256(input, output, N, input_len);
 
 
    Buffer* buff = Buffer::New(output, 32);
@@ -181,9 +148,11 @@ Handle<Value> scryptjane(const Arguments& args) {
     int nMax = num4->Value();
 
     char * input = Buffer::Data(target);
-    char * output = new char[32];
+    char output[32];
 
-    scryptjane_hash(input, 80, (uint32_t *)output, GetNfactorJane(timestamp, nChainStartTime, nMin, nMax));
+    uint32_t input_len = Buffer::Length(target);
+
+    scryptjane_hash(input, input_len, (uint32_t *)output, GetNfactorJane(timestamp, nChainStartTime, nMin, nMax));
 
     Buffer* buff = Buffer::New(output, 32);
     return scope.Close(buff->handle_);
@@ -201,7 +170,7 @@ Handle<Value> keccak(const Arguments& args) {
         return except("Argument should be a buffer object.");
 
     char * input = Buffer::Data(target);
-    char * output = new char[32];
+    char output[32];
 
     unsigned int dSize = Buffer::Length(target);
 
@@ -224,7 +193,7 @@ Handle<Value> bcrypt(const Arguments& args) {
         return except("Argument should be a buffer object.");
 
     char * input = Buffer::Data(target);
-    char * output = new char[32];
+    char output[32];
 
     bcrypt_hash(input, output);
 
@@ -244,9 +213,9 @@ Handle<Value> skein(const Arguments& args) {
         return except("Argument should be a buffer object.");
 
     char * input = Buffer::Data(target);
-    char * output = new char[32];
+    char output[32];
 
-    unsigned int input_len = Buffer::Length(target);
+    uint32_t input_len = Buffer::Length(target);
     
     skein_hash(input, output, input_len);
 
@@ -267,11 +236,34 @@ Handle<Value> groestl(const Arguments& args) {
         return except("Argument should be a buffer object.");
 
     char * input = Buffer::Data(target);
-    char * output = new char[32];
+    char output[32];
     
-    unsigned int input_len = Buffer::Length(target);
+    uint32_t input_len = Buffer::Length(target);
 
     groestl_hash(input, output, input_len);
+
+    Buffer* buff = Buffer::New(output, 32);
+    return scope.Close(buff->handle_);
+}
+
+
+Handle<Value> groestl_myriad(const Arguments& args) {
+    HandleScope scope;
+
+    if (args.Length() < 1)
+        return except("You must provide one argument.");
+
+    Local<Object> target = args[0]->ToObject();
+
+    if(!Buffer::HasInstance(target))
+        return except("Argument should be a buffer object.");
+
+    char * input = Buffer::Data(target);
+    char output[32];
+    
+    uint32_t input_len = Buffer::Length(target);
+
+    groestl_myriad_hash(input, output, input_len);
 
     Buffer* buff = Buffer::New(output, 32);
     return scope.Close(buff->handle_);
@@ -290,15 +282,108 @@ Handle<Value> blake(const Arguments& args) {
         return except("Argument should be a buffer object.");
 
     char * input = Buffer::Data(target);
-    char * output = new char[32];
+    char output[32];
     
-    unsigned int input_len = Buffer::Length(target);
+    uint32_t input_len = Buffer::Length(target);
 
     blake_hash(input, output, input_len);
 
     Buffer* buff = Buffer::New(output, 32);
     return scope.Close(buff->handle_);
 }
+
+
+Handle<Value> fugue(const Arguments& args) {
+    HandleScope scope;
+
+    if (args.Length() < 1)
+        return except("You must provide one argument.");
+
+    Local<Object> target = args[0]->ToObject();
+
+    if(!Buffer::HasInstance(target))
+        return except("Argument should be a buffer object.");
+
+    char * input = Buffer::Data(target);
+    char output[32];
+    
+    uint32_t input_len = Buffer::Length(target);
+
+    fugue_hash(input, output, input_len);
+
+    Buffer* buff = Buffer::New(output, 32);
+    return scope.Close(buff->handle_);
+}
+
+
+Handle<Value> qubit(const Arguments& args) {
+    HandleScope scope;
+
+    if (args.Length() < 1)
+        return except("You must provide one argument.");
+
+    Local<Object> target = args[0]->ToObject();
+
+    if(!Buffer::HasInstance(target))
+        return except("Argument should be a buffer object.");
+
+    char * input = Buffer::Data(target);
+    char output[32];
+    
+    uint32_t input_len = Buffer::Length(target);
+
+    qubit_hash(input, output, input_len);
+
+    Buffer* buff = Buffer::New(output, 32);
+    return scope.Close(buff->handle_);
+}
+
+
+Handle<Value> hefty1(const Arguments& args) {
+    HandleScope scope;
+
+    if (args.Length() < 1)
+        return except("You must provide one argument.");
+
+    Local<Object> target = args[0]->ToObject();
+
+    if(!Buffer::HasInstance(target))
+        return except("Argument should be a buffer object.");
+
+    char * input = Buffer::Data(target);
+    char output[32];
+    
+    uint32_t input_len = Buffer::Length(target);
+
+    hefty1_hash(input, output, input_len);
+
+    Buffer* buff = Buffer::New(output, 32);
+    return scope.Close(buff->handle_);
+}
+
+
+Handle<Value> shavite3(const Arguments& args) {
+    HandleScope scope;
+
+    if (args.Length() < 1)
+        return except("You must provide one argument.");
+
+    Local<Object> target = args[0]->ToObject();
+
+    if(!Buffer::HasInstance(target))
+        return except("Argument should be a buffer object.");
+
+    char * input = Buffer::Data(target);
+    char output[32];
+    
+    uint32_t input_len = Buffer::Length(target);
+
+    shavite3_hash(input, output, input_len);
+
+    Buffer* buff = Buffer::New(output, 32);
+    return scope.Close(buff->handle_);
+}
+
 void init(Handle<Object> exports) {
     exports->Set(String::NewSymbol("quark"), FunctionTemplate::New(quark)->GetFunction());
     exports->Set(String::NewSymbol("x11"), FunctionTemplate::New(x11)->GetFunction());
@@ -309,7 +394,12 @@ void init(Handle<Object> exports) {
     exports->Set(String::NewSymbol("bcrypt"), FunctionTemplate::New(bcrypt)->GetFunction());
     exports->Set(String::NewSymbol("skein"), FunctionTemplate::New(skein)->GetFunction());
     exports->Set(String::NewSymbol("groestl"), FunctionTemplate::New(groestl)->GetFunction());
+    exports->Set(String::NewSymbol("groestl_myriad"), FunctionTemplate::New(groestl_myriad)->GetFunction());
     exports->Set(String::NewSymbol("blake"), FunctionTemplate::New(blake)->GetFunction());
+    exports->Set(String::NewSymbol("fugue"), FunctionTemplate::New(fugue)->GetFunction());
+    exports->Set(String::NewSymbol("qubit"), FunctionTemplate::New(qubit)->GetFunction());
+    exports->Set(String::NewSymbol("hefty1"), FunctionTemplate::New(hefty1)->GetFunction());
+    exports->Set(String::NewSymbol("shavite3"), FunctionTemplate::New(shavite3)->GetFunction());
 }
 
 NODE_MODULE(multihashing, init)

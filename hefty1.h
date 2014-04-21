@@ -1,5 +1,5 @@
-#ifndef QUARK_H
-#define QUARK_H
+#ifndef HEFTY1_H
+#define HEFTY1_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -7,7 +7,7 @@ extern "C" {
 
 #include <stdint.h>
 
-void quark_hash(const char* input, char* output, uint32_t len);
+void hefty1_hash(const char* input, char* output, uint32_t len);
 
 #ifdef __cplusplus
 }

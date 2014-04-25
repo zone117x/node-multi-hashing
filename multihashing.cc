@@ -7,7 +7,6 @@ extern "C" {
     #include "bcrypt.h"
     #include "keccak.h"
     #include "quark.h"
-    #include "scrypt.h"
     #include "scryptjane.h"
     #include "scryptn.h"
     #include "skein.h"

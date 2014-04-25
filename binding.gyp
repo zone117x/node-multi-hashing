@@ -4,7 +4,6 @@
             "target_name": "multihashing",
             "sources": [
                 "multihashing.cc",
-                "scrypt.c",
                 "scryptjane.c",
                 "scryptn.c",
                 "keccak.c",

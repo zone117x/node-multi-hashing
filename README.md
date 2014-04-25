@@ -41,8 +41,6 @@ var hashedData = algorithms.map(function(algo){
 console.log(hashedData);
 //<SlowBuffer 0b de 16 ef 2d 92 e4 35 65 c6 6c d8 92 d9 66 b4 3d 65 ..... >
 
-//Another example...
-var hashedScryptData = multiHashing.scrypt(new Buffer(80));
 
 ```
 

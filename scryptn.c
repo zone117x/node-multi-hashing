@@ -217,7 +217,7 @@ smix(uint8_t * B, size_t r, uint64_t N, uint32_t * V, uint32_t * XY)
 /* cpu and memory intensive function to transform a 80 byte buffer into a 32 byte output
    scratchpad size needs to be at least 63 + (128 * r * p) + (256 * r + 64) + (128 * r * N) bytes
  */
-void scrypt_N_1_1_256_sp(const char* input, char* output, char* scratchpad, uint32_t N, uint32_t len)
+void scrypt_N_R_1_256_sp(const char* input, char* output, char* scratchpad, uint32_t N, uint32_t R, uint32_t len)
 {
 	uint8_t * B;
 	uint32_t * V;
@@ -225,7 +225,7 @@ void scrypt_N_1_1_256_sp(const char* input, char* output, char* scratchpad, uint
 	uint32_t i;
 
 	//const uint32_t N = 1024;
-	const uint32_t r = 1;
+	uint32_t r=R;
 	const uint32_t p = 1;
 
 	B = (uint8_t *)(((uintptr_t)(scratchpad) + 63) & ~ (uintptr_t)(63));
@@ -245,14 +245,14 @@ void scrypt_N_1_1_256_sp(const char* input, char* output, char* scratchpad, uint
 	PBKDF2_SHA256((const uint8_t*)input, len, B, p * 128 * r, 1, (uint8_t*)output, 32);
 }
 
-void scrypt_N_1_1_256(const char* input, char* output, uint32_t N, uint32_t len)
+void scrypt_N_R_1_256(const char* input, char* output, uint32_t N, uint32_t R, uint32_t len)
 {
 	//char scratchpad[131583];
     char *scratchpad;
     
     // align on 4 byte boundary
-    scratchpad = (char*)malloc(128*N + 512);
-	scrypt_N_1_1_256_sp(input, output, scratchpad, N, len);
+    scratchpad = (char*)malloc(128*N*R + (128*R)+(256*R)+64+64);
+	scrypt_N_R_1_256_sp(input, output, scratchpad, N, R, len);
     free(scratchpad);
 }
 

@@ -7,7 +7,6 @@ extern "C" {
     #include "bcrypt.h"
     #include "keccak.h"
     #include "quark.h"
-    #include "scrypt.h"
     #include "scryptjane.h"
     #include "scryptn.h"
     #include "skein.h"
@@ -74,20 +73,25 @@ Handle<Value> x11(const Arguments& args) {
 Handle<Value> scrypt(const Arguments& args) {
    HandleScope scope;
 
-   if (args.Length() < 1)
-       return except("You must provide one argument.");
+   if (args.Length() < 3)
+       return except("You must provide buffer to hash, N value, and R value");
 
    Local<Object> target = args[0]->ToObject();
 
    if(!Buffer::HasInstance(target))
        return except("Argument should be a buffer object.");
-
+    
+   Local<Number> numn = args[1]->ToNumber();
+   unsigned int nValue = numn->Value();
+   Local<Number> numr = args[2]->ToNumber();
+   unsigned int rValue = numr->Value();
+   
    char * input = Buffer::Data(target);
    char output[32];
 
    uint32_t input_len = Buffer::Length(target);
-
-   scrypt_1024_1_1_256(input, output, input_len);
+   
+   scrypt_N_R_1_256(input, output, nValue, rValue, input_len);
 
    Buffer* buff = Buffer::New(output, 32);
    return scope.Close(buff->handle_);
@@ -117,7 +121,7 @@ Handle<Value> scryptn(const Arguments& args) {
    //unsigned int N = 1 << (getNfactor(input) + 1);
    unsigned int N = 1 << nFactor;
 
-   scrypt_N_1_1_256(input, output, N, input_len);
+   scrypt_N_R_1_256(input, output, N, 1, input_len); //hardcode for now to R=1 for now
 
 
    Buffer* buff = Buffer::New(output, 32);

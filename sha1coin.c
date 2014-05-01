@@ -45,7 +45,9 @@ void sha1coin_hash(const char* input, char* output, uint32_t len)
   memcpy(&str[26], str, 11);
   str[37] = 0;
   for (i = 0; i < 26; i++) {
-    SHA1((const unsigned char*)&str[i], 12, (unsigned char *)prehash);
+    SHA1_Init(&ctx);
+    SHA1_Update(&ctx, (void *)&str[i], 12);
+    SHA1_Final((void *)prehash, &ctx);
     hash[0] ^= prehash[0];
     hash[1] ^= prehash[1];
     hash[2] ^= prehash[2];

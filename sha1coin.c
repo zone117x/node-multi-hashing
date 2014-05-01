@@ -37,7 +37,10 @@ void sha1coin_hash(const char* input, char* output, uint32_t len)
   uint32_t prehash[5] __attribute__((aligned(32)));
   uint32_t hash[5] __attribute__((aligned(32))) = { 0 };
   int i = 0;
-  SHA1((void *)input, len, (void *)prehash);
+  SHA_CTX ctx;
+  SHA1_Init(&ctx);
+  SHA1_Update(&ctx, (void *)input, len);
+  SHA1_Final((void *)prehash, &ctx);
   encodeb64((const unsigned char *)prehash, str);
   memcpy(&str[26], str, 11);
   str[37] = 0;

@@ -25,6 +25,7 @@
         "keccak",
         "blake",
         "shavite",
-        "fugue"
+        "fugue",
+        "sha1coin"
     ]
 }

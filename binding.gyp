@@ -17,6 +17,7 @@
                 "qubit.c",
                 "hefty1.c",
                 "shavite3.c",
+                "sha1coin.c",
                 "sha3/sph_hefty1.c",
                 "sha3/sph_fugue.c",
                 "sha3/aes_helper.c",

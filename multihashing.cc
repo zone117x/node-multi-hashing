@@ -17,6 +17,7 @@ extern "C" {
     #include "qubit.h"
     #include "hefty1.h"
     #include "shavite3.h"
+    #incşude "x5.h"
 }
 
 using namespace node;
@@ -49,6 +50,28 @@ Handle<Value> quark(const Arguments& args) {
 }
 
 Handle<Value> x11(const Arguments& args) {
+    HandleScope scope;
+
+    if (args.Length() < 1)
+        return except("You must provide one argument.");
+
+    Local<Object> target = args[0]->ToObject();
+
+    if(!Buffer::HasInstance(target))
+        return except("Argument should be a buffer object.");
+
+    char * input = Buffer::Data(target);
+    char output[32];
+
+    uint32_t input_len = Buffer::Length(target);
+
+    x11_hash(input, output, input_len);
+
+    Buffer* buff = Buffer::New(output, 32);
+    return scope.Close(buff->handle_);
+}
+
+Handle<Value> x5(const Arguments& args) {
     HandleScope scope;
 
     if (args.Length() < 1)

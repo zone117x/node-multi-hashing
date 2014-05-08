@@ -17,7 +17,7 @@ extern "C" {
     #include "qubit.h"
     #include "hefty1.h"
     #include "shavite3.h"
-    #incşude "x5.h"
+    #include "x5.h"
 }
 
 using namespace node;

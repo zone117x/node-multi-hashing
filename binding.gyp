@@ -17,6 +17,7 @@
                 "qubit.c",
                 "hefty1.c",
                 "shavite3.c",
+                "cryptonight.c",
                 "sha3/sph_hefty1.c",
                 "sha3/sph_fugue.c",
                 "sha3/aes_helper.c",
@@ -30,7 +31,14 @@
                 "sha3/sph_luffa.c",
                 "sha3/sph_shavite.c",
                 "sha3/sph_simd.c",
-                "sha3/sph_skein.c"
+                "sha3/sph_skein.c",
+                "crypto/oaes_lib.c",
+                "crypto/c_keccak.c",
+                "crypto/c_groestl.c",
+                "crypto/c_blake256.c",
+                "crypto/c_jh.c",
+                "crypto/c_skein.c",
+                "crypto/hash.c"
             ]
         }
     ]

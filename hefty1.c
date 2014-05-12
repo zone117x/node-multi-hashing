@@ -46,7 +46,7 @@ void hefty1_hash(const char* input, char* output, uint32_t len)
     
     memset(output, 0, 32);
     
-    char* hash[4] = { &hash32_2, &hash64_3, &hash64_4, &hash64_5 };
+    char* hash[4] = { hash32_2, hash64_3, hash64_4, hash64_5 };
     
     uint32_t i;
     uint32_t j;

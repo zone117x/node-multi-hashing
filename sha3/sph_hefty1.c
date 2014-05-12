@@ -62,7 +62,7 @@
     }                                                                   \
 
 /* Nothing up my sleeve constants */
-const static uint32_t K[64] = {
+static const uint32_t K[64] = {
     0x428a2f98UL, 0x71374491UL, 0xb5c0fbcfUL, 0xe9b5dba5UL,
     0x3956c25bUL, 0x59f111f1UL, 0x923f82a4UL, 0xab1c5ed5UL,
     0xd807aa98UL, 0x12835b01UL, 0x243185beUL, 0x550c7dc3UL,
@@ -82,7 +82,7 @@ const static uint32_t K[64] = {
 };
 
 /* Initial hash values */
-const static uint32_t H[HEFTY1_STATE_WORDS] = {
+static const uint32_t H[HEFTY1_STATE_WORDS] = {
     0x6a09e667UL,
     0xbb67ae85UL,
     0x3c6ef372UL,

@@ -111,7 +111,7 @@ void cryptonight_hash(const char* input, char* output, uint32_t len) {
     uint8_t aes_key[AES_KEY_SIZE];
     OAES_CTX* aes_ctx;
 
-    hash_process(&state.hs, input, len);
+    hash_process(&state.hs, (const uint8_t*) input, len);
     memcpy(text, state.init, INIT_SIZE_BYTE);
     memcpy(aes_key, state.hs.b, AES_KEY_SIZE);
     aes_ctx = oaes_alloc();

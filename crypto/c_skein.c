@@ -1934,8 +1934,8 @@ hashState;
 
 /* "incremental" hashing API */
 static SkeinHashReturn Init  (hashState *state, int hashbitlen);
-static SkeinHashReturn Update(hashState *state, const SkeinBitSequence *data, SkeinDataLength databitlen);
-static SkeinHashReturn Final (hashState *state,       SkeinBitSequence *hashval);
+static SkeinHashReturn Update(hashState *state, const BitSequence *data, DataLength databitlen);
+static SkeinHashReturn Final (hashState *state,       BitSequence *hashval);
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /* select the context size and init the context */
@@ -1963,7 +1963,7 @@ static SkeinHashReturn Init(hashState *state, int hashbitlen)
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /* process data to be hashed */
-static SkeinHashReturn Update(hashState *state, const SkeinBitSequence *data, SkeinDataLength databitlen)
+static SkeinHashReturn Update(hashState *state, const BitSequence *data, DataLength databitlen)
 {
   /* only the final Update() call is allowed do partial bytes, else assert an error */
   Skein_Assert((state->u.h.T[1] & SKEIN_T1_FLAG_BIT_PAD) == 0 || databitlen == 0, SKEIN_FAIL);
@@ -2008,7 +2008,7 @@ static SkeinHashReturn Update(hashState *state, const SkeinBitSequence *data, Sk
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /* finalize hash computation and output the result (hashbitlen bits) */
-static SkeinHashReturn Final(hashState *state, SkeinBitSequence *hashval)
+static SkeinHashReturn Final(hashState *state, BitSequence *hashval)
 {
   Skein_Assert(state->statebits % 256 == 0 && (state->statebits-256) < 1024,FAIL);
   switch ((state->statebits >> 8) & 3)
@@ -2022,8 +2022,8 @@ static SkeinHashReturn Final(hashState *state, SkeinBitSequence *hashval)
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /* all-in-one hash function */
-SkeinHashReturn c_skein_hash(int hashbitlen, const SkeinBitSequence *data, /* all-in-one call */
-                SkeinDataLength databitlen,SkeinBitSequence *hashval)
+SkeinHashReturn c_skein_hash(int hashbitlen, const BitSequence *data, /* all-in-one call */
+                DataLength databitlen,BitSequence *hashval)
 {
   hashState  state;
   SkeinHashReturn r = Init(&state,hashbitlen);

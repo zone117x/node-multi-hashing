@@ -1,5 +1,8 @@
 #include "shavite3.h"
 
+#include <string.h>
+#include <stdlib.h>
+
 #include "sha3/sph_shavite.h"
 
 void shavite3_hash(const char* input, char* output, uint32_t len)

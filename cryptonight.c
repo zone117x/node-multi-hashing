@@ -169,3 +169,9 @@ void cryptonight_hash(const char* input, char* output, uint32_t len) {
     extra_hashes[state.hs.b[0] & 3](&state, 200, output);
     oaes_free(&aes_ctx);
 }
+
+void cryptonight_fast_hash(const char* input, char* output, uint32_t len) {
+    union hash_state state;
+    hash_process(&state, input, len);
+    memcpy(output, &state, HASH_SIZE);
+}

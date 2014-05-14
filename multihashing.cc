@@ -392,8 +392,16 @@ Handle<Value> shavite3(const Arguments& args) {
 Handle<Value> cryptonight(const Arguments& args) {
     HandleScope scope;
 
+    bool fast = false;
+
     if (args.Length() < 1)
         return except("You must provide one argument.");
+    
+    if (args.Length() >= 2) {
+        if(!args[1]->IsBoolean())
+            return except("Argument 2 should be a boolean");
+        fast = args[1]->ToBoolean()->BooleanValue();
+    }
 
     Local<Object> target = args[0]->ToObject();
 
@@ -405,7 +413,10 @@ Handle<Value> cryptonight(const Arguments& args) {
     
     uint32_t input_len = Buffer::Length(target);
 
-    cryptonight_hash(input, output, input_len);
+    if(fast)
+        cryptonight_fast_hash(input, output, input_len);
+    else
+        cryptonight_hash(input, output, input_len);
 
     Buffer* buff = Buffer::New(output, 32);
     return scope.Close(buff->handle_);

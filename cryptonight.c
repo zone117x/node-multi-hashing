@@ -178,6 +178,6 @@ void cryptonight_hash(const char* input, char* output, uint32_t len) {
 
 void cryptonight_fast_hash(const char* input, char* output, uint32_t len) {
     union hash_state state;
-    hash_process(&state, input, len);
+    hash_process(&state, (const uint8_t*) input, len);
     memcpy(output, &state, HASH_SIZE);
 }

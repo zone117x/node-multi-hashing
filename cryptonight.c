@@ -12,6 +12,7 @@
 #include "crypto/hash-ops.h"
 #include <x86intrin.h>
 #include <wmmintrin.h>
+#include <sys/mman.h>
 
 #define MEMORY         (1 << 21) /* 2 MiB */
 #define ITER           (1 << 20)

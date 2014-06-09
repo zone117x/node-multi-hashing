@@ -112,11 +112,11 @@ static inline void xor_blocks_dst(const uint8_t* a, const uint8_t* b, uint8_t* d
 }
 
 struct cryptonight_ctx {
-    uint8_t long_state[MEMORY];
+    uint8_t long_state[MEMORY] __attribute((aligned(16)));
     union cn_slow_hash_state state;
-    uint8_t text[INIT_SIZE_BYTE];
-    uint8_t a[AES_BLOCK_SIZE];
-    uint8_t b[AES_BLOCK_SIZE];
+    uint8_t text[INIT_SIZE_BYTE] __attribute((aligned(16)));
+    uint64_t a[AES_BLOCK_SIZE >> 3] __attribute((aligned(16)));
+    uint64_t b[AES_BLOCK_SIZE >> 3] __attribute((aligned(16)));
     uint8_t c[AES_BLOCK_SIZE];
     uint8_t aes_key[AES_KEY_SIZE];
     oaes_ctx* aes_ctx;
@@ -204,7 +204,7 @@ static inline void ExpandAESKey256(char *keybuf)
 	keys[14] = tmp1;
 }
 
-void cryptonight_hash(const char *input, char *output, uint32_t len)
+void cryptonight_hash_ctx(const char *input, char *output, uint32_t len)
 {
 	struct cryptonight_ctx *ctx = alloca(sizeof(struct cryptonight_ctx));
     hash_process(&ctx->state.hs, (const uint8_t*) input, len);
@@ -253,7 +253,7 @@ void cryptonight_hash(const char *input, char *output, uint32_t len)
     }
 
 	__m128i b_x = _mm_load_si128((__m128i *)ctx->b);
-    uint64_t a[2] __attribute((aligned(16))), b[2] __attribute((aligned(16)));
+    uint64_t a[2] __attribute((aligned(16)));
     a[0] = ctx->a[0];
     a[1] = ctx->a[1];
 	

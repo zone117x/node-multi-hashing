@@ -48,8 +48,11 @@
             "include_dirs": [
                 "crypto",
             ],
+            "cflags": [
+                "-maes"
+            ],
             "cflags_cc": [
-                "-std=c++0x"
+                "-std=c++11"
             ],
         }
     ]

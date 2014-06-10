@@ -49,10 +49,16 @@
                 "crypto",
             ],
             "cflags": [
-                "-maes"
+                "-maes -fPIC -Ofast -flto -fuse-linker-plugin -funroll-loops -funswitch-loops -fpeel-loops"
+            ],
+            "cflags!": [ 
+                "-O2", "-fno-strict-aliasing", "-fno-tree-vrp", "-fno-omit-frame-pointer" 
+            ],
+            "ldflags": [
+                "-fPIC"
             ],
             "cflags_cc": [
-                "-std=c++11"
+                "-std=c++0x -fPIC"
             ],
         }
     ]

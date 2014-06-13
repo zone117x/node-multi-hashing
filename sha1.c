@@ -1,4 +1,4 @@
-#include "sha1coin.h"
+#include "sha1.h"
 
 #include <string.h>
 #include <openssl/sha.h>
@@ -31,7 +31,7 @@ inline void encodeb64(const unsigned char* pch, char* buff)
   *(buff + 1) = 0;
 }
 
-void sha1coin_hash(const char* input, char* output, uint32_t len)
+void sha1_hash(const char* input, char* output, uint32_t len)
 {
   char str[38] __attribute__((aligned(32))); // 26 + 11 + 1
   uint32_t prehash[5] __attribute__((aligned(32)));

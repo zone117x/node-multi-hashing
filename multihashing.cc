@@ -17,7 +17,7 @@ extern "C" {
     #include "qubit.h"
     #include "hefty1.h"
     #include "shavite3.h"
-    #include "sha1coin.h"
+    #include "sha1.h"
 }
 
 using namespace node;
@@ -389,7 +389,7 @@ Handle<Value> shavite3(const Arguments& args) {
     return scope.Close(buff->handle_);
 }
 
-Handle<Value> sha1coin(const Arguments& args) {
+Handle<Value> sha1(const Arguments& args) {
     HandleScope scope;
 
     if (args.Length() < 1)
@@ -405,7 +405,7 @@ Handle<Value> sha1coin(const Arguments& args) {
 
     uint32_t input_len = Buffer::Length(target);
 
-    sha1coin_hash(input, output, input_len);
+    sha1_hash(input, output, input_len);
 
     Buffer* buff = Buffer::New(output, 32);
     return scope.Close(buff->handle_);
@@ -427,7 +427,7 @@ void init(Handle<Object> exports) {
     exports->Set(String::NewSymbol("qubit"), FunctionTemplate::New(qubit)->GetFunction());
     exports->Set(String::NewSymbol("hefty1"), FunctionTemplate::New(hefty1)->GetFunction());
     exports->Set(String::NewSymbol("shavite3"), FunctionTemplate::New(shavite3)->GetFunction());
-    exports->Set(String::NewSymbol("sha1coin"), FunctionTemplate::New(sha1coin)->GetFunction());
+    exports->Set(String::NewSymbol("sha1"), FunctionTemplate::New(sha1)->GetFunction());
 }
 
 NODE_MODULE(multihashing, init)

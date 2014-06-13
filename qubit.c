@@ -1,5 +1,8 @@
 #include "qubit.h"
 
+#include <string.h>
+#include <stdlib.h>
+
 #include "sha3/sph_cubehash.h"
 #include "sha3/sph_luffa.h"
 #include "sha3/sph_shavite.h"

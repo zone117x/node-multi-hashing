@@ -1,5 +1,5 @@
-#ifndef SHA1COIN_H
-#define SHA1COIN_H
+#ifndef SHA1_H
+#define SHA1_H
 
 #ifdef __cplusplus
 extern "C" {

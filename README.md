@@ -7,6 +7,28 @@ node-multi-hashing
 
 Cryptocurrency hashing functions for node.js.
 
+
+Algorithms
+----------
+* quark
+* x11
+* x13
+* nist5
+* scrypt
+* scryptn
+* scryptjane
+* keccak
+* bcrypt
+* skein
+* groestl
+* blake
+* fugue
+* qubit
+* hefty1
+* shavite3
+* cryptonight
+* boolberry
+
 Usage
 -----
 

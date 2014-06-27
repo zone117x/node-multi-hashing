@@ -572,7 +572,7 @@ void init(Handle<Object> exports) {
     exports->Set(String::NewSymbol("boolberry"), FunctionTemplate::New(boolberry)->GetFunction());
     exports->Set(String::NewSymbol("nist5"), FunctionTemplate::New(nist5)->GetFunction());
     exports->Set(String::NewSymbol("sha1"), FunctionTemplate::New(sha1)->GetFunction());
-    exports->Set(String::NewSymbol("x15"), FunctionTemplate::New(x13)->GetFunction());
+    exports->Set(String::NewSymbol("x15"), FunctionTemplate::New(x15)->GetFunction());
 }
 
 NODE_MODULE(multihashing, init)

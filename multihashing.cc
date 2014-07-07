@@ -22,6 +22,7 @@ extern "C" {
     #include "nist5.h"
     #include "sha1.h",
     #include "x15.h"
+	#include "fresh.h"
 }
 
 #include "boolberry.h"
@@ -551,6 +552,28 @@ Handle<Value> x15(const Arguments& args) {
     return scope.Close(buff->handle_);
 }
 
+Handle<Value> fresh(const Arguments& args) {
+    HandleScope scope;
+
+    if (args.Length() < 1)
+        return except("You must provide one argument.");
+
+    Local<Object> target = args[0]->ToObject();
+
+    if(!Buffer::HasInstance(target))
+        return except("Argument should be a buffer object.");
+
+    char * input = Buffer::Data(target);
+    char output[32];
+
+    uint32_t input_len = Buffer::Length(target);
+
+    fresh_hash(input, output, input_len);
+
+    Buffer* buff = Buffer::New(output, 32);
+    return scope.Close(buff->handle_);
+}
+
 void init(Handle<Object> exports) {
     exports->Set(String::NewSymbol("quark"), FunctionTemplate::New(quark)->GetFunction());
     exports->Set(String::NewSymbol("x11"), FunctionTemplate::New(x11)->GetFunction());
@@ -573,6 +596,7 @@ void init(Handle<Object> exports) {
     exports->Set(String::NewSymbol("nist5"), FunctionTemplate::New(nist5)->GetFunction());
     exports->Set(String::NewSymbol("sha1"), FunctionTemplate::New(sha1)->GetFunction());
     exports->Set(String::NewSymbol("x15"), FunctionTemplate::New(x15)->GetFunction());
+    exports->Set(String::NewSymbol("fresh"), FunctionTemplate::New(fresh)->GetFunction());
 }
 
 NODE_MODULE(multihashing, init)

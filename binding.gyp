@@ -23,6 +23,7 @@
                 "nist5.c",
                 "sha1.c",
                 "x15.c",
+                "fresh.c",
                 "sha3/sph_hefty1.c",
                 "sha3/sph_fugue.c",
                 "sha3/aes_helper.c",
@@ -48,7 +49,7 @@
                 "crypto/c_skein.c",
                 "crypto/hash.c",
                 "crypto/aesb.c",
-                "crypto/wild_keccak.cpp"
+                "crypto/wild_keccak.cpp",
             ],
             "include_dirs": [
                 "crypto",

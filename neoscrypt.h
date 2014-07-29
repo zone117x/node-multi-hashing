@@ -1,8 +1,7 @@
 #if (__cplusplus)
 extern "C" {
 #endif
-
-void neoscrypt(const unsigned char *input, unsigned char *output, unsigned int profile);
+void neoscrypt(const char *input, char *output, uint32_t profile);
 
 #if (__cplusplus)
 }

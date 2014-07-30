@@ -1,12 +1,11 @@
-#if (__cplusplus)
+#ifdef __cplusplus
 extern "C" {
 #endif
 void neoscrypt(const char *input, char *output, uint32_t profile);
 
-#if (__cplusplus)
+#ifdef __cplusplus
 }
 #else
-
 #define SCRYPT_BLOCK_SIZE 64
 #define SCRYPT_HASH_BLOCK_SIZE 64
 #define SCRYPT_HASH_DIGEST_SIZE 32

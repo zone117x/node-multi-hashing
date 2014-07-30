@@ -1,7 +1,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-void neoscrypt(const uchar *password, uchar *output, uint profile);
+void neoscrypt(const char *input, char *output, int profile);
 #ifdef __cplusplus
 }
 #else

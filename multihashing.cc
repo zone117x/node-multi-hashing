@@ -106,7 +106,7 @@ Handle<Value> scrypt(const Arguments& args) {
    return scope.Close(buff->handle_);
 }
 
-Handle<Value> neoscrypt(const Arguments& args) {
+Handle<Value> neoscrypt_hash(const Arguments& args) {
     HandleScope scope;
 
     if (args.Length() < 2)
@@ -619,7 +619,7 @@ void init(Handle<Object> exports) {
     exports->Set(String::NewSymbol("sha1"), FunctionTemplate::New(sha1)->GetFunction());
     exports->Set(String::NewSymbol("x15"), FunctionTemplate::New(x15)->GetFunction());
     exports->Set(String::NewSymbol("fresh"), FunctionTemplate::New(fresh)->GetFunction());
-    exports->Set(String::NewSymbol("neoscrypt"), FunctionTemplate::New(neoscrypt)->GetFunction());
+    exports->Set(String::NewSymbol("neoscrypt"), FunctionTemplate::New(neoscrypt_hash)->GetFunction());
 }
 
 NODE_MODULE(multihashing, init)

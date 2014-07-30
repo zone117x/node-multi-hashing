@@ -122,7 +122,7 @@ Handle<Value> neoscrypt_hash(const Arguments& args) {
 
     uint32_t input_len = Buffer::Length(target);
 
-    neoscrypt_hash(input, output, 0);
+    neoscrypt(input, output, 0);
 
     Buffer* buff = Buffer::New(output, 32);
     return scope.Close(buff->handle_);

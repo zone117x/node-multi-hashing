@@ -10,6 +10,21 @@
 #include <string.h>
 #include <sys/param.h>
 
+/*
+ * Create GNU compatible endian macros. We use the values for __LITTLE_ENDIAN
+ * and __BIG_ENDIAN based on endian.h.
+ */
+#ifdef __sun
+#include <sys/byteorder.h>
+#define LITTLE_ENDIAN   1234
+#define BIG_ENDIAN      4321
+#ifdef _LITTLE_ENDIAN
+#define BYTE_ORDER      LITTLE_ENDIAN
+#else
+#define BYTE_ORDER      BIG_ENDIAN
+#endif /* _LITTLE_ENDIAN */
+#endif /* __sun */
+
 #if defined(_MSC_VER)
 #include <stdlib.h>
 
@@ -163,7 +178,11 @@ static inline void memcpy_swap64(void *dst, const void *src, size_t n) {
 }
 
 #if !defined(BYTE_ORDER) || !defined(LITTLE_ENDIAN) || !defined(BIG_ENDIAN)
+#if __STDC_VERSION__ - 0 >= 201112L
 static_assert(false, "BYTE_ORDER is undefined. Perhaps, GNU extensions are not enabled");
+#else
+#error "BYTE_ORDER is undefined. Perhaps, GNU extensions are not enabled"
+#endif
 #endif
 
 #if BYTE_ORDER == LITTLE_ENDIAN

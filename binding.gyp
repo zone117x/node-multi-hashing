@@ -19,6 +19,7 @@
                 "shavite3.c",
                 "cryptonight.c",
                 "x13.c",
+                "x14.c",
                 "boolberry.cc",
                 "nist5.c",
                 "sha1.c",

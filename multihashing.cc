@@ -15,15 +15,17 @@ extern "C" {
     #include "blake.h"
     #include "fugue.h"
     #include "qubit.h"
+    #include "s3.h"
     #include "hefty1.h"
     #include "shavite3.h"
     #include "cryptonight.h"
     #include "x13.h"
     #include "x14.h"
     #include "nist5.h"
-    #include "sha1.h",
+    #include "sha1.h"
     #include "x15.h"
     #include "fresh.h"
+    #include "s3.h"
 }
 
 #include "boolberry.h"
@@ -351,6 +353,27 @@ Handle<Value> qubit(const Arguments& args) {
     return scope.Close(buff->handle_);
 }
 
+Handle<Value> s3(const Arguments& args) {
+    HandleScope scope;
+
+    if (args.Length() < 1)
+        return except("You must provide one argument.");
+
+    Local<Object> target = args[0]->ToObject();
+
+    if(!Buffer::HasInstance(target))
+        return except("Argument should be a buffer object.");
+
+    char * input = Buffer::Data(target);
+    char output[32];
+
+    uint32_t input_len = Buffer::Length(target);
+
+    s3_hash(input, output, input_len);
+
+    Buffer* buff = Buffer::New(output, 32);
+    return scope.Close(buff->handle_);
+}
 
 Handle<Value> hefty1(const Arguments& args) {
     HandleScope scope;
@@ -621,6 +644,7 @@ void init(Handle<Object> exports) {
     exports->Set(String::NewSymbol("sha1"), FunctionTemplate::New(sha1)->GetFunction());
     exports->Set(String::NewSymbol("x15"), FunctionTemplate::New(x15)->GetFunction());
     exports->Set(String::NewSymbol("fresh"), FunctionTemplate::New(fresh)->GetFunction());
+    exports->Set(String::NewSymbol("s3"), FunctionTemplate::New(s3)->GetFunction());
 }
 
 NODE_MODULE(multihashing, init)

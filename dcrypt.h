@@ -1,5 +1,5 @@
-#ifndef FRESH_H
-#define FRESH_H
+#ifndef DCRYPT_H
+#define DCRYPT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -7,7 +7,8 @@ extern "C" {
 
 #include <stdint.h>
 
-void dcrypt_hash(const char*, char*, uint32_t);
+void dcrypt_hash(const char* input, char* hash, uint32_t len);
+
 
 #ifdef __cplusplus
 }

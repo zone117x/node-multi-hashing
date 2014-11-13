@@ -55,7 +55,7 @@ void do_groestl_hash(const void* input, size_t len, char* output) {
 }
 
 static void do_jh_hash(const void* input, size_t len, char* output) {
-    int r = jh_hash(HASH_SIZE * 8, input, 8 * len, (uint8_t*)output);
+    int r = jh_hash_n(HASH_SIZE * 8, input, 8 * len, (uint8_t*)output);
     assert(SUCCESS == r);
 }
 

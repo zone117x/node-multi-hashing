@@ -97,7 +97,7 @@ static void F8(hashState *state);  /*The compression function F8 */
 static HashReturn Init(hashState *state, int hashbitlen);
 static HashReturn Update(hashState *state, const BitSequence *data, DataLength databitlen);
 static HashReturn Final(hashState *state, BitSequence *hashval);
-HashReturn jh_hash(int hashbitlen, const BitSequence *data,DataLength databitlen, BitSequence *hashval);
+HashReturn jh_hash_n(int hashbitlen, const BitSequence *data,DataLength databitlen, BitSequence *hashval);
 
 /*swapping bit 2i with bit 2i+1 of 64-bit x*/
 #define SWAP1(x)   (x) = ((((x) & 0x5555555555555555ULL) << 1) | (((x) & 0xaaaaaaaaaaaaaaaaULL) >> 1));
@@ -352,7 +352,7 @@ static HashReturn Final(hashState *state, BitSequence *hashval)
    three inputs: message digest size in bits (hashbitlen); message (data); message length in bits (databitlen)
    one output:   message digest (hashval)
 */
-HashReturn jh_hash(int hashbitlen, const BitSequence *data,DataLength databitlen, BitSequence *hashval)
+HashReturn jh_hash_n(int hashbitlen, const BitSequence *data,DataLength databitlen, BitSequence *hashval)
 {
       hashState state;
 

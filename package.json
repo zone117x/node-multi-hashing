@@ -27,7 +27,9 @@
     "shavite",
     "fugue",
     "yescrypt",
-    "sha1"
+    "sha1",
+    "neoscrypt",
+    "decrypt"
   ],
   "scripts": {
     "install": "node-gyp rebuild"

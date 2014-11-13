@@ -26,6 +26,7 @@
     "blake",
     "shavite",
     "fugue",
+    "yescrypt",
     "sha1"
   ],
   "scripts": {

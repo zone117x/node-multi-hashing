@@ -1,0 +1,2 @@
+Release/obj.target/multihashing/yescrypt/yescryptcommon.o: \
+  ../yescrypt/yescryptcommon.c ../yescrypt/yescrypt.h

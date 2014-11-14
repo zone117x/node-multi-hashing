@@ -1,0 +1,47 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node', '/usr/local/bin/npm', 'install' ]
+2 info using npm@2.1.8
+3 info using node@v0.10.33
+4 verbose node symlink /usr/local/bin/node
+5 verbose install where, deps [ '/Users/ahmedbodi/Desktop/Pool/node-multi-hashing',
+5 verbose install   [ 'bindings' ] ]
+6 verbose install where, peers [ '/Users/ahmedbodi/Desktop/Pool/node-multi-hashing', [] ]
+7 info preinstall multi-hashing@0.0.9
+8 verbose already installed skipping bindings@* /Users/ahmedbodi/Desktop/Pool/node-multi-hashing
+9 silly install resolved []
+10 info build /Users/ahmedbodi/Desktop/Pool/node-multi-hashing
+11 verbose linkStuff [ false, false, false, '/Users/ahmedbodi/Desktop/Pool' ]
+12 info linkStuff multi-hashing@0.0.9
+13 verbose linkBins multi-hashing@0.0.9
+14 verbose linkMans multi-hashing@0.0.9
+15 verbose rebuildBundles multi-hashing@0.0.9
+16 verbose rebuildBundles [ 'bindings' ]
+17 info install multi-hashing@0.0.9
+18 verbose unsafe-perm in lifecycle true
+19 info multi-hashing@0.0.9 Failed to exec install script
+20 verbose stack Error: multi-hashing@0.0.9 install: `node-gyp rebuild`
+20 verbose stack Exit status 1
+20 verbose stack     at EventEmitter.<anonymous> (/usr/local/lib/node_modules/npm/lib/utils/lifecycle.js:212:16)
+20 verbose stack     at EventEmitter.emit (events.js:98:17)
+20 verbose stack     at ChildProcess.<anonymous> (/usr/local/lib/node_modules/npm/lib/utils/spawn.js:14:12)
+20 verbose stack     at ChildProcess.emit (events.js:98:17)
+20 verbose stack     at maybeClose (child_process.js:756:16)
+20 verbose stack     at Process.ChildProcess._handle.onexit (child_process.js:823:5)
+21 verbose pkgid multi-hashing@0.0.9
+22 verbose cwd /Users/ahmedbodi/Desktop/Pool/node-multi-hashing
+23 error Darwin 14.0.0
+24 error argv "node" "/usr/local/bin/npm" "install"
+25 error node v0.10.33
+26 error npm  v2.1.8
+27 error code ELIFECYCLE
+28 error multi-hashing@0.0.9 install: `node-gyp rebuild`
+28 error Exit status 1
+29 error Failed at the multi-hashing@0.0.9 install script 'node-gyp rebuild'.
+29 error This is most likely a problem with the multi-hashing package,
+29 error not with npm itself.
+29 error Tell the author that this fails on your system:
+29 error     node-gyp rebuild
+29 error You can get their info via:
+29 error     npm owner ls multi-hashing
+29 error There is likely additional logging output above.
+30 verbose exit [ 1, true ]

@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
-#include <uint256.h>
+#include "uint256.h"
 #include "sha3/sph_jh.h"
 
 

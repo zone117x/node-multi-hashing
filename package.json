@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/zone117x/node-multi-hashing.git"
+    "url": "https://github.com/sigwo/node-multi-hashing.git"
   },
   "dependencies": {
     "bindings": "*"
@@ -39,12 +39,9 @@
   "readmeFilename": "README.md",
   "description": "node-multi-hashing ===============",
   "bugs": {
-    "url": "https://github.com/zone117x/node-multi-hashing/issues"
+    "url": "https://github.com/sigwo/node-multi-hashing/issues"
   },
   "_id": "multi-hashing@0.0.9",
   "dist": {
     "shasum": "7118157cdf3924f7313d43732064c70549e19123"
-  },
-  "_resolved": "git://github.com/zone117x/node-multi-hashing.git#73996fe77104108f2d66ef750b3e1bce42e4d8f0",
-  "_from": "multi-hashing@git://github.com/zone117x/node-multi-hashing.git"
 }

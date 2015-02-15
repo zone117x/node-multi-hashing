@@ -41,8 +41,5 @@
   "bugs": {
     "url": "https://github.com/sigwo/node-multi-hashing/issues"
   },
-  "_id": "multi-hashing@0.0.9",
-  "dist": {
-    "shasum": "7118157cdf3924f7313d43732064c70549e19123"
-  }  
+  "_id": "multi-hashing@0.0.9"
 }

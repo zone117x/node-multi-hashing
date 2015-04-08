@@ -31,6 +31,7 @@ extern "C" {
     #include "dcrypt.h"
     #include "jh.h"
     #include "x5.h"
+    #include "Lyra2RE.h"
 }
 
 #include "boolberry.h"
@@ -106,6 +107,26 @@ Handle<Value> x5(const Arguments& args) {
 
     Buffer* buff = Buffer::New(output, 32);
     return scope.Close(buff->handle_);
+}
+
+Handle<Value> lyra2re(const Arguments& args) {
+   HandleScope scope;
+
+   if (args.Length() < 1)
+       return except("You must provide one argument.");
+
+   Local<Object> target = args[0]->ToObject();
+
+   if(!Buffer::HasInstance(target))
+       return except("Argument should be a buffer object.");
+
+   char * input = Buffer::Data(target);
+   char output[32];
+
+   lyra2re_hash(input, output);
+
+   Buffer* buff = Buffer::New(output, 32);
+   return scope.Close(buff->handle_);
 }
 
 Handle<Value> scrypt(const Arguments& args) {
@@ -736,6 +757,7 @@ Handle<Value> jh(const Arguments& args) {
 void init(Handle<Object> exports) {
     exports->Set(String::NewSymbol("quark"), FunctionTemplate::New(quark)->GetFunction());
     exports->Set(String::NewSymbol("x11"), FunctionTemplate::New(x11)->GetFunction());
+    exports->Set(String::NewSymbol("lyra2re"), FunctionTemplate::New(lyra2re)->GetFunction());
     exports->Set(String::NewSymbol("scrypt"), FunctionTemplate::New(scrypt)->GetFunction());
     exports->Set(String::NewSymbol("scryptn"), FunctionTemplate::New(scryptn)->GetFunction());
     exports->Set(String::NewSymbol("scryptjane"), FunctionTemplate::New(scryptjane)->GetFunction());

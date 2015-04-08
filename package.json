@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/sigwo/node-multi-hashing.git"
+    "url": "https://github.com/Caberhagen/node-multi-hashing.git"
   },
   "dependencies": {
     "bindings": "*"

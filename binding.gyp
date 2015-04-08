@@ -5,6 +5,7 @@
             "sources": [
                 "multihashing.cc",
                 "scryptn.c",
+                "Lyra2RE.c",
                 "yescrypt/sha256_Y.c",
                 "yescrypt/yescrypt-best.c",
                 "yescrypt/yescryptcommon.c",
@@ -57,6 +58,8 @@
                 "crypto/hash.c",
                 "crypto/aesb.c",
                 "crypto/wild_keccak.cpp",
+                "crypto/Lyra2.c",
++                "crypto/Sponge.c",
             ],
             "include_dirs": [
                 "crypto",

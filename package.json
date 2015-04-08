@@ -29,6 +29,7 @@
     "yescrypt",
     "sha1",
     "neoscrypt",
+    "lyra2RE",
     "decrypt"
   ],
   "gypfile": true,

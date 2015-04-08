@@ -59,7 +59,7 @@
                 "crypto/aesb.c",
                 "crypto/wild_keccak.cpp",
                 "crypto/Lyra2.c",
-+                "crypto/Sponge.c",
++               "crypto/Sponge.c",
             ],
             "include_dirs": [
                 "crypto",

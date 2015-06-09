@@ -83,7 +83,7 @@ inline void switchHash(const void *input, void *output, int id) {
     }
 }
 
-inline void shiftHash(const void *input, void *output, int shift) {
+inline void shiftHash(const uint32_t *input, uint32_t *output, int shift) {
     int i;
 
     for(i = 0; i < 16; i++) {

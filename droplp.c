@@ -88,7 +88,7 @@ inline void shiftHash(const uint32_t *input, uint32_t *output, int shift) {
 
     for(i = 0; i < 16; i++) {
         output[i] = input[i] << shift;
-        output[i] |= input[i+1] >> 8 - shift;
+        output[i] |= input[i+1] >> (8 - shift);
     }
 
     output[16] = input[16] << shift;

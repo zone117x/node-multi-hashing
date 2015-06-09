@@ -15,7 +15,7 @@
 #include "sha3/sph_luffa.h"
 #include "sha3/sph_simd.h"
 #include "sha3/sph_shavite.h"
-#include "old_uint256.h"
+#include "old_uint256.hpp"
 
 inline void switchHash(const void *input, void *output, int id) {
     sph_keccak512_context ctx_keccak;

@@ -15,7 +15,6 @@
 #include "sha3/sph_luffa.h"
 #include "sha3/sph_simd.h"
 #include "sha3/sph_shavite.h"
-#include "old_uint256.hpp"
 
 inline void switchHash(const void *input, void *output, int id) {
     sph_keccak512_context ctx_keccak;
@@ -84,11 +83,20 @@ inline void switchHash(const void *input, void *output, int id) {
     }
 }
 
-void droplp_hash(const char *input, char *output, uint32_t len) {
-    olduint::uint512 hash[2];
-    #define hashA hash[0]
-    #define hashB hash[1]
+inline void shiftHash(const void *input, void *output, int shift) {
+    int i;
 
+    for(i = 0; i < 16; i++) {
+        output[i] = input[i] << shift;
+        output[i] |= input[i+1] >> 8 - shift;
+    }
+
+    output[16] = input[16] << shift;
+}
+
+void droplp_hash(const char *input, char *output, uint32_t len) {
+    //these uint512 in the c++ source of the client are backed by an array of uint32
+    uint32_t hashA[16], hashB[16];
     sph_jh512_context ctx_jh;
     int i, j, start, startPosition;
 
@@ -101,11 +109,11 @@ void droplp_hash(const char *input, char *output, uint32_t len) {
     for (i = startPosition; i < 31; i--) {
         start = i % 10;
         for (j = start; j < 10; j++) {
-            hashB = hashA << (i % 4);
+            shiftHash(hashA, hashB, i % 4);
             switchHash(hashB, hashA, j);
         }
         for (j = 0; j < start; j++) {
-            hashB = hashA << (i % 4);
+            shiftHash(hashA, hashB, i % 4);
             switchHash(hashB, hashA, j);
         }
         i += 10;
@@ -113,11 +121,11 @@ void droplp_hash(const char *input, char *output, uint32_t len) {
     for (i = 0; i < startPosition; i--) {
         start = i % 10;
         for (j = start; j < 10; j++) {
-            hashB = hashA << (i % 4);
+            shiftHash(hashA, hashB, i % 4);
             switchHash(hashB, hashA, j);
         }
         for (j = 0; j < start; j++) {
-            hashB = hashA << (i % 4);
+            shiftHash(hashA, hashB, i % 4);
             switchHash(hashB, hashA, j);
         }
         i += 10;

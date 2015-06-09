@@ -9,11 +9,6 @@
 
 #include <stdint.h>
 #include <stdio.h>
-#include <string>
-#include <string.h>
-#include <vector>
-
-#include "utilstrencodings.h"
 
 namespace olduint {
 
@@ -295,56 +290,6 @@ namespace olduint {
             return (!(a == b));
         }
 
-
-
-        std::string GetHex() const
-        {
-            char psz[sizeof(pn)*2 + 1];
-            for (unsigned int i = 0; i < sizeof(pn); i++)
-                sprintf(psz + i*2, "%02x", ((unsigned char*)pn)[sizeof(pn) - i - 1]);
-            return std::string(psz, psz + sizeof(pn)*2);
-        }
-
-        void SetHex(const char* psz)
-        {
-            memset(pn,0,sizeof(pn));
-
-            // skip leading spaces
-            while (isspace(*psz))
-                psz++;
-
-            // skip 0x
-            if (psz[0] == '0' && tolower(psz[1]) == 'x')
-                psz += 2;
-
-            // hex string to uint
-            const char* pbegin = psz;
-            while (HexDigit(*psz) != -1)
-                psz++;
-            psz--;
-            unsigned char* p1 = (unsigned char*)pn;
-            unsigned char* pend = p1 + WIDTH * 4;
-            while (psz >= pbegin && p1 < pend)
-            {
-                *p1 = HexDigit(*psz--);
-                if (psz >= pbegin)
-                {
-                    *p1 |= ((unsigned char)HexDigit(*psz--) << 4);
-                    p1++;
-                }
-            }
-        }
-
-        void SetHex(const std::string& str)
-        {
-            SetHex(str.c_str());
-        }
-
-        std::string ToString() const
-        {
-            return (GetHex());
-        }
-
         unsigned char* begin()
         {
             return (unsigned char*)&pn[0];
@@ -466,19 +411,6 @@ namespace olduint {
                 pn[i] = 0;
             return *this;
         }
-
-        explicit uint160(const std::string& str)
-        {
-            SetHex(str);
-        }
-
-        explicit uint160(const std::vector<unsigned char>& vch)
-        {
-            if (vch.size() == sizeof(pn))
-                memcpy(pn, &vch[0], sizeof(pn));
-            else
-                *this = 0;
-        }
     };
 
     inline bool operator==(const uint160& a, uint64_t b)                         { return (base_uint160)a == b; }
@@ -578,19 +510,6 @@ namespace olduint {
                 pn[i] = 0;
             return *this;
         }
-
-        explicit uint256(const std::string& str)
-        {
-            SetHex(str);
-        }
-
-        explicit uint256(const std::vector<unsigned char>& vch)
-        {
-            if (vch.size() == sizeof(pn))
-                memcpy(pn, &vch[0], sizeof(pn));
-            else
-                *this = 0;
-        }
     };
 
     inline bool operator==(const uint256& a, uint64_t b)                          { return (base_uint256)a == b; }
@@ -689,19 +608,6 @@ namespace olduint {
             for (int i = 2; i < WIDTH; i++)
                 pn[i] = 0;
             return *this;
-        }
-
-        explicit uint512(const std::string& str)
-        {
-            SetHex(str);
-        }
-
-        explicit uint512(const std::vector<unsigned char>& vch)
-        {
-            if (vch.size() == sizeof(pn))
-                memcpy(pn, &vch[0], sizeof(pn));
-            else
-                *this = 0;
         }
 
         uint256 trim256() const

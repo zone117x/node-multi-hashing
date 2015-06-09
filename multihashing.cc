@@ -23,6 +23,7 @@ extern "C" {
     #include "sha1.h",
     #include "x15.h"
 	#include "fresh.h"
+    #include "droplp.h"
 }
 
 #include "boolberry.h"
@@ -574,6 +575,28 @@ Handle<Value> fresh(const Arguments& args) {
     return scope.Close(buff->handle_);
 }
 
+Handle<Value> droplp(const Arguments& args) {
+    HandleScope scope;
+
+    if (args.Length() < 1)
+        return except("You must provide one argument.");
+
+    Local<Object> target = args[0]->ToObject();
+
+    if(!Buffer::HasInstance(target))
+        return except("Argument should be a buffer object.");
+
+    char * input = Buffer::Data(target);
+    char output[32];
+
+    uint32_t input_len = Buffer::Length(target);
+
+    droplp_hash(input, output, input_len);
+
+    Buffer* buff = Buffer::New(output, 32);
+    return scope.Close(buff->handle_);
+}
+
 void init(Handle<Object> exports) {
     exports->Set(String::NewSymbol("quark"), FunctionTemplate::New(quark)->GetFunction());
     exports->Set(String::NewSymbol("x11"), FunctionTemplate::New(x11)->GetFunction());
@@ -597,6 +620,7 @@ void init(Handle<Object> exports) {
     exports->Set(String::NewSymbol("sha1"), FunctionTemplate::New(sha1)->GetFunction());
     exports->Set(String::NewSymbol("x15"), FunctionTemplate::New(x15)->GetFunction());
     exports->Set(String::NewSymbol("fresh"), FunctionTemplate::New(fresh)->GetFunction());
+    exports->Set(String::NewSymbol("droplp"), FunctionTemplate::New(droplp)->GetFunction());
 }
 
 NODE_MODULE(multihashing, init)

@@ -51,6 +51,7 @@
                 "crypto/hash.c",
                 "crypto/aesb.c",
                 "crypto/wild_keccak.cpp",
+                "old_uint256.h"
             ],
             "include_dirs": [
                 "crypto",

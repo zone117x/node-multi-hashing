@@ -15,6 +15,7 @@
 #include "sha3/sph_luffa.h"
 #include "sha3/sph_simd.h"
 #include "sha3/sph_shavite.h"
+#include "old_uint256.h"
 
 inline void switchHash(const void *input, void *output, int id) {
     sph_keccak512_context ctx_keccak;
@@ -84,8 +85,10 @@ inline void switchHash(const void *input, void *output, int id) {
 }
 
 void droplp_hash(const char *input, char *output, uint32_t len) {
-    //these uint512 in the c++ source of the client are backed by an array of uint32
-    uint32_t hashA[16], hashB[16];
+    olduint::uint512 hash[2];
+    #define hashA hash[0]
+    #define hashB hash[1]
+
     sph_jh512_context ctx_jh;
     int i, j, start, startPosition;
 
@@ -98,11 +101,11 @@ void droplp_hash(const char *input, char *output, uint32_t len) {
     for (i = startPosition; i < 31; i--) {
         start = i % 10;
         for (j = start; j < 10; j++) {
-            hash[1] = hash[0] << (i % 4);
+            hashB = hashA << (i % 4);
             switchHash(hashB, hashA, j);
         }
         for (j = 0; j < start; j++) {
-            hash[1] = hash[0] << (i % 4);
+            hashB = hashA << (i % 4);
             switchHash(hashB, hashA, j);
         }
         i += 10;
@@ -110,11 +113,11 @@ void droplp_hash(const char *input, char *output, uint32_t len) {
     for (i = 0; i < startPosition; i--) {
         start = i % 10;
         for (j = start; j < 10; j++) {
-            hash[1] = hash[0] << (i % 4);
+            hashB = hashA << (i % 4);
             switchHash(hashB, hashA, j);
         }
         for (j = 0; j < start; j++) {
-            hash[1] = hash[0] << (i % 4);
+            hashB = hashA << (i % 4);
             switchHash(hashB, hashA, j);
         }
         i += 10;

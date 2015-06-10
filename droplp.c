@@ -84,14 +84,20 @@ inline void switchHash(const void *input, void *output, int id) {
 }
 
 inline void shiftHash(const uint32_t *input, uint32_t *output, int shift) {
+{
     int i;
-
-    for(i = 0; i < 16; i++) {
-        output[i] = input[i] << shift;
-        output[i] |= input[i+1] >> (8 - shift);
-    }
-
-    output[16] = input[16] << shift;
+	if (!shift) {
+		memcpy(output, input, 64);
+		return;
+	}
+	memset(output, 0, 64);
+	for (i = 0; i < 15; ++i) {
+		output[i + 1] |= (input[i] >> (32 - shift));
+		output[i] |= (input[i] << shift);
+	}
+	output[15] |= (input[15] << shift);
+	return;
+}
 }
 
 void droplp_hash(const char *input, char *output, uint32_t len) {
@@ -109,11 +115,11 @@ void droplp_hash(const char *input, char *output, uint32_t len) {
     for (i = startPosition; i < 31; i--) {
         start = i % 10;
         for (j = start; j < 10; j++) {
-            shiftHash(hashA, hashB, i % 4);
+            shiftHash(hashA, hashB, i & 3);
             switchHash(hashB, hashA, j);
         }
         for (j = 0; j < start; j++) {
-            shiftHash(hashA, hashB, i % 4);
+            shiftHash(hashA, hashB, i & 3);
             switchHash(hashB, hashA, j);
         }
         i += 10;
@@ -121,11 +127,11 @@ void droplp_hash(const char *input, char *output, uint32_t len) {
     for (i = 0; i < startPosition; i--) {
         start = i % 10;
         for (j = start; j < 10; j++) {
-            shiftHash(hashA, hashB, i % 4);
+            shiftHash(hashA, hashB, i & 3);
             switchHash(hashB, hashA, j);
         }
         for (j = 0; j < start; j++) {
-            shiftHash(hashA, hashB, i % 4);
+            shiftHash(hashA, hashB, i & 3);
             switchHash(hashB, hashA, j);
         }
         i += 10;

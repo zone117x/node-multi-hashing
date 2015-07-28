@@ -161,11 +161,11 @@ inline void absorbBlockBlake2Safe(uint64_t *state, const uint64_t *in) {
  * @param state     The current state of the sponge 
  * @param rowOut    Row to receive the data squeezed
  */
-inline void reducedSqueezeRow0(uint64_t* state, uint64_t* rowOut) {
-    uint64_t* ptrWord = rowOut + (N_COLS-1)*BLOCK_LEN_INT64; //In Lyra2: pointer to M[0][C-1]
+inline void reducedSqueezeRow0(uint64_t* state, uint64_t* rowOut, uint64_t nCols) {
+    uint64_t* ptrWord = rowOut + (nCols-1)*BLOCK_LEN_INT64; //In Lyra2: pointer to M[0][C-1]
     int i;
     //M[row][C-1-col] = H.reduced_squeeze()    
-    for (i = 0; i < N_COLS; i++) {
+    for (i = 0; i < nCols; i++) {
 	ptrWord[0] = state[0];
 	ptrWord[1] = state[1];
 	ptrWord[2] = state[2];
@@ -196,12 +196,12 @@ inline void reducedSqueezeRow0(uint64_t* state, uint64_t* rowOut) {
  * @param rowIn		Row to feed the sponge
  * @param rowOut	Row to receive the sponge's output
  */
-inline void reducedDuplexRow1(uint64_t *state, uint64_t *rowIn, uint64_t *rowOut) {
+inline void reducedDuplexRow1(uint64_t *state, uint64_t *rowIn, uint64_t *rowOut, uint64_t nCols) {
     uint64_t* ptrWordIn = rowIn;				//In Lyra2: pointer to prev
-    uint64_t* ptrWordOut = rowOut + (N_COLS-1)*BLOCK_LEN_INT64; //In Lyra2: pointer to row
+    uint64_t* ptrWordOut = rowOut + (nCols-1)*BLOCK_LEN_INT64; //In Lyra2: pointer to row
     int i;
 
-    for (i = 0; i < N_COLS; i++) {
+    for (i = 0; i < nCols; i++) {
 
 	//Absorbing "M[prev][col]"
 	state[0]  ^= (ptrWordIn[0]);
@@ -256,13 +256,13 @@ inline void reducedDuplexRow1(uint64_t *state, uint64_t *rowIn, uint64_t *rowOut
  * @param rowOut         Row receiving the output
  *
  */
-inline void reducedDuplexRowSetup(uint64_t *state, uint64_t *rowIn, uint64_t *rowInOut, uint64_t *rowOut) {
+inline void reducedDuplexRowSetup(uint64_t *state, uint64_t *rowIn, uint64_t *rowInOut, uint64_t *rowOut, uint64_t nCols) {
     uint64_t* ptrWordIn = rowIn;				//In Lyra2: pointer to prev
     uint64_t* ptrWordInOut = rowInOut;				//In Lyra2: pointer to row*
-    uint64_t* ptrWordOut = rowOut + (N_COLS-1)*BLOCK_LEN_INT64; //In Lyra2: pointer to row
+    uint64_t* ptrWordOut = rowOut + (nCols-1)*BLOCK_LEN_INT64; //In Lyra2: pointer to row
     int i;
 
-    for (i = 0; i < N_COLS; i++) {
+    for (i = 0; i < nCols; i++) {
 	//Absorbing "M[prev] [+] M[row*]"
 	state[0]  ^= (ptrWordIn[0]  + ptrWordInOut[0]);
 	state[1]  ^= (ptrWordIn[1]  + ptrWordInOut[1]);
@@ -330,13 +330,13 @@ inline void reducedDuplexRowSetup(uint64_t *state, uint64_t *rowIn, uint64_t *ro
  * @param rowOut         Row receiving the output
  *
  */
-inline void reducedDuplexRow(uint64_t *state, uint64_t *rowIn, uint64_t *rowInOut, uint64_t *rowOut) {
+inline void reducedDuplexRow(uint64_t *state, uint64_t *rowIn, uint64_t *rowInOut, uint64_t *rowOut, uint64_t nCols) {
     uint64_t* ptrWordInOut = rowInOut; //In Lyra2: pointer to row*
     uint64_t* ptrWordIn = rowIn; //In Lyra2: pointer to prev
     uint64_t* ptrWordOut = rowOut; //In Lyra2: pointer to row
     int i;
 
-    for (i = 0; i < N_COLS; i++) {
+    for (i = 0; i < nCols; i++) {
 
 	//Absorbing "M[prev] [+] M[row*]"
 	state[0]  ^= (ptrWordIn[0]  + ptrWordInOut[0]);

@@ -1,14 +1,14 @@
 {
   "name": "multi-hashing",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "main": "multihashing",
   "author": {
-    "name": "Matthew Little",
-    "email": "zone117x@gmail.com"
+    "name": "UNOMP",
+    "email": "steven@sigwo.com"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/zone117x/node-multi-hashing.git"
+    "url": "https://github.com/UNOMP/node-multi-hashing.git"
   },
   "dependencies": {
     "bindings": "*"
@@ -35,16 +35,10 @@
     "install": "node-gyp rebuild"
   },
   "gypfile": true,
-  "readme": "node-multi-hashing\n===============\n\n[![Build Status](https://travis-ci.org/zone117x/node-multi-hashing.png?branch=master)](https://travis-ci.org/zone117x/node-multi-hashing)\n\n[![NPM](https://nodei.co/npm/multi-hashing.png?downloads=true&stars=true)](https://nodei.co/npm/multi-hashing/)\n\nCryptocurrency hashing functions for node.js.\n\n\nAlgorithms\n----------\n* quark\n* x11\n* x13\n* x14\n* nist5\n* scrypt\n* scryptn\n* scryptjane\n* keccak\n* bcrypt\n* skein\n* groestl\n* blake\n* fugue\n* qubit\n* hefty1\n* shavite3\n* cryptonight\n* boolberry\n\nUsage\n-----\n\nInstall\n\n```bash\nnpm install multi-hashing\n```\n\nSo far this native Node.js addon can do the following hashing algos\n\n```javascript\nvar multiHashing = require('multi-hashing');\n\nvar algorithms = ['quark', 'x11', 'scrypt', 'scryptn', 'scryptjane', 'keccak', 'bcrypt', 'skein', 'blake'];\n\nvar data = new Buffer(\"7000000001e980924e4e1109230383e66d62945ff8e749903bea4336755c00000000000051928aff1b4d72416173a8c3948159a09a73ac3bb556aa6bfbcad1a85da7f4c1d13350531e24031b939b9e2b\", \"hex\");\n\nvar hashedData = algorithms.map(function(algo){\n    if (algo === 'scryptjane'){\n        //scryptjane needs block.nTime and nChainStartTime (found in coin source)\n        var yaCoinChainStartTime = 1367991200;\n        var nTime = Math.round(Date.now() / 1000);\n        return multiHashing[algo](data, nTime, yaCoinChainStartTime);\n    }\n    else{\n        return multiHashing[algo](data);\n    }\n});\n\n\nconsole.log(hashedData);\n//<SlowBuffer 0b de 16 ef 2d 92 e4 35 65 c6 6c d8 92 d9 66 b4 3d 65 ..... >\n\n\n```\n\nCredits\n-------\n* [NSA](http://www.nsa.gov/) and [NIST](http://www.nist.gov/) for creation or sponsoring creation of SHA2 and SHA3 algos\n* [Keccak](http://en.wikipedia.org/wiki/Keccak) - Guido Bertoni, Joan Daemen, Michaël Peeters, and Gilles Van Assche\n* [Skein](http://en.wikipedia.org/wiki/Skein_(hash_function)) - Bruce Schneier, Stefan Lucks, Niels Ferguson, Doug Whiting, Mihir Bellare, Tadayoshi Kohno, Jon Callas and Jesse Walker.\n* [BLAKE](http://en.wikipedia.org/wiki/BLAKE_(hash_function)) - Jean-Philippe Aumasson, Luca Henzen, Willi Meier, and Raphael C.-W. Phan\n* [Grøstl](http://en.wikipedia.org/wiki/Gr%C3%B8stl) - Praveen Gauravaram, Lars Knudsen, Krystian Matusiewicz, Florian Mendel, Christian Rechberger, Martin Schläffer, and Søren S. Thomsen\n* [JH](http://en.wikipedia.org/wiki/JH_(hash_function)) - Hongjun Wu\n* [Fugue](http://en.wikipedia.org/wiki/Fugue_(hash_function)) - Shai Halevi, William E. Hall, and Charanjit S. Jutla\n* [scrypt](http://en.wikipedia.org/wiki/Scrypt) - Colin Percival\n* [bcrypt](http://en.wikipedia.org/wiki/Bcrypt) - Niels Provos and David Mazières\n* [X11](http://www.darkcoin.io/), [Hefty1](http://heavycoin.github.io/about.html), [Quark](http://www.qrk.cc/) creators (they just mixed together a bunch of the above algos)\n",
   "readmeFilename": "README.md",
-  "description": "node-multi-hashing ===============",
+  "description": "node-multi-hashing",
   "bugs": {
-    "url": "https://github.com/zone117x/node-multi-hashing/issues"
+    "url": "https://github.com/UNOMP/node-multi-hashing/issues"
   },
-  "_id": "multi-hashing@0.0.9",
-  "dist": {
-    "shasum": "7118157cdf3924f7313d43732064c70549e19123"
-  },
-  "_resolved": "git://github.com/zone117x/node-multi-hashing.git#73996fe77104108f2d66ef750b3e1bce42e4d8f0",
-  "_from": "multi-hashing@git://github.com/zone117x/node-multi-hashing.git"
+  "_id": "multi-hashing@0.1.0",
 }

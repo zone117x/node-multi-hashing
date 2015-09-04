@@ -39,6 +39,6 @@
   "description": "node-multi-hashing",
   "bugs": {
     "url": "https://github.com/UNOMP/node-multi-hashing/issues"
-  },
+  }
   "_id": "multi-hashing@0.1.0",
 }

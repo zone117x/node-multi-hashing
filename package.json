@@ -32,7 +32,7 @@
     "decrypt"
   ],
     "scripts": {
-    "install": "node-gyp configure build"
+    "install": "node-gyp configure"
   },
   "gypfile": true,
   "readmeFilename": "README.md",

@@ -1,5 +1,5 @@
 {
-  "name": "multi-hashing",
+  "name": "unomp-multi-hashing",
   "version": "0.1.0",
   "main": "multihashing",
   "author": {
@@ -32,7 +32,7 @@
     "decrypt"
   ],
     "scripts": {
-    "install": "node-gyp configure build"
+    "install": "node-gyp rebuild"
   },
   "gypfile": true,
   "readmeFilename": "README.md",

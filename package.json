@@ -8,7 +8,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/zone117x/node-multi-hashing.git"
+        "url": "https://github.com/altpooler/node-multi-hashing-yescrypt.git"
     },
     "dependencies" : {
         "bindings" : "*"
@@ -17,6 +17,7 @@
         "scrypt",
         "scryptjane",
         "script-n",
+        "yescrypt",
         "x11",
         "quark",
         "keccak_hash",

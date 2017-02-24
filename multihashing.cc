@@ -9,6 +9,8 @@ extern "C" {
     #include "quark.h"
     #include "scryptjane.h"
     #include "scryptn.h"
+    #include "yescrypt/yescrypt.h"
+    #include "yescrypt/sha256_Y.h"
     #include "skein.h"
     #include "x11.h"
     #include "groestl.h"
@@ -168,6 +170,28 @@ Handle<Value> scryptjane(const Arguments& args) {
 
     Buffer* buff = Buffer::New(output, 32);
     return scope.Close(buff->handle_);
+}
+
+Handle<Value> yescrypt(const Arguments& args) {
+   HandleScope scope;
+
+    if (args.Length() < 1)
+        return except("You must provide one argument.");
+
+   Local<Object> target = args[0]->ToObject();
+
+   if(!Buffer::HasInstance(target))
+       return except("Argument should be a buffer object.");
+    
+   
+   char * input = Buffer::Data(target);
+   char output[32];
+
+   
+   yescrypt_hash(input, output);
+
+   Buffer* buff = Buffer::New(output, 32);
+   return scope.Close(buff->handle_);
 }
 
 Handle<Value> keccak(const Arguments& args) {
@@ -580,6 +604,7 @@ void init(Handle<Object> exports) {
     exports->Set(String::NewSymbol("scrypt"), FunctionTemplate::New(scrypt)->GetFunction());
     exports->Set(String::NewSymbol("scryptn"), FunctionTemplate::New(scryptn)->GetFunction());
     exports->Set(String::NewSymbol("scryptjane"), FunctionTemplate::New(scryptjane)->GetFunction());
+    exports->Set(String::NewSymbol("yescrypt"), FunctionTemplate::New(yescrypt)->GetFunction());
     exports->Set(String::NewSymbol("keccak"), FunctionTemplate::New(keccak)->GetFunction());
     exports->Set(String::NewSymbol("bcrypt"), FunctionTemplate::New(bcrypt)->GetFunction());
     exports->Set(String::NewSymbol("skein"), FunctionTemplate::New(skein)->GetFunction());

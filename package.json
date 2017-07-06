@@ -10,12 +10,13 @@
         "type": "git",
         "url": "https://github.com/zone117x/node-multi-hashing.git"
     },
-    "dependencies" : {
-        "bindings" : "*"
+    "dependencies": {
+        "bindings": "^1.2.1",
+        "nan": "^2.6.2"
     },
     "keywords": [
         "scrypt",
-        "scryptjane",
+        //"scryptjane",
         "script-n",
         "x11",
         "quark",

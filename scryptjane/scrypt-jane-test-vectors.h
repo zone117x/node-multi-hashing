@@ -7,7 +7,7 @@ static const scrypt_test_setting post_settings[] = {
 	{"", "", 3, 0, 0},
 	{"password", "NaCl", 9, 3, 4},
 	{0}
-};
+}; // TODO: line 9 {0} throws warning about missing salt initilizer
 
 #if defined(SCRYPT_SHA256)
 	#if defined(SCRYPT_SALSA)

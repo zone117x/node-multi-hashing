@@ -102,7 +102,6 @@ NAN_METHOD(scrypt) {
 
 
 NAN_METHOD(scryptn) {
-    printf("Running scryptn call");
 
    if (info.Length() < 2)
        return THROW_ERROR_EXCEPTION("You must provide buffer to hash and N factor.");
@@ -124,6 +123,7 @@ NAN_METHOD(scryptn) {
    unsigned int N = 1 << nFactor;
 
    scrypt_N_R_1_256(input, output, N, 1, input_len); //hardcode for now to R=1 for now
+   printf("Made it past most of the stuff\n");
 
    info.GetReturnValue().Set(Nan::NewBuffer(output, 32).ToLocalChecked());
 }

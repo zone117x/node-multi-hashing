@@ -102,17 +102,22 @@ NAN_METHOD(scrypt) {
 
 
 NAN_METHOD(scryptn) {
+    printf("Running scryptn call");
 
    if (info.Length() < 2)
        return THROW_ERROR_EXCEPTION("You must provide buffer to hash and N factor.");
 
    Local<Object> target = Nan::To<Object>(info[0]).ToLocalChecked();
 
+   printf(target);
+
    if(!Buffer::HasInstance(target))
        return THROW_ERROR_EXCEPTION("Argument should be a buffer object.");
 
    Local<Number> num = Nan::To<Number>(info[1]).ToLocalChecked();
    unsigned int nFactor = num->Value();
+
+   printf(nFactor);
 
    char * input = Buffer::Data(target);
    char output[32];
@@ -123,6 +128,8 @@ NAN_METHOD(scryptn) {
    unsigned int N = 1 << nFactor;
 
    scrypt_N_R_1_256(input, output, N, 1, input_len); //hardcode for now to R=1 for now
+
+   printf(output);
 
 
    info.GetReturnValue().Set(Nan::NewBuffer(output, 32).ToLocalChecked());

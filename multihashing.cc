@@ -109,8 +109,6 @@ NAN_METHOD(scryptn) {
 
    Local<Object> target = Nan::To<Object>(info[0]).ToLocalChecked();
 
-   printf(target);
-
    if(!Buffer::HasInstance(target))
        return THROW_ERROR_EXCEPTION("Argument should be a buffer object.");
 
@@ -130,7 +128,6 @@ NAN_METHOD(scryptn) {
    scrypt_N_R_1_256(input, output, N, 1, input_len); //hardcode for now to R=1 for now
 
    printf(output);
-
 
    info.GetReturnValue().Set(Nan::NewBuffer(output, 32).ToLocalChecked());
 }

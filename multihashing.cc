@@ -115,8 +115,6 @@ NAN_METHOD(scryptn) {
    Local<Number> num = Nan::To<Number>(info[1]).ToLocalChecked();
    unsigned int nFactor = num->Value();
 
-   printf(nFactor);
-
    char * input = Buffer::Data(target);
    char output[32];
 
@@ -126,8 +124,6 @@ NAN_METHOD(scryptn) {
    unsigned int N = 1 << nFactor;
 
    scrypt_N_R_1_256(input, output, N, 1, input_len); //hardcode for now to R=1 for now
-
-   printf(output);
 
    info.GetReturnValue().Set(Nan::NewBuffer(output, 32).ToLocalChecked());
 }

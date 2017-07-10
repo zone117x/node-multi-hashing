@@ -106,7 +106,7 @@ NAN_METHOD(scryptn) {
    if (info.Length() < 2)
        return THROW_ERROR_EXCEPTION("You must provide buffer to hash and N factor.");
 
-   Local<Object> target = info[0]->ToObject();
+   Local<Object> target = Nan::To<Object>(info[0]).ToLocalChecked();
 
    if(!Buffer::HasInstance(target))
        return THROW_ERROR_EXCEPTION("Argument should be a buffer object.");

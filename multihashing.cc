@@ -114,10 +114,10 @@ NAN_METHOD(scryptn) {
    Local<Number> num = Nan::To<Number>(info[1]).ToLocalChecked();
    unsigned int nFactor = num->Value();
 
-   char * input = Buffer::Data(target);
+   char* input = Buffer::Data(target);
    char output[32];
 
-   uint32_t input_len = Buffer::Length(target);
+   uint32_t input_len = Nan::To<uint32_t>(Buffer::Length(target)).ToLocalChecked();
 
    //unsigned int N = 1 << (getNfactor(input) + 1);
    unsigned int N = 1 << nFactor;
@@ -532,29 +532,30 @@ NAN_METHOD(fresh) {
     info.GetReturnValue().Set(Nan::NewBuffer(output, 32).ToLocalChecked());
 }
 
-void init(Handle<Object> exports) {
-    exports->Set(Nan::New<String>("quark").ToLocalChecked(), Nan::New<FunctionTemplate>(quark)->GetFunction());
-    exports->Set(Nan::New<String>("x11").ToLocalChecked(), Nan::New<FunctionTemplate>(x11)->GetFunction());
-    exports->Set(Nan::New<String>("scrypt").ToLocalChecked(), Nan::New<FunctionTemplate>(scrypt)->GetFunction());
-    exports->Set(Nan::New<String>("scryptn").ToLocalChecked(), Nan::New<FunctionTemplate>(scryptn)->GetFunction());
-    //exports->Set(Nan::New<String>("scryptjane").ToLocalChecked(), Nan::New<FunctionTemplate>(scryptjane)->GetFunction());
-    exports->Set(Nan::New<String>("keccak").ToLocalChecked(), Nan::New<FunctionTemplate>(keccak)->GetFunction());
-    exports->Set(Nan::New<String>("bcrypt").ToLocalChecked(), Nan::New<FunctionTemplate>(bcrypt)->GetFunction());
-    exports->Set(Nan::New<String>("skein").ToLocalChecked(), Nan::New<FunctionTemplate>(skein)->GetFunction());
-    exports->Set(Nan::New<String>("groestl").ToLocalChecked(), Nan::New<FunctionTemplate>(groestl)->GetFunction());
-    exports->Set(Nan::New<String>("groestlmyriad").ToLocalChecked(), Nan::New<FunctionTemplate>(groestlmyriad)->GetFunction());
-    exports->Set(Nan::New<String>("blake").ToLocalChecked(), Nan::New<FunctionTemplate>(blake)->GetFunction());
-    exports->Set(Nan::New<String>("fugue").ToLocalChecked(), Nan::New<FunctionTemplate>(fugue)->GetFunction());
-    exports->Set(Nan::New<String>("qubit").ToLocalChecked(), Nan::New<FunctionTemplate>(qubit)->GetFunction());
-    exports->Set(Nan::New<String>("hefty1").ToLocalChecked(), Nan::New<FunctionTemplate>(hefty1)->GetFunction());
-    exports->Set(Nan::New<String>("shavite3").ToLocalChecked(), Nan::New<FunctionTemplate>(shavite3)->GetFunction());
-    exports->Set(Nan::New<String>("cryptonight").ToLocalChecked(), Nan::New<FunctionTemplate>(cryptonight)->GetFunction());
-    exports->Set(Nan::New<String>("x13").ToLocalChecked(), Nan::New<FunctionTemplate>(x13)->GetFunction());
-    exports->Set(Nan::New<String>("boolberry").ToLocalChecked(), Nan::New<FunctionTemplate>(boolberry)->GetFunction());
-    exports->Set(Nan::New<String>("nist5").ToLocalChecked(), Nan::New<FunctionTemplate>(nist5)->GetFunction());
-    exports->Set(Nan::New<String>("sha1").ToLocalChecked(), Nan::New<FunctionTemplate>(sha1)->GetFunction());
-    exports->Set(Nan::New<String>("x15").ToLocalChecked(), Nan::New<FunctionTemplate>(x15)->GetFunction());
-    exports->Set(Nan::New<String>("fresh").ToLocalChecked(), Nan::New<FunctionTemplate>(fresh)->GetFunction());
+NAN_MODULE_INIT(init) {
+    Nan::Set(target, Nan::New("nothing").ToLocalChecked(),Nan::GetFunction(Nan::New<FunctionTemplate>(nothing)).ToLocalChecked());
+    Nan::Set(target, Nan::New("quark").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(quark)).ToLocalChecked());
+    Nan::Set(target, Nan::New("x11").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(x11).ToLocalChecked());
+    Nan::Set(target, Nan::New("scrypt").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(scrypt).ToLocalChecked());
+    Nan::Set(target, Nan::New("scryptn").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(scryptn).ToLocalChecked());
+    //Nan::Set(target, Nan::New("scryptjane").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(scryptjane).ToLocalChecked());
+    Nan::Set(target, Nan::New("keccak").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(keccak).ToLocalChecked());
+    Nan::Set(target, Nan::New("bcrypt").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(bcrypt).ToLocalChecked());
+    Nan::Set(target, Nan::New("skein").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(skein).ToLocalChecked());
+    Nan::Set(target, Nan::New("groestl").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(groestl).ToLocalChecked());
+    Nan::Set(target, Nan::New("groestlmyriad").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(groestlmyriad).ToLocalChecked());
+    Nan::Set(target, Nan::New("blake").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(blake).ToLocalChecked());
+    Nan::Set(target, Nan::New("fugue").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(fugue).ToLocalChecked());
+    Nan::Set(target, Nan::New("qubit").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(qubit).ToLocalChecked());
+    Nan::Set(target, Nan::New("hefty1").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(hefty1).ToLocalChecked());
+    Nan::Set(target, Nan::New("shavite3").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(shavite3).ToLocalChecked());
+    Nan::Set(target, Nan::New("cryptonight").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(cryptonight).ToLocalChecked());
+    Nan::Set(target, Nan::New("x13").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(x13).ToLocalChecked());
+    Nan::Set(target, Nan::New("boolberry").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(boolberry).ToLocalChecked());
+    Nan::Set(target, Nan::New("nist5").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(nist5).ToLocalChecked());
+    Nan::Set(target, Nan::New("sha1").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(sha1).ToLocalChecked());
+    Nan::Set(target, Nan::New("x15").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(x15).ToLocalChecked());
+    Nan::Set(target, Nan::New("fresh").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(fresh).ToLocalChecked());
 }
 
 NODE_MODULE(multihashing, init)

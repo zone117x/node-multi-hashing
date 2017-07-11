@@ -258,5 +258,6 @@ void scrypt_N_R_1_256(const char* input, char* output, uint32_t N, uint32_t R, u
 	scrypt_N_R_1_256_sp(input, output, scratchpad, N, R, len);
 	printf("About to FREE SCRATCHPAD!!!!\n");
     free(scratchpad);
+	printf("Oh Snap, we free scratchpad!\n");
 }
 

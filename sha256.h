@@ -326,7 +326,6 @@ HMAC_SHA256_Init(HMAC_SHA256_CTX * ctx, const void * _K, size_t Klen)
 	const unsigned char * K = _K;
 	size_t i;
 	
-	printf("Start HMAC_SHA256_Init");
 	/* If Klen > 64, the key is really SHA256(K). */
 	if (Klen > 64) {
 		SHA256_Init(&ctx->ictx);
@@ -351,17 +350,14 @@ HMAC_SHA256_Init(HMAC_SHA256_CTX * ctx, const void * _K, size_t Klen)
 	SHA256_Update(&ctx->octx, pad, 64);
 
 	
-	printf("Start HMAC_SHA256_Init last memset");
 	/* Clean the stack. */
 	memset(khash, 0, 32);
-	printf("end HMAC_SHA256_Init");
 }
 
 /* Add bytes to the HMAC-SHA256 operation. */
 static void
 HMAC_SHA256_Update(HMAC_SHA256_CTX * ctx, const void *in, size_t len)
 {
-	printf("Start HMAC_SHA256_Update no end");
 	/* Feed data to the inner SHA256 operation. */
 	SHA256_Update(&ctx->ictx, in, len);
 }
@@ -371,7 +367,6 @@ static void
 HMAC_SHA256_Final(unsigned char digest[32], HMAC_SHA256_CTX * ctx)
 {
 	unsigned char ihash[32];
-	printf("Start HMAC_SHA256_Final");
 
 	/* Finish the inner SHA256 operation. */
 	SHA256_Final(ihash, &ctx->ictx);
@@ -382,10 +377,8 @@ HMAC_SHA256_Final(unsigned char digest[32], HMAC_SHA256_CTX * ctx)
 	/* Finish the outer SHA256 operation. */
 	SHA256_Final(digest, &ctx->octx);
 
-	printf("Start HMAC_SHA256_Final memset");
 	/* Clean the stack. */
 	memset(ihash, 0, 32);
-	printf("END HMAC_SHA256_Final");
 }
 
 /**
@@ -405,8 +398,6 @@ PBKDF2_SHA256(const uint8_t * passwd, size_t passwdlen, const uint8_t * salt,
 	uint64_t j;
 	int k;
 	size_t clen;
-
-	printf("Start PBKDF2_SHA256");
 
 	/* Compute HMAC state after processing P and S. */
 	HMAC_SHA256_Init(&PShctx, passwd, passwdlen);
@@ -443,9 +434,7 @@ PBKDF2_SHA256(const uint8_t * passwd, size_t passwdlen, const uint8_t * salt,
 		memcpy(&buf[i * 32], T, clen);
 	}
 
-	printf("Start PBKDF2_SHA256 memset call");
 	/* Clean PShctx, since we never called _Final on it. */
 	memset(&PShctx, 0, sizeof(HMAC_SHA256_CTX));
-	printf("END PBKDF2_SHA256");
 }
 #endif

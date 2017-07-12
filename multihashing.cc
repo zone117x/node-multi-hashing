@@ -79,7 +79,7 @@ NAN_METHOD(scrypt) {
    if (info.Length() < 3)
        return THROW_ERROR_EXCEPTION("You must provide buffer to hash, N value, and R value");
 
-   Local<Object> target = info[0]->ToObject();
+   Local<Object> target = Nan::To<Object>(info[0]).ToLocalChecked();
 
    if(!Buffer::HasInstance(target))
        return THROW_ERROR_EXCEPTION("Argument should be a buffer object.");
@@ -90,7 +90,7 @@ NAN_METHOD(scrypt) {
    unsigned int rValue = numr->Value();
    
    char * input = Buffer::Data(target);
-   char output[32];
+   char *output = (char*) malloc(sizeof(char) * 32);
 
    uint32_t input_len = Buffer::Length(target);
    

@@ -115,15 +115,14 @@ NAN_METHOD(scryptn) {
    unsigned int nFactor = num->Value();
 
    char* input = Buffer::Data(target);
-   char output[32];
+   //char output[32]; // Node tries to free this later on but can't and causes a malloc error
+   char *output = (char*) malloc(sizeof(char) * 32);
 
    uint32_t input_len = Buffer::Length(target);
 
    //unsigned int N = 1 << (getNfactor(input) + 1);
    unsigned int N = 1 << nFactor;
-
    scrypt_N_R_1_256(input, output, N, 1, input_len); //hardcode for now to R=1 for now
-   printf("Made it past most of the stuff\n");
 
    info.GetReturnValue().Set(Nan::NewBuffer(output, 32).ToLocalChecked());
 }

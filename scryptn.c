@@ -30,6 +30,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
 
 #include "scryptn.h"
 #include "sha256.h"
@@ -248,16 +249,11 @@ void scrypt_N_R_1_256_sp(const char* input, char* output, char* scratchpad, uint
 void scrypt_N_R_1_256(const char* input, char* output, uint32_t N, uint32_t R, uint32_t len)
 {
 	//char scratchpad[131583];
-    //char *scratchpad;
-	void *scratchpad;
+    char *scratchpad;
     
     // align on 4 byte boundary
-    //scratchpad = (char*)malloc(128*N*R + (128*R)+(256*R)+64+64);
-	scratchpad = (void*)malloc(128*N*R + (128*R)+(256*R)+64+64);
-	printf("Moving on in to that scrypt_n_r_1_256_sp shit\n");
+    scratchpad = (char*)malloc(128*N*R + (128*R)+(256*R)+64+64);
 	scrypt_N_R_1_256_sp(input, output, scratchpad, N, R, len);
-	printf("About to FREE SCRATCHPAD!!!!\n");
     free(scratchpad);
-	printf("Oh Snap, we free scratchpad!\n");
 }
 

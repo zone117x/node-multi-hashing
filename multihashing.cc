@@ -208,7 +208,7 @@ NAN_METHOD(skein) {
     if(!Buffer::HasInstance(target))
         return THROW_ERROR_EXCEPTION("Argument should be a buffer object.");
 
-    char  *input = Buffer::Data(target);
+    char *input = Buffer::Data(target);
     char *output = (char*) malloc(sizeof(char) * 32);
 
     uint32_t input_len = Buffer::Length(target);
@@ -224,13 +224,13 @@ NAN_METHOD(groestl) {
     if (info.Length() < 1)
         return THROW_ERROR_EXCEPTION("You must provide one argument.");
 
-    Local<Object> target = info[0]->ToObject();
+    Local<Object> target = Nan::To<Object>(info[0]).ToLocalChecked();
 
     if(!Buffer::HasInstance(target))
         return THROW_ERROR_EXCEPTION("Argument should be a buffer object.");
 
-    char * input = Buffer::Data(target);
-    char output[32];
+    char *input = Buffer::Data(target);
+    char *output = (char*) malloc(sizeof(char) * 32);
     
     uint32_t input_len = Buffer::Length(target);
 

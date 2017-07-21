@@ -8,8 +8,7 @@ extern "C" {
     #include "bcrypt.h"
     #include "keccak.h"
     #include "quark.h"
-    #include "scryptjane.h"
-    #include "scryptn.h"
+      #include "scryptn.h"
     #include "skein.h"
     #include "x11.h"
     #include "groestl.h"
@@ -61,7 +60,7 @@ NAN_METHOD(quark)
 		else
 		{
 			char * input = Buffer::Data(target);
-			char output[32];
+			char* output = (char*)malloc(32);
 
 			uint32_t input_len = Buffer::Length(target);
 
@@ -96,7 +95,7 @@ NAN_METHOD(x11)
 		else
 		{
 			char * input = Buffer::Data(target);
-			char output[32];
+			char* output = (char*)malloc(32);
 
 			uint32_t input_len = Buffer::Length(target);
 
@@ -134,7 +133,7 @@ NAN_METHOD(scryptHash)
 			unsigned int rValue = numr->Value();
 
 			char * input = Buffer::Data(target);
-			char output[32];
+			char* output = (char*)malloc(32);
 
 			uint32_t input_len = Buffer::Length(target);
 
@@ -172,7 +171,7 @@ NAN_METHOD(scryptn)
 
 
 			char * input = Buffer::Data(target);
-			char output[32];
+			char* output = (char*)malloc(32);
 
 			uint32_t input_len = Buffer::Length(target);
 			unsigned int N = 1 << nFactor;
@@ -186,7 +185,7 @@ NAN_METHOD(scryptn)
 
 }
 
-
+/*
 NAN_METHOD(scryptjane)
 {
 	Isolate* isolate = info.GetIsolate();
@@ -219,7 +218,7 @@ NAN_METHOD(scryptjane)
 
 
 			char * input = Buffer::Data(target);
-			char output[32];
+			char* output = (char*)malloc(32);
 
 			uint32_t input_len = Buffer::Length(target);
 
@@ -233,7 +232,7 @@ NAN_METHOD(scryptjane)
 
 }
 
-
+*/
 
 
 NAN_METHOD(keccak)
@@ -255,7 +254,7 @@ NAN_METHOD(keccak)
 		else
 		{
 			char * input = Buffer::Data(target);
-			char output[32];
+			char* output = (char*)malloc(32);
 
 			uint32_t input_len = Buffer::Length(target);
 
@@ -288,7 +287,7 @@ NAN_METHOD(bcrypt)
 		else
 		{
 			char * input = Buffer::Data(target);
-			char output[32];
+			char* output = (char*)malloc(32);
 
 			uint32_t input_len = Buffer::Length(target);
 
@@ -321,7 +320,7 @@ NAN_METHOD(skein)
 		else
 		{
 			char * input = Buffer::Data(target);
-			char output[32];
+			char* output = (char*)malloc(32);
 
 			uint32_t input_len = Buffer::Length(target);
 
@@ -355,7 +354,7 @@ NAN_METHOD(groestl)
 		else
 		{
 			char * input = Buffer::Data(target);
-			char output[32];
+			char* output = (char*)malloc(32);
 
 			uint32_t input_len = Buffer::Length(target);
 
@@ -390,7 +389,7 @@ NAN_METHOD(groestlmyriad)
 		else
 		{
 			char * input = Buffer::Data(target);
-			char output[32];
+			char* output = (char*)malloc(32);
 
 			uint32_t input_len = Buffer::Length(target);
 
@@ -427,7 +426,7 @@ NAN_METHOD(blake)
 		else
 		{
 			char * input = Buffer::Data(target);
-			char output[32];
+			char* output = (char*)malloc(32);
 
 			uint32_t input_len = Buffer::Length(target);
 
@@ -460,7 +459,7 @@ NAN_METHOD(fugue)
 		else
 		{
 			char * input = Buffer::Data(target);
-			char output[32];
+			char* output = (char*)malloc(32);
 
 			uint32_t input_len = Buffer::Length(target);
 
@@ -493,7 +492,7 @@ NAN_METHOD(qubit)
 		else
 		{
 			char * input = Buffer::Data(target);
-			char output[32];
+			char* output = (char*)malloc(32);
 
 			uint32_t input_len = Buffer::Length(target);
 
@@ -527,7 +526,7 @@ NAN_METHOD(hefty1)
 		else
 		{
 			char * input = Buffer::Data(target);
-			char output[32];
+			char* output = (char*)malloc(32);
 
 			uint32_t input_len = Buffer::Length(target);
 
@@ -560,7 +559,7 @@ NAN_METHOD(shavite3)
 		else
 		{
 			char * input = Buffer::Data(target);
-			char output[32];
+			char* output = (char*)malloc(32);
 
 			uint32_t input_len = Buffer::Length(target);
 
@@ -605,7 +604,7 @@ NAN_METHOD(cryptonight)
 			}
 
 			char * input = Buffer::Data(target);
-			char output[32];
+			char* output = (char*)malloc(32);
 
 			uint32_t input_len = Buffer::Length(target);
 
@@ -641,7 +640,7 @@ NAN_METHOD(x13)
 		else
 		{
 			char * input = Buffer::Data(target);
-			char output[32];
+			char* output = (char*)malloc(32);
 
 			uint32_t input_len = Buffer::Length(target);
 
@@ -696,7 +695,7 @@ NAN_METHOD(boolberry)
 
 			char * input = Buffer::Data(target);
 			char * scratchpad = Buffer::Data(target_spad);
-			char output[32];
+			char* output = (char*)malloc(32);
 
 			uint32_t input_len = Buffer::Length(target);
 			uint64_t spad_len = Buffer::Length(target_spad);
@@ -730,7 +729,7 @@ NAN_METHOD(nist5)
 		else
 		{
 			char * input = Buffer::Data(target);
-			char output[32];
+			char* output = (char*)malloc(32);
 
 			uint32_t input_len = Buffer::Length(target);
 
@@ -766,7 +765,7 @@ NAN_METHOD(sha1)
 		else
 		{
 			char * input = Buffer::Data(target);
-			char output[32];
+			char* output = (char*)malloc(32);
 
 			uint32_t input_len = Buffer::Length(target);
 
@@ -800,7 +799,7 @@ NAN_METHOD(x15)
 		else
 		{
 			char * input = Buffer::Data(target);
-			char output[32];
+			char* output = (char*)malloc(32);
 
 			uint32_t input_len = Buffer::Length(target);
 
@@ -834,7 +833,7 @@ NAN_METHOD(fresh)
 		else
 		{
 			char * input = Buffer::Data(target);
-			char output[32];
+			char* output = (char*)malloc(32);
 
 			uint32_t input_len = Buffer::Length(target);
 
@@ -857,7 +856,7 @@ void init(Local<Object> exports) {
     exports->Set(String::NewFromUtf8(isolate,"x11"), Nan::GetFunction(Nan::New<FunctionTemplate>(x11)).ToLocalChecked());
     exports->Set(String::NewFromUtf8(isolate,"scrypt"), Nan::GetFunction(Nan::New<FunctionTemplate>(scryptHash)).ToLocalChecked());
     exports->Set(String::NewFromUtf8(isolate,"scryptn"), Nan::GetFunction(Nan::New<FunctionTemplate>(scryptn)).ToLocalChecked());
-    exports->Set(String::NewFromUtf8(isolate,"scryptjane"), Nan::GetFunction(Nan::New<FunctionTemplate>(scryptjane)).ToLocalChecked());
+   // exports->Set(String::NewFromUtf8(isolate,"scryptjane"), Nan::GetFunction(Nan::New<FunctionTemplate>(scryptjane)).ToLocalChecked());
     exports->Set(String::NewFromUtf8(isolate,"keccak"), Nan::GetFunction(Nan::New<FunctionTemplate>(keccak)).ToLocalChecked());
     exports->Set(String::NewFromUtf8(isolate,"bcrypt"), Nan::GetFunction(Nan::New<FunctionTemplate>(bcrypt)).ToLocalChecked());
     exports->Set(String::NewFromUtf8(isolate,"skein"), Nan::GetFunction(Nan::New<FunctionTemplate>(skein)).ToLocalChecked());

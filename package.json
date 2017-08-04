@@ -1,14 +1,14 @@
 {
-  "name": "multi-hashing",
-  "version": "0.0.9",
+  "name": "node-multi-hashing",
+  "version": "0.0.1",
   "main": "multihashing",
   "author": {
-    "name": "Matthew Little",
-    "email": "zone117x@gmail.com"
+    "name": "Ayoub Serti",
+    "email": "ayb.serti@gmail.com"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/zone117x/node-multi-hashing.git"
+    "url": "https://github.com/ayoubserti/node-multi-hashing.git"
   },
   "dependencies": {
     "bindings": "*",

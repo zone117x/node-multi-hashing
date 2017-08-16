@@ -8,7 +8,7 @@ extern "C" {
     #include "bcrypt.h"
     #include "keccak.h"
     #include "quark.h"
-    //#include "scryptjane.h"
+    #include "scryptjane.h"
     #include "scryptn.h"
     #include "skein.h"
     #include "x11.h"
@@ -127,7 +127,7 @@ NAN_METHOD(scryptn) {
    info.GetReturnValue().Set(Nan::NewBuffer(output, 32).ToLocalChecked());
 }
 
-/*NAN_METHOD(scryptjane) {
+NAN_METHOD(scryptjane) {
 
     if (info.Length() < 5)
         return THROW_ERROR_EXCEPTION("You must provide two argument: buffer, timestamp as number, and nChainStarTime as number, nMin, and nMax");
@@ -150,14 +150,14 @@ NAN_METHOD(scryptn) {
     int nMax = num4->Value();
 
     char * input = Buffer::Data(target);
-    char output[32];
+    char *output = (char*) malloc(sizeof(char) * 32);
 
     uint32_t input_len = Buffer::Length(target);
 
     scryptjane_hash(input, input_len, (uint32_t *)output, GetNfactorJane(timestamp, nChainStartTime, nMin, nMax));
 
     info.GetReturnValue().Set(Nan::NewBuffer(output, 32).ToLocalChecked());
-}*/
+}
 
 NAN_METHOD(keccak) {
 
@@ -536,7 +536,7 @@ NAN_MODULE_INIT(init) {
     Nan::Set(target, Nan::New("x11").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(x11)).ToLocalChecked());
     Nan::Set(target, Nan::New("scrypt").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(scrypt)).ToLocalChecked());
     Nan::Set(target, Nan::New("scryptn").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(scryptn)).ToLocalChecked());
-    //Nan::Set(target, Nan::New("scryptjane").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(scryptjane)).ToLocalChecked());
+    Nan::Set(target, Nan::New("scryptjane").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(scryptjane)).ToLocalChecked());
     Nan::Set(target, Nan::New("keccak").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(keccak)).ToLocalChecked());
     Nan::Set(target, Nan::New("bcrypt").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(bcrypt)).ToLocalChecked());
     Nan::Set(target, Nan::New("skein").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(skein)).ToLocalChecked());

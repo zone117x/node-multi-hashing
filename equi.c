@@ -112,7 +112,8 @@ bool verifyEH(const char *hdr, const char *soln) {
 
   uint8_t vHash[hashLength];
   memset(vHash, 0 , sizeof(vHash));
-  for (int j = 0; j < solnr; j++) {
+  int j;
+  for (j = 0; j < solnr; j++) {
   	uint8_t tmpHash[hashOutput];
   	uint8_t hash[hashLength];
   	int i = be32toh(indices[j]);

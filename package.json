@@ -12,7 +12,7 @@
     },
     "dependencies": {
         "bindings": "^1.3.0",
-        "nan": "^2.6.2"
+        "nan": "^2.7.0"
     },
     "keywords": [
         "scrypt",
@@ -27,6 +27,7 @@
         "blake",
         "shavite",
         "fugue",
-        "sha1"
+        "sha1",
+        "equihash"
     ]
 }

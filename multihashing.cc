@@ -23,7 +23,8 @@ extern "C" {
     #include "nist5.h"
     #include "sha1.h"
     #include "x15.h"
-	#include "fresh.h"
+    #include "fresh.h"
+    #include "equi.h"
 }
 
 #include "boolberry.h"
@@ -32,6 +33,26 @@ extern "C" {
 
 using namespace node;
 using namespace v8;
+
+NAN_METHOD(equihash) {
+
+    if (info.Length() < 2)
+        return THROW_ERROR_EXCEPTION("Wrong number of arguments");
+
+    Local<Object> header = Nan::To<Object>(info[0]).ToLocalChecked();
+    Local<Object> solution = Nan::To<Object>(info[1]).ToLocalChecked();
+
+    if(!Buffer::HasInstance(header) || !Buffer::HasInstance(solution))
+        return THROW_ERROR_EXCEPTION("Argument should be a buffer object.");
+
+    char *hdr = Buffer::Data(header);
+    char *soln = Buffer::Data(solution);
+
+    bool result = verifyEH(hdr, soln);
+
+    info.GetReturnValue().Set(result); 
+
+}
 
 
 NAN_METHOD(quark) {
@@ -554,6 +575,7 @@ NAN_MODULE_INIT(init) {
     Nan::Set(target, Nan::New("sha1").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(sha1)).ToLocalChecked());
     Nan::Set(target, Nan::New("x15").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(x15)).ToLocalChecked());
     Nan::Set(target, Nan::New("fresh").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(fresh)).ToLocalChecked());
+    Nan::Set(target, Nan::New("equihash").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(equihash)).ToLocalChecked());
 }
 
 NODE_MODULE(multihashing, init)

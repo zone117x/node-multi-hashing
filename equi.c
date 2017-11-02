@@ -48,7 +48,8 @@ static void expandArray(const unsigned char *in, const size_t in_len,
     uint32_t acc_value = 0;
 
     size_t j = 0;
-    for (size_t i = 0; i < in_len; i++) {
+    size_t i;
+    for (i = 0; i < in_len; i++) {
       acc_value = (acc_value << 8) | in[i];
       acc_bits += 8;
 
@@ -56,16 +57,18 @@ static void expandArray(const unsigned char *in, const size_t in_len,
       // output element.
       if (acc_bits >= bit_len) {
         acc_bits -= bit_len;
-        for (size_t x = 0; x < byte_pad; x++) {
+        size_t x; 
+        for (x = 0; x < byte_pad; x++) {
           out[j + x] = 0;
         }
-        for (size_t x = byte_pad; x < out_width; x++) {
-          out[j + x] = (
+        size_t bp;
+        for (bp = byte_pad; bp < out_width; bp++) {
+          out[j + bp] = (
             // Big-endian
-            acc_value >> (acc_bits + (8 * (out_width - x - 1)))
+            acc_value >> (acc_bits + (8 * (out_width - bp - 1)))
           ) & (
             // Apply bit_len_mask across byte boundaries
-            (bit_len_mask >> (8 * (out_width - x - 1))) & 0xFF
+            (bit_len_mask >> (8 * (out_width - bp - 1))) & 0xFF
           );
         }
         j += out_width;
@@ -75,7 +78,8 @@ static void expandArray(const unsigned char *in, const size_t in_len,
 
 static int isZero(const uint8_t *hash, size_t len) {
   // This doesn't need to be constant time.
-  for (int i = 0; i < len; i++) {
+  int i;
+  for (i = 0; i < len; i++) {
     if (hash[i] != 0)
       return 0;
   }

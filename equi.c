@@ -118,8 +118,9 @@ bool verifyEH(const char *hdr, const char *soln) {
   	uint8_t hash[hashLength];
   	int i = be32toh(indices[j]);
   	generateHash(&state, i / indicesPerHashOutput, tmpHash, hashOutput);
-  	expandArray(tmpHash + (i % indicesPerHashOutput * n / 8), n / 8, hash, hashLength, collisionBitLength, 0);
-  	for (int k = 0; k < hashLength; ++k)
+    expandArray(tmpHash + (i % indicesPerHashOutput * n / 8), n / 8, hash, hashLength, collisionBitLength, 0);
+    int k;
+  	for (k = 0; k < hashLength; ++k)
   	    vHash[k] ^= hash[k];
   }
   return isZero(vHash, sizeof(vHash));

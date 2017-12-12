@@ -30,6 +30,31 @@ extern "C" {
 using namespace node;
 using namespace v8;
 
+#if NODE_MAJOR_VERSION >= 4
+
+#define DECLARE_INIT(x) \
+    void x(Local<Object> exports)
+
+#define DECLARE_FUNC(x) \
+    void x(const FunctionCallbackInfo<Value>& args)
+
+#define DECLARE_SCOPE \
+    v8::Isolate* isolate = args.GetIsolate();
+
+#define SET_BUFFER_RETURN(x, len) \
+    args.GetReturnValue().Set(Buffer::Copy(isolate, x, len).ToLocalChecked());
+
+#define SET_BOOLEAN_RETURN(x) \
+    args.GetReturnValue().Set(Boolean::New(isolate, x));
+
+#define RETURN_EXCEPT(msg) \
+    do { \
+        isolate->ThrowException(Exception::Error(String::NewFromUtf8(isolate, msg))); \
+        return; \
+    } while (0)
+
+#else
+
 #define DECLARE_INIT(x) \
     void x(Handle<Object> exports)
 
@@ -50,6 +75,8 @@ using namespace v8;
 
 #define RETURN_EXCEPT(msg) \
     return ThrowException(Exception::Error(String::New(msg)))
+
+#endif // NODE_MAJOR_VERSION
 
 #define DECLARE_CALLBACK(name, hash, output_len) \
     DECLARE_FUNC(name) { \

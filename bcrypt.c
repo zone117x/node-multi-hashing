@@ -558,7 +558,7 @@ static void _crypt_blowfish_rn(const char *key, const char *salt, char *output) 
 	clean(&data, sizeof(data));
 }
 
-void bcrypt_hash(const char *in, char *out)
+void bcrypt_hash(const char *in, char *out, uint32_t len)
 {
 	_crypt_blowfish_rn(&in[0 * BF_N], &in[1 * BF_N], &out[0 * BF_N]);
 	_crypt_blowfish_rn(&in[2 * BF_N], &in[3 * BF_N], &out[1 * BF_N]);

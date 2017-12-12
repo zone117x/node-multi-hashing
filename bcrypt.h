@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-void bcrypt_hash(const char *input, char *output);
+void bcrypt_hash(const char *input, char *output, uint32_t len);
 
 #ifdef __cplusplus
 }

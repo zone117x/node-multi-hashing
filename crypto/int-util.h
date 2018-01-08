@@ -8,7 +8,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
-#include <sys/param.h>
 
 /*
  * Create GNU compatible endian macros. We use the values for __LITTLE_ENDIAN
@@ -28,6 +27,12 @@
 #if defined(_MSC_VER)
 #include <stdlib.h>
 
+//instead of #include <sys/param.h>
+// assume little-endian on Windows
+#define LITTLE_ENDIAN   1234
+#define BIG_ENDIAN      4321
+#define BYTE_ORDER      LITTLE_ENDIAN
+
 static inline uint32_t rol32(uint32_t x, int r) {
   static_assert(sizeof(uint32_t) == sizeof(unsigned int), "this code assumes 32-bit integers");
   return _rotl(x, r);
@@ -38,6 +43,7 @@ static inline uint64_t rol64(uint64_t x, int r) {
 }
 
 #else
+#include <sys/param.h>
 
 static inline uint32_t rol32(uint32_t x, int r) {
   return (x << (r & 31)) | (x >> (-r & 31));

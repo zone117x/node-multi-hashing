@@ -4,7 +4,7 @@
             "target_name": "multihashing",
             "sources": [
                 "multihashing.cc",
-                "scryptjane.c",
+
                 "scryptn.c",
                 "keccak.c",
                 "skein.c",
@@ -51,11 +51,13 @@
                 "crypto/aesb.c",
                 "crypto/wild_keccak.cpp",
             ],
-            "include_dirs": [
-                "crypto",
-            ],
+          "include_dirs": [
+            "crypto",
+             "<!(node -e \"require('nan')\")",
+          ],
             "cflags_cc": [
-                "-std=c++0x"
+                "-std=c++0x",
+                
             ],
         }
     ]

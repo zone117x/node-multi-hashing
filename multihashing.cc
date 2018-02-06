@@ -2,13 +2,13 @@
 #include <node_buffer.h>
 #include <v8.h>
 #include <stdint.h>
+#include "nan.h"
 
 extern "C" {
     #include "bcrypt.h"
     #include "keccak.h"
     #include "quark.h"
-    #include "scryptjane.h"
-    #include "scryptn.h"
+      #include "scryptn.h"
     #include "skein.h"
     #include "x11.h"
     #include "groestl.h"
@@ -30,573 +30,850 @@ extern "C" {
 using namespace node;
 using namespace v8;
 
-Handle<Value> except(const char* msg) {
-    return ThrowException(Exception::Error(String::New(msg)));
-}
 
-Handle<Value> quark(const Arguments& args) {
-    HandleScope scope;
 
-    if (args.Length() < 1)
-        return except("You must provide one argument.");
-
-    Local<Object> target = args[0]->ToObject();
-
-    if(!Buffer::HasInstance(target))
-        return except("Argument should be a buffer object.");
-
-    char * input = Buffer::Data(target);
-    char output[32];
-    
-    uint32_t input_len = Buffer::Length(target);
-
-    quark_hash(input, output, input_len);
-
-    Buffer* buff = Buffer::New(output, 32);
-    return scope.Close(buff->handle_);
-}
-
-Handle<Value> x11(const Arguments& args) {
-    HandleScope scope;
-
-    if (args.Length() < 1)
-        return except("You must provide one argument.");
-
-    Local<Object> target = args[0]->ToObject();
-
-    if(!Buffer::HasInstance(target))
-        return except("Argument should be a buffer object.");
-
-    char * input = Buffer::Data(target);
-    char output[32];
-
-    uint32_t input_len = Buffer::Length(target);
-
-    x11_hash(input, output, input_len);
-
-    Buffer* buff = Buffer::New(output, 32);
-    return scope.Close(buff->handle_);
-}
-
-Handle<Value> scrypt(const Arguments& args) {
-   HandleScope scope;
-
-   if (args.Length() < 3)
-       return except("You must provide buffer to hash, N value, and R value");
-
-   Local<Object> target = args[0]->ToObject();
-
-   if(!Buffer::HasInstance(target))
-       return except("Argument should be a buffer object.");
-    
-   Local<Number> numn = args[1]->ToNumber();
-   unsigned int nValue = numn->Value();
-   Local<Number> numr = args[2]->ToNumber();
-   unsigned int rValue = numr->Value();
-   
-   char * input = Buffer::Data(target);
-   char output[32];
-
-   uint32_t input_len = Buffer::Length(target);
-   
-   scrypt_N_R_1_256(input, output, nValue, rValue, input_len);
-
-   Buffer* buff = Buffer::New(output, 32);
-   return scope.Close(buff->handle_);
+void except(const char* msg)
+{
+	Nan::ThrowError(Exception::Error(Nan::New<String>(msg).ToLocalChecked()));
 }
 
 
 
-Handle<Value> scryptn(const Arguments& args) {
-   HandleScope scope;
 
-   if (args.Length() < 2)
-       return except("You must provide buffer to hash and N factor.");
+NAN_METHOD(quark)
+{
+	Isolate* isolate = info.GetIsolate();
+	HandleScope scope(isolate);
 
-   Local<Object> target = args[0]->ToObject();
+	if (info.Length() < 1)
+	{
+		except("You must provide one argument.");
+	}
+	else
+	{
+		Local<Object> target = info[0]->ToObject();
+		if (!node::Buffer::HasInstance(target))
+		{
+			except("Argument should be a buffer object.");
 
-   if(!Buffer::HasInstance(target))
-       return except("Argument should be a buffer object.");
+		}
+		else
+		{
+			char * input = Buffer::Data(target);
+			char* output = (char*)malloc(32);
 
-   Local<Number> num = args[1]->ToNumber();
-   unsigned int nFactor = num->Value();
+			uint32_t input_len = Buffer::Length(target);
 
-   char * input = Buffer::Data(target);
-   char output[32];
+			quark_hash(input, output, input_len);
 
-   uint32_t input_len = Buffer::Length(target);
+			auto result = node::Buffer::New(isolate, output, 32).ToLocalChecked();
 
-   //unsigned int N = 1 << (getNfactor(input) + 1);
-   unsigned int N = 1 << nFactor;
+			info.GetReturnValue().Set(result);
+		}
+	}
+	
 
-   scrypt_N_R_1_256(input, output, N, 1, input_len); //hardcode for now to R=1 for now
-
-
-   Buffer* buff = Buffer::New(output, 32);
-   return scope.Close(buff->handle_);
-}
-
-Handle<Value> scryptjane(const Arguments& args) {
-    HandleScope scope;
-
-    if (args.Length() < 5)
-        return except("You must provide two argument: buffer, timestamp as number, and nChainStarTime as number, nMin, and nMax");
-
-    Local<Object> target = args[0]->ToObject();
-
-    if(!Buffer::HasInstance(target))
-        return except("First should be a buffer object.");
-
-    Local<Number> num = args[1]->ToNumber();
-    int timestamp = num->Value();
-
-    Local<Number> num2 = args[2]->ToNumber();
-    int nChainStartTime = num2->Value();
-
-    Local<Number> num3 = args[3]->ToNumber();
-    int nMin = num3->Value();
-
-    Local<Number> num4 = args[4]->ToNumber();
-    int nMax = num4->Value();
-
-    char * input = Buffer::Data(target);
-    char output[32];
-
-    uint32_t input_len = Buffer::Length(target);
-
-    scryptjane_hash(input, input_len, (uint32_t *)output, GetNfactorJane(timestamp, nChainStartTime, nMin, nMax));
-
-    Buffer* buff = Buffer::New(output, 32);
-    return scope.Close(buff->handle_);
-}
-
-Handle<Value> keccak(const Arguments& args) {
-    HandleScope scope;
-
-    if (args.Length() < 1)
-        return except("You must provide one argument.");
-
-    Local<Object> target = args[0]->ToObject();
-
-    if(!Buffer::HasInstance(target))
-        return except("Argument should be a buffer object.");
-
-    char * input = Buffer::Data(target);
-    char output[32];
-
-    unsigned int dSize = Buffer::Length(target);
-
-    keccak_hash(input, output, dSize);
-
-    Buffer* buff = Buffer::New(output, 32);
-    return scope.Close(buff->handle_);
 }
 
 
-Handle<Value> bcrypt(const Arguments& args) {
-    HandleScope scope;
+NAN_METHOD(x11)
+{
+	Isolate* isolate = info.GetIsolate();
+	HandleScope scope(isolate);
+	if (info.Length() < 1)
+	{
+		except("You must provide one argument.");
+	}
+	else
+	{
+		Local<Object> target = info[0]->ToObject();
+		if (!node::Buffer::HasInstance(target))
+		{
+			except("Argument should be a buffer object.");
 
-    if (args.Length() < 1)
-        return except("You must provide one argument.");
+		}
+		else
+		{
+			char * input = Buffer::Data(target);
+			char* output = (char*)malloc(32);
 
-    Local<Object> target = args[0]->ToObject();
+			uint32_t input_len = Buffer::Length(target);
 
-    if(!Buffer::HasInstance(target))
-        return except("Argument should be a buffer object.");
+			x11_hash(input, output, input_len);
 
-    char * input = Buffer::Data(target);
-    char output[32];
+			auto result = node::Buffer::New(isolate, output, 32).ToLocalChecked();
 
-    bcrypt_hash(input, output);
+			info.GetReturnValue().Set(result);
+		}
+	}
 
-    Buffer* buff = Buffer::New(output, 32);
-    return scope.Close(buff->handle_);
 }
 
-Handle<Value> skein(const Arguments& args) {
-    HandleScope scope;
+NAN_METHOD(scryptHash)
+{
+	Isolate* isolate = info.GetIsolate();
+	HandleScope scope(isolate);
+	if (info.Length() < 3)
+	{
+		except("You must provide buffer to hash, N value, and R value");
+	}
+	else
+	{
+		Local<Object> target = info[0]->ToObject();
+		if (!node::Buffer::HasInstance(target))
+		{
+			except("Argument should be a buffer object.");
 
-    if (args.Length() < 1)
-        return except("You must provide one argument.");
+		}
+		else
+		{
+			Local<Number> numn = info[1]->ToNumber();
+			unsigned int nValue = numn->Value();
+			Local<Number> numr = info[2]->ToNumber();
+			unsigned int rValue = numr->Value();
 
-    Local<Object> target = args[0]->ToObject();
+			char * input = Buffer::Data(target);
+			char* output = (char*)malloc(32);
 
-    if(!Buffer::HasInstance(target))
-        return except("Argument should be a buffer object.");
+			uint32_t input_len = Buffer::Length(target);
 
-    char * input = Buffer::Data(target);
-    char output[32];
+			scrypt_N_R_1_256(input, output, nValue, rValue, input_len);
 
-    uint32_t input_len = Buffer::Length(target);
-    
-    skein_hash(input, output, input_len);
+			auto result = node::Buffer::New(isolate, output, 32).ToLocalChecked();
 
-    Buffer* buff = Buffer::New(output, 32);
-    return scope.Close(buff->handle_);
-}
+			info.GetReturnValue().Set(result);
+		}
+	}
 
-
-Handle<Value> groestl(const Arguments& args) {
-    HandleScope scope;
-
-    if (args.Length() < 1)
-        return except("You must provide one argument.");
-
-    Local<Object> target = args[0]->ToObject();
-
-    if(!Buffer::HasInstance(target))
-        return except("Argument should be a buffer object.");
-
-    char * input = Buffer::Data(target);
-    char output[32];
-    
-    uint32_t input_len = Buffer::Length(target);
-
-    groestl_hash(input, output, input_len);
-
-    Buffer* buff = Buffer::New(output, 32);
-    return scope.Close(buff->handle_);
-}
-
-
-Handle<Value> groestlmyriad(const Arguments& args) {
-    HandleScope scope;
-
-    if (args.Length() < 1)
-        return except("You must provide one argument.");
-
-    Local<Object> target = args[0]->ToObject();
-
-    if(!Buffer::HasInstance(target))
-        return except("Argument should be a buffer object.");
-
-    char * input = Buffer::Data(target);
-    char output[32];
-    
-    uint32_t input_len = Buffer::Length(target);
-
-    groestlmyriad_hash(input, output, input_len);
-
-    Buffer* buff = Buffer::New(output, 32);
-    return scope.Close(buff->handle_);
 }
 
 
-Handle<Value> blake(const Arguments& args) {
-    HandleScope scope;
+NAN_METHOD(scryptn)
+{
+	Isolate* isolate = info.GetIsolate();
+	HandleScope scope(isolate);
+	if (info.Length() < 2)
+	{
+		except("You must provide buffer to hash and N factor.");
+	}
+	else
+	{
+		Local<Object> target = info[0]->ToObject();
+		if (!node::Buffer::HasInstance(target))
+		{
+			except("Argument should be a buffer object.");
 
-    if (args.Length() < 1)
-        return except("You must provide one argument.");
+		}
+		else
+		{
+			Local<Number> num = info[1]->ToNumber();
+			unsigned int nFactor = num->Value();
 
-    Local<Object> target = args[0]->ToObject();
 
-    if(!Buffer::HasInstance(target))
-        return except("Argument should be a buffer object.");
+			char * input = Buffer::Data(target);
+			char* output = (char*)malloc(32);
 
-    char * input = Buffer::Data(target);
-    char output[32];
-    
-    uint32_t input_len = Buffer::Length(target);
+			uint32_t input_len = Buffer::Length(target);
+			unsigned int N = 1 << nFactor;
+			scrypt_N_R_1_256(input, output, N, 1, input_len); //hardcode for now to R=1 for now
 
-    blake_hash(input, output, input_len);
+			auto result = node::Buffer::New(isolate, output, 32).ToLocalChecked();
 
-    Buffer* buff = Buffer::New(output, 32);
-    return scope.Close(buff->handle_);
+			info.GetReturnValue().Set(result);
+		}
+	}
+
+}
+
+/*
+NAN_METHOD(scryptjane)
+{
+	Isolate* isolate = info.GetIsolate();
+	HandleScope scope(isolate);
+	if (info.Length() < 5)
+	{
+		except("You must provide two argument : buffer, timestamp as number, and nChainStarTime as number, nMin, and nMax");
+	}
+	else
+	{
+		Local<Object> target = info[0]->ToObject();
+		if (!node::Buffer::HasInstance(target))
+		{
+			except("Argument should be a buffer object.");
+
+		}
+		else
+		{
+			Local<Number> num = info[1]->ToNumber();
+			int timestamp = num->Value();
+
+			Local<Number> num2 = info[2]->ToNumber();
+			int nChainStartTime = num2->Value();
+
+			Local<Number> num3 = info[3]->ToNumber();
+			int nMin = num3->Value();
+
+			Local<Number> num4 = info[4]->ToNumber();
+			int nMax = num4->Value();
+
+
+			char * input = Buffer::Data(target);
+			char* output = (char*)malloc(32);
+
+			uint32_t input_len = Buffer::Length(target);
+
+			scryptjane_hash(input, input_len, (uint32_t *)output, GetNfactorJane(timestamp, nChainStartTime, nMin, nMax));
+
+			auto result = node::Buffer::New(isolate, output, 32).ToLocalChecked();
+
+			info.GetReturnValue().Set(result);
+		}
+	}
+
+}
+
+*/
+
+
+NAN_METHOD(keccak)
+{
+	Isolate* isolate = info.GetIsolate();
+	HandleScope scope(isolate);
+	if (info.Length() < 1)
+	{
+		except("You must provide one argument.");
+	}
+	else
+	{
+		Local<Object> target = info[0]->ToObject();
+		if (!node::Buffer::HasInstance(target))
+		{
+			except("Argument should be a buffer object.");
+
+		}
+		else
+		{
+			char * input = Buffer::Data(target);
+			char* output = (char*)malloc(32);
+
+			uint32_t input_len = Buffer::Length(target);
+
+			keccak_hash(input, output, input_len);
+
+			auto result = node::Buffer::New(isolate, output, 32).ToLocalChecked();
+
+			info.GetReturnValue().Set(result);
+		}
+	}
+
+}
+
+NAN_METHOD(bcrypt)
+{
+	Isolate* isolate = info.GetIsolate();
+	HandleScope scope(isolate);
+	if (info.Length() < 1)
+	{
+		except("You must provide one argument.");
+	}
+	else
+	{
+		Local<Object> target = info[0]->ToObject();
+		if (!node::Buffer::HasInstance(target))
+		{
+			except("Argument should be a buffer object.");
+
+		}
+		else
+		{
+			char * input = Buffer::Data(target);
+			char* output = (char*)malloc(32);
+
+			uint32_t input_len = Buffer::Length(target);
+
+			bcrypt_hash(input, output);
+
+			auto result = node::Buffer::New(isolate, output, 32).ToLocalChecked();
+
+			info.GetReturnValue().Set(result);
+		}
+	}
+
+}
+
+NAN_METHOD(skein)
+{
+	Isolate* isolate = info.GetIsolate();
+	HandleScope scope(isolate);
+	if (info.Length() < 1)
+	{
+		except("You must provide one argument.");
+	}
+	else
+	{
+		Local<Object> target = info[0]->ToObject();
+		if (!node::Buffer::HasInstance(target))
+		{
+			except("Argument should be a buffer object.");
+
+		}
+		else
+		{
+			char * input = Buffer::Data(target);
+			char* output = (char*)malloc(32);
+
+			uint32_t input_len = Buffer::Length(target);
+
+			skein_hash(input, output,input_len);
+
+			auto result = node::Buffer::New(isolate, output, 32).ToLocalChecked();
+
+			info.GetReturnValue().Set(result);
+		}
+	}
+
 }
 
 
-Handle<Value> fugue(const Arguments& args) {
-    HandleScope scope;
+NAN_METHOD(groestl)
+{
+	Isolate* isolate = info.GetIsolate();
+	HandleScope scope(isolate);
+	if (info.Length() < 1)
+	{
+		except("You must provide one argument.");
+	}
+	else
+	{
+		Local<Object> target = info[0]->ToObject();
+		if (!node::Buffer::HasInstance(target))
+		{
+			except("Argument should be a buffer object.");
 
-    if (args.Length() < 1)
-        return except("You must provide one argument.");
+		}
+		else
+		{
+			char * input = Buffer::Data(target);
+			char* output = (char*)malloc(32);
 
-    Local<Object> target = args[0]->ToObject();
+			uint32_t input_len = Buffer::Length(target);
 
-    if(!Buffer::HasInstance(target))
-        return except("Argument should be a buffer object.");
+			groestl_hash(input, output, input_len);
 
-    char * input = Buffer::Data(target);
-    char output[32];
-    
-    uint32_t input_len = Buffer::Length(target);
+			auto result = node::Buffer::New(isolate, output, 32).ToLocalChecked();
 
-    fugue_hash(input, output, input_len);
+			info.GetReturnValue().Set(result);
+		}
+	}
 
-    Buffer* buff = Buffer::New(output, 32);
-    return scope.Close(buff->handle_);
 }
 
 
-Handle<Value> qubit(const Arguments& args) {
-    HandleScope scope;
 
-    if (args.Length() < 1)
-        return except("You must provide one argument.");
+NAN_METHOD(groestlmyriad)
+{
+	Isolate* isolate = info.GetIsolate();
+	HandleScope scope(isolate);
+	if (info.Length() < 1)
+	{
+		except("You must provide one argument.");
+	}
+	else
+	{
+		Local<Object> target = info[0]->ToObject();
+		if (!node::Buffer::HasInstance(target))
+		{
+			except("Argument should be a buffer object.");
 
-    Local<Object> target = args[0]->ToObject();
+		}
+		else
+		{
+			char * input = Buffer::Data(target);
+			char* output = (char*)malloc(32);
 
-    if(!Buffer::HasInstance(target))
-        return except("Argument should be a buffer object.");
+			uint32_t input_len = Buffer::Length(target);
 
-    char * input = Buffer::Data(target);
-    char output[32];
-    
-    uint32_t input_len = Buffer::Length(target);
+			groestlmyriad_hash(input, output, input_len);
 
-    qubit_hash(input, output, input_len);
+			auto result = node::Buffer::New(isolate, output, 32).ToLocalChecked();
 
-    Buffer* buff = Buffer::New(output, 32);
-    return scope.Close(buff->handle_);
+			info.GetReturnValue().Set(result);
+		}
+	}
+
 }
 
 
-Handle<Value> hefty1(const Arguments& args) {
-    HandleScope scope;
 
-    if (args.Length() < 1)
-        return except("You must provide one argument.");
 
-    Local<Object> target = args[0]->ToObject();
 
-    if(!Buffer::HasInstance(target))
-        return except("Argument should be a buffer object.");
+NAN_METHOD(blake)
+{
+	Isolate* isolate = info.GetIsolate();
+	HandleScope scope(isolate);
+	if (info.Length() < 1)
+	{
+		except("You must provide one argument.");
+	}
+	else
+	{
+		Local<Object> target = info[0]->ToObject();
+		if (!node::Buffer::HasInstance(target))
+		{
+			except("Argument should be a buffer object.");
 
-    char * input = Buffer::Data(target);
-    char output[32];
-    
-    uint32_t input_len = Buffer::Length(target);
+		}
+		else
+		{
+			char * input = Buffer::Data(target);
+			char* output = (char*)malloc(32);
 
-    hefty1_hash(input, output, input_len);
+			uint32_t input_len = Buffer::Length(target);
 
-    Buffer* buff = Buffer::New(output, 32);
-    return scope.Close(buff->handle_);
+			blake_hash(input, output, input_len);
+
+			auto result = node::Buffer::New(isolate, output, 32).ToLocalChecked();
+
+			info.GetReturnValue().Set(result);
+		}
+	}
+
+}
+
+NAN_METHOD(fugue)
+{
+	Isolate* isolate = info.GetIsolate();
+	HandleScope scope(isolate);
+	if (info.Length() < 1)
+	{
+		except("You must provide one argument.");
+	}
+	else
+	{
+		Local<Object> target = info[0]->ToObject();
+		if (!node::Buffer::HasInstance(target))
+		{
+			except("Argument should be a buffer object.");
+
+		}
+		else
+		{
+			char * input = Buffer::Data(target);
+			char* output = (char*)malloc(32);
+
+			uint32_t input_len = Buffer::Length(target);
+
+			fugue_hash(input, output, input_len);
+
+			auto result = node::Buffer::New(isolate, output, 32).ToLocalChecked();
+
+			info.GetReturnValue().Set(result);
+		}
+	}
+
+}
+
+NAN_METHOD(qubit)
+{
+	Isolate* isolate = info.GetIsolate();
+	HandleScope scope(isolate);
+	if (info.Length() < 1)
+	{
+		except("You must provide one argument.");
+	}
+	else
+	{
+		Local<Object> target = info[0]->ToObject();
+		if (!node::Buffer::HasInstance(target))
+		{
+			except("Argument should be a buffer object.");
+
+		}
+		else
+		{
+			char * input = Buffer::Data(target);
+			char* output = (char*)malloc(32);
+
+			uint32_t input_len = Buffer::Length(target);
+
+			qubit_hash(input, output, input_len);
+
+			auto result = node::Buffer::New(isolate, output, 32).ToLocalChecked();
+
+			info.GetReturnValue().Set(result);
+		}
+	}
+
 }
 
 
-Handle<Value> shavite3(const Arguments& args) {
-    HandleScope scope;
+NAN_METHOD(hefty1)
+{
+	Isolate* isolate = info.GetIsolate();
+	HandleScope scope(isolate);
+	if (info.Length() < 1)
+	{
+		except("You must provide one argument.");
+	}
+	else
+	{
+		Local<Object> target = info[0]->ToObject();
+		if (!node::Buffer::HasInstance(target))
+		{
+			except("Argument should be a buffer object.");
 
-    if (args.Length() < 1)
-        return except("You must provide one argument.");
+		}
+		else
+		{
+			char * input = Buffer::Data(target);
+			char* output = (char*)malloc(32);
 
-    Local<Object> target = args[0]->ToObject();
+			uint32_t input_len = Buffer::Length(target);
 
-    if(!Buffer::HasInstance(target))
-        return except("Argument should be a buffer object.");
+			hefty1_hash(input, output, input_len);
 
-    char * input = Buffer::Data(target);
-    char output[32];
-    
-    uint32_t input_len = Buffer::Length(target);
+			auto result = node::Buffer::New(isolate, output, 32).ToLocalChecked();
 
-    shavite3_hash(input, output, input_len);
+			info.GetReturnValue().Set(result);
+		}
+	}
 
-    Buffer* buff = Buffer::New(output, 32);
-    return scope.Close(buff->handle_);
 }
 
-Handle<Value> cryptonight(const Arguments& args) {
-    HandleScope scope;
+NAN_METHOD(shavite3)
+{
+	Isolate* isolate = info.GetIsolate();
+	HandleScope scope(isolate);
+	if (info.Length() < 1)
+	{
+		except("You must provide one argument.");
+	}
+	else
+	{
+		Local<Object> target = info[0]->ToObject();
+		if (!node::Buffer::HasInstance(target))
+		{
+			except("Argument should be a buffer object.");
 
-    bool fast = false;
+		}
+		else
+		{
+			char * input = Buffer::Data(target);
+			char* output = (char*)malloc(32);
 
-    if (args.Length() < 1)
-        return except("You must provide one argument.");
-    
-    if (args.Length() >= 2) {
-        if(!args[1]->IsBoolean())
-            return except("Argument 2 should be a boolean");
-        fast = args[1]->ToBoolean()->BooleanValue();
-    }
+			uint32_t input_len = Buffer::Length(target);
 
-    Local<Object> target = args[0]->ToObject();
+			shavite3_hash(input, output, input_len);
 
-    if(!Buffer::HasInstance(target))
-        return except("Argument should be a buffer object.");
+			auto result = node::Buffer::New(isolate, output, 32).ToLocalChecked();
 
-    char * input = Buffer::Data(target);
-    char output[32];
-    
-    uint32_t input_len = Buffer::Length(target);
+			info.GetReturnValue().Set(result);
+		}
+	}
 
-    if(fast)
-        cryptonight_fast_hash(input, output, input_len);
-    else
-        cryptonight_hash(input, output, input_len);
-
-    Buffer* buff = Buffer::New(output, 32);
-    return scope.Close(buff->handle_);
 }
 
-Handle<Value> x13(const Arguments& args) {
-    HandleScope scope;
+NAN_METHOD(cryptonight)
+{
+	Isolate* isolate = info.GetIsolate();
+	HandleScope scope(isolate);
 
-    if (args.Length() < 1)
-        return except("You must provide one argument.");
+	bool fast = false;
+	if (info.Length() < 1)
+	{
+		except("You must provide one argument.");
+	}
+	else
+	{
+		Local<Object> target = info[0]->ToObject();
+		if (!node::Buffer::HasInstance(target))
+		{
+			except("Argument should be a buffer object.");
 
-    Local<Object> target = args[0]->ToObject();
+		}
+		else
+		{
+			if (info.Length() >= 2) {
+				if (!info[1]->IsBoolean())
+				{
+					except("Argument 2 should be a boolean");
+					return;
+				}
+					
+				fast = info[1]->ToBoolean()->BooleanValue();
+			}
 
-    if(!Buffer::HasInstance(target))
-        return except("Argument should be a buffer object.");
+			char * input = Buffer::Data(target);
+			char* output = (char*)malloc(32);
 
-    char * input = Buffer::Data(target);
-    char output[32];
+			uint32_t input_len = Buffer::Length(target);
 
-    uint32_t input_len = Buffer::Length(target);
+			if (fast)
+				cryptonight_fast_hash(input, output, input_len);
+			else
+				cryptonight_hash(input, output, input_len);
 
-    x13_hash(input, output, input_len);
+			auto result = node::Buffer::New(isolate, output, 32).ToLocalChecked();
 
-    Buffer* buff = Buffer::New(output, 32);
-    return scope.Close(buff->handle_);
+			info.GetReturnValue().Set(result);
+		}
+	}
+
 }
 
-Handle<Value> boolberry(const Arguments& args) {
-    HandleScope scope;
+NAN_METHOD(x13)
+{
+	Isolate* isolate = info.GetIsolate();
+	HandleScope scope(isolate);
+	if (info.Length() < 1)
+	{
+		except("You must provide one argument.");
+	}
+	else
+	{
+		Local<Object> target = info[0]->ToObject();
+		if (!node::Buffer::HasInstance(target))
+		{
+			except("Argument should be a buffer object.");
 
-    if (args.Length() < 2)
-        return except("You must provide two arguments.");
+		}
+		else
+		{
+			char * input = Buffer::Data(target);
+			char* output = (char*)malloc(32);
 
-    Local<Object> target = args[0]->ToObject();
-    Local<Object> target_spad = args[1]->ToObject();
-    uint32_t height = 1;
+			uint32_t input_len = Buffer::Length(target);
 
-    if(!Buffer::HasInstance(target))
-        return except("Argument 1 should be a buffer object.");
+			x13_hash(input, output, input_len);
 
-    if(!Buffer::HasInstance(target_spad))
-        return except("Argument 2 should be a buffer object.");
+			auto result = node::Buffer::New(isolate, output, 32).ToLocalChecked();
 
-    if(args.Length() >= 3)
-        if(args[2]->IsUint32())
-            height = args[2]->ToUint32()->Uint32Value();
-        else
-            return except("Argument 3 should be an unsigned integer.");
+			info.GetReturnValue().Set(result);
+		}
+	}
 
-    char * input = Buffer::Data(target);
-    char * scratchpad = Buffer::Data(target_spad);
-    char output[32];
-
-    uint32_t input_len = Buffer::Length(target);
-    uint64_t spad_len = Buffer::Length(target_spad);
-
-    boolberry_hash(input, input_len, scratchpad, spad_len, output, height);
-
-    Buffer* buff = Buffer::New(output, 32);
-    return scope.Close(buff->handle_);
 }
 
-Handle<Value> nist5(const Arguments& args) {
-    HandleScope scope;
+//*********
 
-    if (args.Length() < 1)
-        return except("You must provide one argument.");
 
-    Local<Object> target = args[0]->ToObject();
+NAN_METHOD(boolberry)
+{
+	Isolate* isolate = info.GetIsolate();
+	HandleScope scope(isolate);
+	if (info.Length() < 2)
+	{
+		except("You must provide two arguments.");
+	}
+	else
+	{
+		Local<Object> target = info[0]->ToObject();
+		Local<Object> target_spad = info[1]->ToObject();
+		uint32_t height = 1;
+		if (!node::Buffer::HasInstance(target))
+		{
+			except("Argument 1 should be a buffer object.");
 
-    if(!Buffer::HasInstance(target))
-        return except("Argument should be a buffer object.");
+		}
+		else
+		{
+			if (!node::Buffer::HasInstance(target_spad))
+			{
+				except("Argument 2 should be a buffer object.");
+				return;
+			}
 
-    char * input = Buffer::Data(target);
-    char output[32];
+			if (info.Length() >= 3)
+				if (info[2]->IsUint32())
+					height = info[2]->ToUint32()->Uint32Value();
+				else
+				{
+					except("Argument 3 should be an unsigned integer."); 
+					return;
+				}
+					
 
-    uint32_t input_len = Buffer::Length(target);
+			char * input = Buffer::Data(target);
+			char * scratchpad = Buffer::Data(target_spad);
+			char* output = (char*)malloc(32);
 
-    nist5_hash(input, output, input_len);
+			uint32_t input_len = Buffer::Length(target);
+			uint64_t spad_len = Buffer::Length(target_spad);
 
-    Buffer* buff = Buffer::New(output, 32);
-    return scope.Close(buff->handle_);
+			boolberry_hash(input, input_len, scratchpad, spad_len, output, height);
+
+			auto result = node::Buffer::New(isolate, output, 32).ToLocalChecked();
+
+			info.GetReturnValue().Set(result);
+		}
+	}
+
 }
 
-Handle<Value> sha1(const Arguments& args) {
-    HandleScope scope;
+NAN_METHOD(nist5)
+{
+	Isolate* isolate = info.GetIsolate();
+	HandleScope scope(isolate);
+	if (info.Length() < 1)
+	{
+		except("You must provide one argument.");
+	}
+	else
+	{
+		Local<Object> target = info[0]->ToObject();
+		if (!node::Buffer::HasInstance(target))
+		{
+			except("Argument should be a buffer object.");
 
-    if (args.Length() < 1)
-        return except("You must provide one argument.");
+		}
+		else
+		{
+			char * input = Buffer::Data(target);
+			char* output = (char*)malloc(32);
 
-    Local<Object> target = args[0]->ToObject();
+			uint32_t input_len = Buffer::Length(target);
 
-    if(!Buffer::HasInstance(target))
-        return except("Argument should be a buffer object.");
+			nist5_hash(input, output, input_len);
 
-    char * input = Buffer::Data(target);
-    char output[32];
+			auto result = node::Buffer::New(isolate, output, 32).ToLocalChecked();
 
-    uint32_t input_len = Buffer::Length(target);
+			info.GetReturnValue().Set(result);
+		}
+	}
 
-    sha1_hash(input, output, input_len);
-
-    Buffer* buff = Buffer::New(output, 32);
-    return scope.Close(buff->handle_);
 }
 
-Handle<Value> x15(const Arguments& args) {
-    HandleScope scope;
 
-    if (args.Length() < 1)
-        return except("You must provide one argument.");
 
-    Local<Object> target = args[0]->ToObject();
 
-    if(!Buffer::HasInstance(target))
-        return except("Argument should be a buffer object.");
+NAN_METHOD(sha1)
+{
+	Isolate* isolate = info.GetIsolate();
+	HandleScope scope(isolate);
+	if (info.Length() < 1)
+	{
+		except("You must provide one argument.");
+	}
+	else
+	{
+		Local<Object> target = info[0]->ToObject();
+		if (!node::Buffer::HasInstance(target))
+		{
+			except("Argument should be a buffer object.");
 
-    char * input = Buffer::Data(target);
-    char output[32];
+		}
+		else
+		{
+			char * input = Buffer::Data(target);
+			char* output = (char*)malloc(32);
 
-    uint32_t input_len = Buffer::Length(target);
+			uint32_t input_len = Buffer::Length(target);
 
-    x15_hash(input, output, input_len);
+			sha1_hash(input, output, input_len);
 
-    Buffer* buff = Buffer::New(output, 32);
-    return scope.Close(buff->handle_);
+			auto result = node::Buffer::New(isolate, output, 32).ToLocalChecked();
+
+			info.GetReturnValue().Set(result);
+		}
+	}
+
 }
 
-Handle<Value> fresh(const Arguments& args) {
-    HandleScope scope;
 
-    if (args.Length() < 1)
-        return except("You must provide one argument.");
+NAN_METHOD(x15)
+{
+	Isolate* isolate = info.GetIsolate();
+	HandleScope scope(isolate);
+	if (info.Length() < 1)
+	{
+		except("You must provide one argument.");
+	}
+	else
+	{
+		Local<Object> target = info[0]->ToObject();
+		if (!node::Buffer::HasInstance(target))
+		{
+			except("Argument should be a buffer object.");
 
-    Local<Object> target = args[0]->ToObject();
+		}
+		else
+		{
+			char * input = Buffer::Data(target);
+			char* output = (char*)malloc(32);
 
-    if(!Buffer::HasInstance(target))
-        return except("Argument should be a buffer object.");
+			uint32_t input_len = Buffer::Length(target);
 
-    char * input = Buffer::Data(target);
-    char output[32];
+			x15_hash(input, output, input_len);
 
-    uint32_t input_len = Buffer::Length(target);
+			auto result = node::Buffer::New(isolate, output, 32).ToLocalChecked();
 
-    fresh_hash(input, output, input_len);
+			info.GetReturnValue().Set(result);
+		}
+	}
 
-    Buffer* buff = Buffer::New(output, 32);
-    return scope.Close(buff->handle_);
 }
 
-void init(Handle<Object> exports) {
-    exports->Set(String::NewSymbol("quark"), FunctionTemplate::New(quark)->GetFunction());
-    exports->Set(String::NewSymbol("x11"), FunctionTemplate::New(x11)->GetFunction());
-    exports->Set(String::NewSymbol("scrypt"), FunctionTemplate::New(scrypt)->GetFunction());
-    exports->Set(String::NewSymbol("scryptn"), FunctionTemplate::New(scryptn)->GetFunction());
-    exports->Set(String::NewSymbol("scryptjane"), FunctionTemplate::New(scryptjane)->GetFunction());
-    exports->Set(String::NewSymbol("keccak"), FunctionTemplate::New(keccak)->GetFunction());
-    exports->Set(String::NewSymbol("bcrypt"), FunctionTemplate::New(bcrypt)->GetFunction());
-    exports->Set(String::NewSymbol("skein"), FunctionTemplate::New(skein)->GetFunction());
-    exports->Set(String::NewSymbol("groestl"), FunctionTemplate::New(groestl)->GetFunction());
-    exports->Set(String::NewSymbol("groestlmyriad"), FunctionTemplate::New(groestlmyriad)->GetFunction());
-    exports->Set(String::NewSymbol("blake"), FunctionTemplate::New(blake)->GetFunction());
-    exports->Set(String::NewSymbol("fugue"), FunctionTemplate::New(fugue)->GetFunction());
-    exports->Set(String::NewSymbol("qubit"), FunctionTemplate::New(qubit)->GetFunction());
-    exports->Set(String::NewSymbol("hefty1"), FunctionTemplate::New(hefty1)->GetFunction());
-    exports->Set(String::NewSymbol("shavite3"), FunctionTemplate::New(shavite3)->GetFunction());
-    exports->Set(String::NewSymbol("cryptonight"), FunctionTemplate::New(cryptonight)->GetFunction());
-    exports->Set(String::NewSymbol("x13"), FunctionTemplate::New(x13)->GetFunction());
-    exports->Set(String::NewSymbol("boolberry"), FunctionTemplate::New(boolberry)->GetFunction());
-    exports->Set(String::NewSymbol("nist5"), FunctionTemplate::New(nist5)->GetFunction());
-    exports->Set(String::NewSymbol("sha1"), FunctionTemplate::New(sha1)->GetFunction());
-    exports->Set(String::NewSymbol("x15"), FunctionTemplate::New(x15)->GetFunction());
-    exports->Set(String::NewSymbol("fresh"), FunctionTemplate::New(fresh)->GetFunction());
+
+NAN_METHOD(fresh)
+{
+	Isolate* isolate = info.GetIsolate();
+	HandleScope scope(isolate);
+	if (info.Length() < 1)
+	{
+		except("You must provide one argument.");
+	}
+	else
+	{
+		Local<Object> target = info[0]->ToObject();
+		if (!node::Buffer::HasInstance(target))
+		{
+			except("Argument should be a buffer object.");
+
+		}
+		else
+		{
+			char * input = Buffer::Data(target);
+			char* output = (char*)malloc(32);
+
+			uint32_t input_len = Buffer::Length(target);
+
+			fresh_hash(input, output, input_len);
+
+			auto result = node::Buffer::New(isolate, output, 32).ToLocalChecked();
+
+			info.GetReturnValue().Set(result);
+		}
+	}
+
+}
+
+
+void init(Local<Object> exports) {
+	auto isolate = exports->GetIsolate();
+	
+	
+	exports->Set(String::NewFromUtf8(isolate, "quark"), Nan::GetFunction(Nan::New<FunctionTemplate>(quark)).ToLocalChecked());
+    exports->Set(String::NewFromUtf8(isolate,"x11"), Nan::GetFunction(Nan::New<FunctionTemplate>(x11)).ToLocalChecked());
+    exports->Set(String::NewFromUtf8(isolate,"scrypt"), Nan::GetFunction(Nan::New<FunctionTemplate>(scryptHash)).ToLocalChecked());
+    exports->Set(String::NewFromUtf8(isolate,"scryptn"), Nan::GetFunction(Nan::New<FunctionTemplate>(scryptn)).ToLocalChecked());
+   // exports->Set(String::NewFromUtf8(isolate,"scryptjane"), Nan::GetFunction(Nan::New<FunctionTemplate>(scryptjane)).ToLocalChecked());
+    exports->Set(String::NewFromUtf8(isolate,"keccak"), Nan::GetFunction(Nan::New<FunctionTemplate>(keccak)).ToLocalChecked());
+    exports->Set(String::NewFromUtf8(isolate,"bcrypt"), Nan::GetFunction(Nan::New<FunctionTemplate>(bcrypt)).ToLocalChecked());
+    exports->Set(String::NewFromUtf8(isolate,"skein"), Nan::GetFunction(Nan::New<FunctionTemplate>(skein)).ToLocalChecked());
+    exports->Set(String::NewFromUtf8(isolate,"groestl"), Nan::GetFunction(Nan::New<FunctionTemplate>(groestl)).ToLocalChecked());
+    exports->Set(String::NewFromUtf8(isolate,"groestlmyriad"), Nan::GetFunction(Nan::New<FunctionTemplate>(groestlmyriad)).ToLocalChecked());
+    exports->Set(String::NewFromUtf8(isolate,"blake"), Nan::GetFunction(Nan::New<FunctionTemplate>(blake)).ToLocalChecked());
+    exports->Set(String::NewFromUtf8(isolate,"fugue"), Nan::GetFunction(Nan::New<FunctionTemplate>(fugue)).ToLocalChecked());
+    exports->Set(String::NewFromUtf8(isolate,"qubit"), Nan::GetFunction(Nan::New<FunctionTemplate>(qubit)).ToLocalChecked());
+    exports->Set(String::NewFromUtf8(isolate,"hefty1"), Nan::GetFunction(Nan::New<FunctionTemplate>(hefty1)).ToLocalChecked());
+    exports->Set(String::NewFromUtf8(isolate,"shavite3"), Nan::GetFunction(Nan::New<FunctionTemplate>(shavite3)).ToLocalChecked());
+    exports->Set(String::NewFromUtf8(isolate,"cryptonight"), Nan::GetFunction(Nan::New<FunctionTemplate>(cryptonight)).ToLocalChecked());
+    exports->Set(String::NewFromUtf8(isolate,"x13"), Nan::GetFunction(Nan::New<FunctionTemplate>(x13)).ToLocalChecked());
+    exports->Set(String::NewFromUtf8(isolate,"boolberry"), Nan::GetFunction(Nan::New<FunctionTemplate>(boolberry)).ToLocalChecked());
+    exports->Set(String::NewFromUtf8(isolate,"nist5"), Nan::GetFunction(Nan::New<FunctionTemplate>(nist5)).ToLocalChecked());
+    exports->Set(String::NewFromUtf8(isolate,"sha1"), Nan::GetFunction(Nan::New<FunctionTemplate>(sha1)).ToLocalChecked());
+    exports->Set(String::NewFromUtf8(isolate,"x15"), Nan::GetFunction(Nan::New<FunctionTemplate>(x15)).ToLocalChecked());
+    exports->Set(String::NewFromUtf8(isolate,"fresh"), Nan::GetFunction(Nan::New<FunctionTemplate>(fresh)).ToLocalChecked());
 }
 
 NODE_MODULE(multihashing, init)

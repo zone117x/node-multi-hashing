@@ -706,6 +706,7 @@ static void neoscrypt_blkxor(void *dstp, const void *srcp, uint len) {
 
 /* 32-bit / 64-bit optimised memcpy() */
 void neoscrypt_copy(void *dstp, const void *srcp, uint len) {
+#ifdef VECTORIZE
     size_t *dst = (size_t *) dstp;
     size_t *src = (size_t *) srcp;
     uint i, tail;
@@ -721,10 +722,14 @@ void neoscrypt_copy(void *dstp, const void *srcp, uint len) {
         for(i = len - tail; i < len; i++)
           dstb[i] = srcb[i];
     }
+#else
+    memcpy(dstp, srcp, len);
+#endif
 }
 
 /* 32-bit / 64-bit optimised memory erase aka memset() to zero */
 void neoscrypt_erase(void *dstp, uint len) {
+#ifdef VECTORIZE
     const size_t null = 0;
     size_t *dst = (size_t *) dstp;
     uint i, tail;
@@ -739,16 +744,37 @@ void neoscrypt_erase(void *dstp, uint len) {
         for(i = len - tail; i < len; i++)
           dstb[i] = (uchar)null;
     }
+#else
+    memset(dstp, 0, len);
+#endif
 }
 
-/* Fail safe bytewise XOR engine */
+/* 32-bit / 64-bit optimised XOR engine */
 void neoscrypt_xor(void *dstp, const void *srcp, uint len) {
+#ifdef VECTORIZE
+    size_t *dst = (size_t *) dstp;
+    size_t *src = (size_t *) srcp;
+    uint i, tail;
+
+    for(i = 0; i < (len / sizeof(size_t)); i++)
+        dst[i] ^= src[i];
+
+    tail = len & (sizeof(size_t) - 1);
+    if(tail) {
+        uchar *dstb = (uchar *) dstp;
+        uchar *srcb = (uchar *) srcp;
+
+        for(i = len - tail; i < len; i++)
+            dstb[i] ^= srcb[i];
+    }
+#else
     uchar *dst = (uchar *) dstp;
     uchar *src = (uchar *) srcp;
     uint i;
 
     for(i = 0; i < len; i++)
       dst[i] ^= src[i];
+#endif
 }
 
 #endif /* NEOSCRYPT_ASM */

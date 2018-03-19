@@ -426,9 +426,11 @@ Handle<Value> cryptonight(const Arguments& args) {
 
     if(fast)
         cryptonight_fast_hash(input, output, input_len);
-    else
+    else {
+        if (cn_variant > 0 && input_len < 43)
+            return except("Argument must be 43 bytes for monero variant 1+");
         cryptonight_hash(input, output, input_len, cn_variant);
-
+    }
     Buffer* buff = Buffer::New(output, 32);
     return scope.Close(buff->handle_);
 }

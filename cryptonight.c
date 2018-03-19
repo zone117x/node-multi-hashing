@@ -25,20 +25,25 @@
 #define VARIANT1_1(p) \
   do if (variant > 0) \
   { \
-    uint8_t tmp = ((const uint8_t*)p)[11]; \
-    uint8_t tmp1 = (tmp>>4)&1, tmp2 = (tmp>>5)&1, tmp3 = tmp1^tmp2; \
-    uint8_t tmp0 = nonce_flag ? tmp3 : tmp1 + 1; \
-    ((uint8_t*)p)[11] = (tmp & 0xef) | (tmp0<<4); \
+    const uint8_t tmp = ((const uint8_t*)(p))[11]; \
+    static const uint32_t table = 0x75310; \
+    const uint8_t index = (((tmp >> 3) & 6) | (tmp & 1)) << 1; \
+    ((uint8_t*)(p))[11] = tmp ^ ((table >> index) & 0x30); \
   } while(0)
 
-#define VARIANT1_2(p) VARIANT1_1(p)
+#define VARIANT1_2(p) \
+   do if (variant > 0) \
+   { \
+     ((uint64_t*)p)[1] ^= tweak1_2; \
+   } while(0)
+
 #define VARIANT1_INIT() \
   if (variant > 0 && len < 43) \
   { \
     fprintf(stderr, "Cryptonight variants need at least 43 bytes of data"); \
     _exit(1); \
   } \
-  const uint8_t nonce_flag = variant > 0 ? ((const uint8_t*)input)[39] & 0x01 : 0
+  const uint64_t tweak1_2 = variant > 0 ? *(const uint64_t*)(((const uint8_t*)input)+35) ^ ctx->state.hs.w[24] : 0
 
 #pragma pack(push, 1)
 union cn_slow_hash_state {

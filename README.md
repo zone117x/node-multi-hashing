@@ -16,6 +16,7 @@ Cryptocurrency hashing functions for node.js.
 
 Algorithms
 ----------
+* argon2
 * quark
 * x11
 * x13

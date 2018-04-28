@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 extern "C" {
+    #include "argon2/argon2.h"
     #include "bcrypt.h"
     #include "blake.h"
     #include "cryptonight.h"
@@ -118,6 +119,80 @@ using namespace v8;
  DECLARE_CALLBACK(x13, x13_hash, 32);
  DECLARE_CALLBACK(x15, x15_hash, 32);
 
+DECLARE_FUNC(argon2d) {
+    DECLARE_SCOPE;
+
+    if (args.Length() < 4)
+        RETURN_EXCEPT("You must provide buffer to hash, T value, M value, and P value");
+
+    Local<Object> target = args[0]->ToObject();
+
+    if(!Buffer::HasInstance(target))
+        RETURN_EXCEPT("Argument should be a buffer object.");
+
+    unsigned int tValue = args[1]->Uint32Value();
+    unsigned int mValue = args[2]->Uint32Value();
+    unsigned int pValue = args[3]->Uint32Value();
+
+    char * input = Buffer::Data(target);
+    char output[32];
+
+    uint32_t input_len = Buffer::Length(target);
+
+    argon2d_hash_raw(tValue, mValue, pValue, input, input_len, input, input_len, output, 32);
+
+    SET_BUFFER_RETURN(output, 32);
+}
+
+DECLARE_FUNC(argon2i) {
+    DECLARE_SCOPE;
+
+    if (args.Length() < 4)
+        RETURN_EXCEPT("You must provide buffer to hash, T value, M value, and P value");
+
+    Local<Object> target = args[0]->ToObject();
+
+    if(!Buffer::HasInstance(target))
+        RETURN_EXCEPT("Argument should be a buffer object.");
+
+    unsigned int tValue = args[1]->Uint32Value();
+    unsigned int mValue = args[2]->Uint32Value();
+    unsigned int pValue = args[3]->Uint32Value();
+
+    char * input = Buffer::Data(target);
+    char output[32];
+
+    uint32_t input_len = Buffer::Length(target);
+
+    argon2i_hash_raw(tValue, mValue, pValue, input, input_len, input, input_len, output, 32);
+
+    SET_BUFFER_RETURN(output, 32);
+}
+
+DECLARE_FUNC(argon2id) {
+    DECLARE_SCOPE;
+
+    if (args.Length() < 4)
+        RETURN_EXCEPT("You must provide buffer to hash, T value, M value, and P value");
+
+    Local<Object> target = args[0]->ToObject();
+
+    if(!Buffer::HasInstance(target))
+        RETURN_EXCEPT("Argument should be a buffer object.");
+
+    unsigned int tValue = args[1]->Uint32Value();
+    unsigned int mValue = args[2]->Uint32Value();
+    unsigned int pValue = args[3]->Uint32Value();
+
+    char * input = Buffer::Data(target);
+    char output[32];
+
+    uint32_t input_len = Buffer::Length(target);
+
+    argon2id_hash_raw(tValue, mValue, pValue, input, input_len, input, input_len, output, 32);
+
+    SET_BUFFER_RETURN(output, 32);
+}
 
 DECLARE_FUNC(scrypt) {
    DECLARE_SCOPE;
@@ -269,6 +344,9 @@ DECLARE_FUNC(boolberry) {
 }
 
 DECLARE_INIT(init) {
+    NODE_SET_METHOD(exports, "argon2d", argon2d);
+    NODE_SET_METHOD(exports, "argon2i", argon2i);
+    NODE_SET_METHOD(exports, "argon2id", argon2id);
     NODE_SET_METHOD(exports, "bcrypt", bcrypt);
     NODE_SET_METHOD(exports, "blake", blake);
     NODE_SET_METHOD(exports, "boolberry", boolberry);

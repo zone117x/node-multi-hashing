@@ -19,6 +19,7 @@
         "nan": "^2.14.1"
     },
     "keywords": [
+        "argon2",
         "scrypt",
         "scryptjane",
         "script-n",

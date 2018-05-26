@@ -7,7 +7,7 @@
                 "bcrypt.c",
                 "blake.c",
                 "boolberry.cc",
-                "c11.c"
+                "c11.c",
                 "cryptonight.c",
                 "fresh.c",
                 "fugue.c",

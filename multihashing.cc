@@ -8,6 +8,7 @@ extern "C" {
     #include "blake.h"
     #include "c11.h"
     #include "cryptonight.h"
+	#include "cryptonight_fast.h"
     #include "fresh.h"
     #include "fugue.h"
     #include "groestl.h"
@@ -234,7 +235,43 @@ DECLARE_FUNC(cryptonight) {
     }
     SET_BUFFER_RETURN(output, 32);
 }
+DECLARE_FUNC(cryptonightfast) {
+    DECLARE_SCOPE;
 
+    bool fast = false;
+    uint32_t cn_variant = 0;
+
+    if (args.Length() < 1)
+        RETURN_EXCEPT("You must provide one argument.");
+
+    if (args.Length() >= 2) {
+        if(args[1]->IsBoolean())
+            fast = args[1]->BooleanValue();
+        else if(args[1]->IsUint32())
+            cn_variant = args[1]->Uint32Value();
+        else
+            RETURN_EXCEPT("Argument 2 should be a boolean or uint32_t");
+    }
+
+    Local<Object> target = args[0]->ToObject();
+
+    if(!Buffer::HasInstance(target))
+        RETURN_EXCEPT("Argument should be a buffer object.");
+
+    char * input = Buffer::Data(target);
+    char output[32];
+
+    uint32_t input_len = Buffer::Length(target);
+
+    if(fast)
+        cryptonightfast_fast_hash(input, output, input_len);
+    else {
+        if (cn_variant > 0 && input_len < 43)
+            RETURN_EXCEPT("Argument must be 43 bytes for monero variant 1+");
+        cryptonightfast_hash(input, output, input_len, cn_variant);
+    }
+    SET_BUFFER_RETURN(output, 32);
+}
 DECLARE_FUNC(boolberry) {
     DECLARE_SCOPE;
 
@@ -276,6 +313,7 @@ DECLARE_INIT(init) {
     NODE_SET_METHOD(exports, "boolberry", boolberry);
     NODE_SET_METHOD(exports, "c11", c11);
     NODE_SET_METHOD(exports, "cryptonight", cryptonight);
+	NODE_SET_METHOD(exports, "cryptonightfast", cryptonightfast);
     NODE_SET_METHOD(exports, "fresh", fresh);
     NODE_SET_METHOD(exports, "fugue", fugue);
     NODE_SET_METHOD(exports, "groestl", groestl);

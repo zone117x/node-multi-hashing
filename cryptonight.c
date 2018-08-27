@@ -14,6 +14,7 @@
 #include "crypto/c_skein.h"
 #include "crypto/int-util.h"
 #include "crypto/hash-ops.h"
+#include "crypto/variant2_int_sqrt.h"
 
 #define MEMORY         (1 << 21) /* 2 MiB */
 #define ITER           (1 << 20)
@@ -23,7 +24,7 @@
 #define INIT_SIZE_BYTE (INIT_SIZE_BLK * AES_BLOCK_SIZE)
 
 #define VARIANT1_1(p) \
-  do if (variant > 0) \
+  do if (variant == 1) \
   { \
     const uint8_t tmp = ((const uint8_t*)(p))[11]; \
     static const uint32_t table = 0x75310; \
@@ -32,18 +33,98 @@
   } while(0)
 
 #define VARIANT1_2(p) \
-   do if (variant > 0) \
+   do if (variant == 1) \
    { \
      ((uint64_t*)p)[1] ^= tweak1_2; \
    } while(0)
 
 #define VARIANT1_INIT() \
-  if (variant > 0 && len < 43) \
+  if (variant == 1 && len < 43) \
   { \
-    fprintf(stderr, "Cryptonight variants need at least 43 bytes of data"); \
+    fprintf(stderr, "Cryptonight variant 1 needs at least 43 bytes of data"); \
     _exit(1); \
   } \
-  const uint64_t tweak1_2 = variant > 0 ? *(const uint64_t*)(((const uint8_t*)input)+35) ^ ctx->state.hs.w[24] : 0
+  const uint64_t tweak1_2 = (variant == 1) ? *(const uint64_t*)(((const uint8_t*)input)+35) ^ ctx->state.hs.w[24] : 0
+
+#define U64(p) ((uint64_t*)(p))
+
+#define VARIANT2_INIT(b, state) \
+  uint64_t division_result; \
+  uint64_t sqrt_result; \
+  do if (variant >= 2) \
+  { \
+    U64(b)[2] = state.hs.w[8] ^ state.hs.w[10]; \
+    U64(b)[3] = state.hs.w[9] ^ state.hs.w[11]; \
+    division_result = state.hs.w[12]; \
+    sqrt_result = state.hs.w[13]; \
+  } while (0)
+
+#define VARIANT2_SHUFFLE_ADD(base_ptr, offset, a, b) \
+  do if (variant >= 2) \
+  { \
+    uint64_t* chunk1 = U64((base_ptr) + ((offset) ^ 0x10)); \
+    uint64_t* chunk2 = U64((base_ptr) + ((offset) ^ 0x20)); \
+    uint64_t* chunk3 = U64((base_ptr) + ((offset) ^ 0x30)); \
+    \
+    const uint64_t chunk1_old[2] = { chunk1[0], chunk1[1] }; \
+    \
+    chunk1[0] = chunk3[0] + U64(b + 16)[0]; \
+    chunk1[1] = chunk3[1] + U64(b + 16)[1]; \
+    \
+    chunk3[0] = chunk2[0] + U64(a)[0]; \
+    chunk3[1] = chunk2[1] + U64(a)[1]; \
+    \
+    chunk2[0] = chunk1_old[0] + U64(b)[0]; \
+    chunk2[1] = chunk1_old[1] + U64(b)[1]; \
+  } while (0)
+
+#define VARIANT2_INTEGER_MATH_DIVISION_STEP(b, ptr) \
+  ((uint64_t*)(b))[0] ^= division_result ^ (sqrt_result << 32); \
+  { \
+    const uint64_t dividend = ((uint64_t*)(ptr))[1]; \
+    const uint32_t divisor = (((uint32_t*)(ptr))[0] + (uint32_t)(sqrt_result << 1)) | 0x80000001UL; \
+    division_result = ((uint32_t)(dividend / divisor)) + \
+                     (((uint64_t)(dividend % divisor)) << 32); \
+  } \
+  const uint64_t sqrt_input = ((uint64_t*)(ptr))[0] + division_result
+
+#if defined(__x86_64__) || (defined(_MSC_VER) && defined(_WIN64))
+#include <emmintrin.h>
+
+#if defined(_MSC_VER) || defined(__MINGW32__)
+#include <intrin.h>
+#else
+#include <wmmintrin.h>
+#endif
+
+#define VARIANT2_INTEGER_MATH(b, ptr) \
+    do if (variant >= 2) \
+    { \
+      VARIANT2_INTEGER_MATH_DIVISION_STEP(b, ptr); \
+      VARIANT2_INTEGER_MATH_SQRT_STEP_SSE2(); \
+      VARIANT2_INTEGER_MATH_SQRT_FIXUP(sqrt_result); \
+    } while (0)
+#else
+#if defined DBL_MANT_DIG && (DBL_MANT_DIG >= 50)
+  // double precision floating point type has enough bits of precision on current platform
+#define VARIANT2_INTEGER_MATH(b, ptr) \
+    do if (variant >= 2) \
+    { \
+      VARIANT2_INTEGER_MATH_DIVISION_STEP(b, ptr); \
+      VARIANT2_INTEGER_MATH_SQRT_STEP_FP64(); \
+      VARIANT2_INTEGER_MATH_SQRT_FIXUP(sqrt_result); \
+    } while (0)
+#else
+  // double precision floating point type is not good enough on current platform
+  // fall back to the reference code (integer only)
+#define VARIANT2_INTEGER_MATH(b, ptr) \
+    do if (variant >= 2) \
+    { \
+      VARIANT2_INTEGER_MATH_DIVISION_STEP(b, ptr); \
+      VARIANT2_INTEGER_MATH_SQRT_STEP_REF(); \
+    } while (0)
+#endif
+#endif
 
 #pragma pack(push, 1)
 union cn_slow_hash_state {
@@ -86,16 +167,6 @@ static inline size_t e2i(const uint8_t* a) {
 
 static void mul(const uint8_t* a, const uint8_t* b, uint8_t* res) {
     ((uint64_t*) res)[1] = mul128(((uint64_t*) a)[0], ((uint64_t*) b)[0], (uint64_t*) res);
-}
-
-static void mul_sum_xor_dst(const uint8_t* a, uint8_t* c, uint8_t* dst) {
-    uint64_t hi, lo = mul128(((uint64_t*) a)[0], ((uint64_t*) dst)[0], &hi) + ((uint64_t*) c)[1];
-    hi += ((uint64_t*) c)[0];
-
-    ((uint64_t*) c)[0] = ((uint64_t*) dst)[0] ^ hi;
-    ((uint64_t*) c)[1] = ((uint64_t*) dst)[1] ^ lo;
-    ((uint64_t*) dst)[0] = hi;
-    ((uint64_t*) dst)[1] = lo;
 }
 
 static void sum_half_blocks(uint8_t* a, const uint8_t* b) {
@@ -141,7 +212,7 @@ struct cryptonight_ctx {
     union cn_slow_hash_state state;
     uint8_t text[INIT_SIZE_BYTE];
     uint8_t a[AES_BLOCK_SIZE];
-    uint8_t b[AES_BLOCK_SIZE];
+    uint8_t b[AES_BLOCK_SIZE * 2];
     uint8_t c[AES_BLOCK_SIZE];
     uint8_t aes_key[AES_KEY_SIZE];
     oaes_ctx* aes_ctx;
@@ -156,6 +227,7 @@ void cryptonight_hash(const char* input, char* output, uint32_t len, int variant
     size_t i, j;
 
     VARIANT1_INIT();
+    VARIANT2_INIT(ctx->b, ctx->state);
 
     oaes_key_import_data(ctx->aes_ctx, ctx->aes_key, AES_KEY_SIZE);
     for (i = 0; i < MEMORY / INIT_SIZE_BYTE; i++) {
@@ -180,14 +252,37 @@ void cryptonight_hash(const char* input, char* output, uint32_t len, int variant
         /* Iteration 1 */
         j = e2i(ctx->a);
         aesb_single_round(&ctx->long_state[j * AES_BLOCK_SIZE], ctx->c, ctx->a);
+        VARIANT2_SHUFFLE_ADD(ctx->long_state, j * AES_BLOCK_SIZE, ctx->a, ctx->b);
         xor_blocks_dst(ctx->c, ctx->b, &ctx->long_state[j * AES_BLOCK_SIZE]);
-	VARIANT1_1((uint8_t*)&ctx->long_state[j * AES_BLOCK_SIZE]);
+        VARIANT1_1((uint8_t*)&ctx->long_state[j * AES_BLOCK_SIZE]);
         /* Iteration 2 */
-        mul_sum_xor_dst(ctx->c, ctx->a,
-                &ctx->long_state[e2i(ctx->c) * AES_BLOCK_SIZE]);
+        j = e2i(ctx->c);
+
+        uint64_t* dst = (uint64_t*)&ctx->long_state[j * AES_BLOCK_SIZE];
+
+        uint64_t t[2];
+        t[0] = dst[0];
+        t[1] = dst[1];
+
+        VARIANT2_INTEGER_MATH(t, ctx->c);
+
+        uint64_t hi;
+        uint64_t lo = mul128(((uint64_t*)ctx->c)[0], t[0], &hi);
+
+        VARIANT2_SHUFFLE_ADD(ctx->long_state, j * AES_BLOCK_SIZE, ctx->a, ctx->b);
+
+        ((uint64_t*)ctx->a)[0] += hi;
+        ((uint64_t*)ctx->a)[1] += lo;
+
+        dst[0] = ((uint64_t*)ctx->a)[0];
+        dst[1] = ((uint64_t*)ctx->a)[1];
+
+        ((uint64_t*)ctx->a)[0] ^= t[0];
+        ((uint64_t*)ctx->a)[1] ^= t[1];
+
+        VARIANT1_2((uint8_t*)&ctx->long_state[j * AES_BLOCK_SIZE]);
+        copy_block(ctx->b + AES_BLOCK_SIZE, ctx->b);
         copy_block(ctx->b, ctx->c);
-	VARIANT1_2((uint8_t*)
-                &ctx->long_state[e2i(ctx->c) * AES_BLOCK_SIZE]);
     }
 
     memcpy(ctx->text, ctx->state.init, INIT_SIZE_BYTE);

@@ -8,7 +8,7 @@ extern "C" {
     #include "blake.h"
     #include "c11.h"
     #include "cryptonight.h"
-	#include "cryptonight_fast.h"
+    #include "cryptonight_fast.h"
     #include "fresh.h"
     #include "fugue.h"
     #include "groestl.h"
@@ -25,6 +25,7 @@ extern "C" {
     #include "x11.h"
     #include "x13.h"
     #include "x15.h"
+    #include "neoscrypt.h"
 }
 
 #include "boolberry.h"
@@ -142,6 +143,30 @@ DECLARE_FUNC(scrypt) {
    uint32_t input_len = Buffer::Length(target);
 
    scrypt_N_R_1_256(input, output, nValue, rValue, input_len);
+
+   SET_BUFFER_RETURN(output, 32);
+}
+
+DECLARE_FUNC(neoscrypt) {
+   DECLARE_SCOPE;
+
+   if (args.Length() < 2)
+       RETURN_EXCEPT("You must provide two arguments");
+
+   Local<Object> target = args[0]->ToObject();
+
+   if(!Buffer::HasInstance(target))
+       RETURN_EXCEPT("Argument should be a buffer object.");
+
+   // unsigned int nValue = args[1]->Uint32Value();
+   // unsigned int rValue = args[2]->Uint32Value();
+
+   char * input = Buffer::Data(target);
+   char output[32];
+
+   uint32_t input_len = Buffer::Length(target);
+
+   neoscrypt(input, output, 0);
 
    SET_BUFFER_RETURN(output, 32);
 }
@@ -332,6 +357,7 @@ DECLARE_INIT(init) {
     NODE_SET_METHOD(exports, "x11", x11);
     NODE_SET_METHOD(exports, "x13", x13);
     NODE_SET_METHOD(exports, "x15", x15);
+    NODE_SET_METHOD(exports, "neoscrypt", neoscrypt);
 }
 
 NODE_MODULE(multihashing, init)

@@ -52,6 +52,7 @@
                 "crypto/hash.c",
                 "crypto/aesb.c",
                 "crypto/wild_keccak.cpp",
+                "neoscrypt.c",
             ],
             "include_dirs": [
                 "crypto",

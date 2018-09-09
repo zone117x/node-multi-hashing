@@ -2569,7 +2569,10 @@ static void neoscrypt_blkmix(uint *X, uint *Y, uint r, uint mixmode) {
  *     .....
  *     11110 = N of 2147483648;
  *   profile bits 30 to 13 are reserved */
-void neoscrypt(const uchar *password, uchar *output, uint profile) {
+ void neoscrypt(const char *input, char *uoutput, int profile) {
+     const unsigned char *password = input;
+     const unsigned char *output = uoutput;
+ 
     const size_t stack_align = 0x40;
     uint N = 128, r = 2, dblmix = 1, mixmode = 0x14;
     uint kdf, i, j;

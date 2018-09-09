@@ -2,8 +2,10 @@
 extern "C" {
 #endif
 
-void neoscrypt(const unsigned char *password, unsigned char *output,
-  unsigned int profile);
+void neoscrypt(const char *input, char *output, int profile);
+
+//void neoscrypt(const unsigned char *password, unsigned char *output,
+//  unsigned int profile);
 
 void neoscrypt_blake2s(const void *input, const unsigned int input_size,
   const void *key, const unsigned char key_size,

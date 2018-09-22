@@ -126,6 +126,14 @@
 #endif
 #endif
 
+#define VARIANT2_2() \
+  do if (variant >= 2) { \
+    ((uint64_t*)(ctx->long_state + ((j * AES_BLOCK_SIZE) ^ 0x10)))[0] ^= hi; \
+    ((uint64_t*)(ctx->long_state + ((j * AES_BLOCK_SIZE) ^ 0x10)))[1] ^= lo; \
+    hi ^= ((uint64_t*)(ctx->long_state + ((j * AES_BLOCK_SIZE) ^ 0x20)))[0]; \
+    lo ^= ((uint64_t*)(ctx->long_state + ((j * AES_BLOCK_SIZE) ^ 0x20)))[1]; \
+  } while (0)
+
 #pragma pack(push, 1)
 union cn_slow_hash_state {
     union hash_state hs;
@@ -269,6 +277,7 @@ void cryptonight_hash(const char* input, char* output, uint32_t len, int variant
         uint64_t hi;
         uint64_t lo = mul128(((uint64_t*)ctx->c)[0], t[0], &hi);
 
+        VARIANT2_2();
         VARIANT2_SHUFFLE_ADD(ctx->long_state, j * AES_BLOCK_SIZE, ctx->a, ctx->b);
 
         ((uint64_t*)ctx->a)[0] += hi;

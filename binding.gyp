@@ -25,6 +25,7 @@
                 "sha256d.c",
                 "shavite3.c",
                 "skein.c",
+                "tribus.c",
                 "x11.c",
                 "x13.c",
                 "x15.c",

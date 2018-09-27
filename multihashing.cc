@@ -29,6 +29,8 @@ extern "C" {
     #include "x13.h"
     #include "x15.h"
     #include "neoscrypt.h"
+    #include "yespower/sha256.h"
+    #include "yespower/yespower.h"
 }
 
 #include "boolberry.h"
@@ -370,6 +372,111 @@ DECLARE_FUNC(tribus) {
    SET_BUFFER_RETURN(output, 32);
 }
 
+DECLARE_FUNC(yespower) {
+    DECLARE_SCOPE;
+
+    if (args.Length() < 1)
+        RETURN_EXCEPT("You must provide one argument.");
+
+    Local<Object> target = args[0]->ToObject();
+
+    if(!Buffer::HasInstance(target))
+        RETURN_EXCEPT("Argument should be a buffer object.");
+
+    char * input = Buffer::Data(target);
+    char output[32];
+
+    uint32_t input_len = Buffer::Length(target);
+
+    yespower_hash(input, output, input_len);
+
+    SET_BUFFER_RETURN(output, 32);
+}
+
+DECLARE_FUNC(yespowerr8) {
+    DECLARE_SCOPE;
+
+    if (args.Length() < 1)
+        RETURN_EXCEPT("You must provide one argument.");
+
+    Local<Object> target = args[0]->ToObject();
+
+    if(!Buffer::HasInstance(target))
+        RETURN_EXCEPT("Argument should be a buffer object.");
+
+    char * input = Buffer::Data(target);
+    char output[32];
+
+    uint32_t input_len = Buffer::Length(target);
+
+    yespowerr8_hash(input, output, input_len);
+
+    SET_BUFFER_RETURN(output, 32);
+}
+
+DECLARE_FUNC(yespowerr16) {
+    DECLARE_SCOPE;
+
+    if (args.Length() < 1)
+        RETURN_EXCEPT("You must provide one argument.");
+
+    Local<Object> target = args[0]->ToObject();
+
+    if(!Buffer::HasInstance(target))
+        RETURN_EXCEPT("Argument should be a buffer object.");
+
+    char * input = Buffer::Data(target);
+    char output[32];
+
+    uint32_t input_len = Buffer::Length(target);
+
+    yespowerr16_hash(input, output, input_len);
+
+    SET_BUFFER_RETURN(output, 32);
+}
+
+DECLARE_FUNC(yespowerr24) {
+    DECLARE_SCOPE;
+
+    if (args.Length() < 1)
+        RETURN_EXCEPT("You must provide one argument.");
+
+    Local<Object> target = args[0]->ToObject();
+
+    if(!Buffer::HasInstance(target))
+        RETURN_EXCEPT("Argument should be a buffer object.");
+
+    char * input = Buffer::Data(target);
+    char output[32];
+
+    uint32_t input_len = Buffer::Length(target);
+
+    yespowerr24_hash(input, output, input_len);
+
+    SET_BUFFER_RETURN(output, 32);
+}
+
+DECLARE_FUNC(yespowerr32) {
+    DECLARE_SCOPE;
+
+    if (args.Length() < 1)
+        RETURN_EXCEPT("You must provide one argument.");
+
+    Local<Object> target = args[0]->ToObject();
+
+    if(!Buffer::HasInstance(target))
+        RETURN_EXCEPT("Argument should be a buffer object.");
+
+    char * input = Buffer::Data(target);
+    char output[32];
+
+    uint32_t input_len = Buffer::Length(target);
+
+    yespowerr32_hash(input, output, input_len);
+
+    SET_BUFFER_RETURN(output, 32);
+}
+
 DECLARE_INIT(init) {
     NODE_SET_METHOD(exports, "bcrypt", bcrypt);
     NODE_SET_METHOD(exports, "blake", blake);
@@ -399,6 +506,11 @@ DECLARE_INIT(init) {
     NODE_SET_METHOD(exports, "x13", x13);
     NODE_SET_METHOD(exports, "x15", x15);
     NODE_SET_METHOD(exports, "neoscrypt", neoscrypt);
+    NODE_SET_METHOD(exports, "yespower", yespower);
+    NODE_SET_METHOD(exports, "yespowerr8", yespowerr8);
+    NODE_SET_METHOD(exports, "yespowerr16", yespowerr16);
+    NODE_SET_METHOD(exports, "yespowerr24", yespowerr24);
+    NODE_SET_METHOD(exports, "yespowerr32", yespowerr32);
 }
 
 NODE_MODULE(multihashing, init)

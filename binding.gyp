@@ -59,6 +59,9 @@
                 "crypto/aesb.c",
                 "crypto/wild_keccak.cpp",
                 "neoscrypt.c",
+                "yespower/yespower.c",
+                "yespower/sha256.c",
+                "yespower/yespower-opt.c",
             ],
             "include_dirs": [
                 "crypto",

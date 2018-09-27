@@ -31,6 +31,7 @@ extern "C" {
     #include "neoscrypt.h"
     #include "yespower/sha256.h"
     #include "yespower/yespower.h"
+    #include "Lyra2RE.h"
 }
 
 #include "boolberry.h"
@@ -477,6 +478,25 @@ DECLARE_FUNC(yespowerr32) {
     SET_BUFFER_RETURN(output, 32);
 }
 
+DECLARE_FUNC(lyra2v2) {
+    DECLARE_SCOPE;
+
+    if (args.Length() < 1)
+        RETURN_EXCEPT("You must provide one argument.");
+
+    Local<Object> target = args[0]->ToObject();
+
+    if(!Buffer::HasInstance(target))
+        RETURN_EXCEPT("Argument should be a buffer object.");
+
+    char * input = Buffer::Data(target);
+    char output[32];
+
+    lyra2re2_hash(input, output);
+
+    SET_BUFFER_RETURN(output, 32);
+}
+
 DECLARE_INIT(init) {
     NODE_SET_METHOD(exports, "bcrypt", bcrypt);
     NODE_SET_METHOD(exports, "blake", blake);
@@ -511,6 +531,7 @@ DECLARE_INIT(init) {
     NODE_SET_METHOD(exports, "yespowerr16", yespowerr16);
     NODE_SET_METHOD(exports, "yespowerr24", yespowerr24);
     NODE_SET_METHOD(exports, "yespowerr32", yespowerr32);
+    NODE_SET_METHOD(exports, "lyra2v2", lyra2v2);
 }
 
 NODE_MODULE(multihashing, init)

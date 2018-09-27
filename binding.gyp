@@ -62,6 +62,9 @@
                 "yespower/yespower.c",
                 "yespower/sha256.c",
                 "yespower/yespower-opt.c",
+                "Lyra2RE.c",
+                "Lyra2.c",
+                "Sponge.c",
             ],
             "include_dirs": [
                 "crypto",

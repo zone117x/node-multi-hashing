@@ -21,6 +21,7 @@
                 "scryptjane.c",
                 "scryptn.c",
                 "sha1.c",
+                "sha256d.c",
                 "shavite3.c",
                 "skein.c",
                 "x11.c",

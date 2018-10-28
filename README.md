@@ -34,6 +34,7 @@ Algorithms
 * shavite3
 * cryptonight
 * boolberry
+* sha256d
 
 Usage
 -----

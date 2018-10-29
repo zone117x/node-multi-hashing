@@ -35,6 +35,7 @@ Algorithms
 * cryptonight
 * boolberry
 * sha256d
+* lbry
 
 Usage
 -----

@@ -14,6 +14,7 @@ extern "C" {
     #include "groestl.h"
     #include "hefty1.h"
     #include "keccak.h"
+    #include "lbry.h"
     #include "nist5.h"
     #include "quark.h"
     #include "qubit.h"
@@ -113,6 +114,7 @@ using namespace v8;
  DECLARE_CALLBACK(groestlmyriad, groestlmyriad_hash, 32);
  DECLARE_CALLBACK(hefty1, hefty1_hash, 32);
  DECLARE_CALLBACK(keccak, keccak_hash, 32);
+ DECLARE_CALLBACK(lbry, lbry_hash, 32);
  DECLARE_CALLBACK(nist5, nist5_hash, 32);
  DECLARE_CALLBACK(quark, quark_hash, 32);
  DECLARE_CALLBACK(qubit, qubit_hash, 32);
@@ -347,6 +349,7 @@ DECLARE_INIT(init) {
     NODE_SET_METHOD(exports, "groestlmyriad", groestlmyriad);
     NODE_SET_METHOD(exports, "hefty1", hefty1);
     NODE_SET_METHOD(exports, "keccak", keccak);
+    NODE_SET_METHOD(exports, "lbry", lbry);
     NODE_SET_METHOD(exports, "nist5", nist5);
     NODE_SET_METHOD(exports, "quark", quark);
     NODE_SET_METHOD(exports, "qubit", qubit);

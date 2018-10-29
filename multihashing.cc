@@ -20,6 +20,7 @@ extern "C" {
     #include "scryptjane.h"
     #include "scryptn.h"
     #include "sha1.h"
+    #include "sha256d.h"
     #include "shavite3.h"
     #include "skein.h"
     #include "x11.h"
@@ -116,6 +117,7 @@ using namespace v8;
  DECLARE_CALLBACK(quark, quark_hash, 32);
  DECLARE_CALLBACK(qubit, qubit_hash, 32);
  DECLARE_CALLBACK(sha1, sha1_hash, 32);
+ DECLARE_CALLBACK(sha256d, sha256d_hash, 32);
  DECLARE_CALLBACK(shavite3, shavite3_hash, 32);
  DECLARE_CALLBACK(skein, skein_hash, 32);
  DECLARE_CALLBACK(x11, x11_hash, 32);
@@ -352,6 +354,7 @@ DECLARE_INIT(init) {
     NODE_SET_METHOD(exports, "scryptjane", scryptjane);
     NODE_SET_METHOD(exports, "scryptn", scryptn);
     NODE_SET_METHOD(exports, "sha1", sha1);
+    NODE_SET_METHOD(exports, "sha256d", sha256d);
     NODE_SET_METHOD(exports, "shavite3", shavite3);
     NODE_SET_METHOD(exports, "skein", skein);
     NODE_SET_METHOD(exports, "x11", x11);

@@ -110,3 +110,31 @@ void lyra2rev2_hash(const char* input, char* output, uint32_t _len)
 
    	memcpy(output, hashA, 32);
 }
+
+void lyra2rev3_hash(const char* input, char* output, uint32_t _len)
+{
+    sph_blake256_context ctx_blake;
+    sph_cubehash256_context ctx_cubehash;
+
+    sph_bmw256_context ctx_bmw;
+
+    uint32_t hashA[8], hashB[8];
+
+    sph_blake256_init(&ctx_blake);
+    sph_blake256(&ctx_blake, input, 80);
+    sph_blake256_close (&ctx_blake, hashA);
+
+    LYRA2_3(hashB, 32, hashA, 32, hashA, 32, 1, 4, 4);
+
+    sph_cubehash256_init(&ctx_cubehash);
+    sph_cubehash256(&ctx_cubehash, hashB, 32);
+    sph_cubehash256_close(&ctx_cubehash, hashA);
+
+    LYRA2_3(hashB, 32, hashA, 32, hashA, 32, 1, 4, 4);
+
+    sph_bmw256_init(&ctx_bmw);
+    sph_bmw256(&ctx_bmw, hashB, 32);
+    sph_bmw256_close(&ctx_bmw, hashA);
+
+    memcpy(output, hashA, 32);
+}

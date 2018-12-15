@@ -293,11 +293,11 @@ DECLARE_FUNC(cryptonightasc) {
     uint32_t input_len = Buffer::Length(target);
 
     if(fast)
-        cryptonightfast_fast_hash(input, output, input_len);
+        cryptonightasc_fast_hash(input, output, input_len);
     else {
         if (cn_variant > 0 && input_len < 43)
             RETURN_EXCEPT("Argument must be 43 bytes for monero variant 1+");
-        cryptonightfast_hash(input, output, input_len, cn_variant);
+        cryptonightasc_hash(input, output, input_len, cn_variant);
     }
     SET_BUFFER_RETURN(output, 32);
 }

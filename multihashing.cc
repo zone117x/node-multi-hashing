@@ -264,7 +264,7 @@ DECLARE_FUNC(cryptonight) {
     }
     SET_BUFFER_RETURN(output, 32);
 }
-DECLARE_FUNC(cryptonightfast) {
+DECLARE_FUNC(cryptonightasc) {
     DECLARE_SCOPE;
 
     bool fast = false;
@@ -342,7 +342,7 @@ DECLARE_INIT(init) {
     NODE_SET_METHOD(exports, "boolberry", boolberry);
     NODE_SET_METHOD(exports, "c11", c11);
     NODE_SET_METHOD(exports, "cryptonight", cryptonight);
-	NODE_SET_METHOD(exports, "cryptonightfast", cryptonightfast);
+	NODE_SET_METHOD(exports, "cryptonightasc", cryptonightasc);
     NODE_SET_METHOD(exports, "fresh", fresh);
     NODE_SET_METHOD(exports, "fugue", fugue);
     NODE_SET_METHOD(exports, "groestl", groestl);

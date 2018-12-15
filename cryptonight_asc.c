@@ -1,26 +1,20 @@
-/*
-  * This program is free software: you can redistribute it and/or modify
-  * it under the terms of the GNU General Public License as published by
-  * the Free Software Foundation, either version 3 of the License, or
-  * any later version.
-  *
-  * This program is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  * GNU General Public License for more details.
-  *
-  * You should have received a copy of the GNU General Public License
-  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  *
-  */
-#pragma once
+// Copyright (c) 2012-2013 The Cryptonote developers
+// Distributed under the MIT/X11 software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+// Portions Copyright (c) 2018 The Monero developers
+ #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include "crypto/oaes_lib.h"
+#include "crypto/c_keccak.h"
+#include "crypto/c_groestl.h"
+#include "crypto/c_blake256.h"
+#include "crypto/c_jh.h"
+#include "crypto/c_skein.h"
+#include "crypto/int-util.h"
+#include "crypto/hash-ops.h"
 
-#include "cryptonight.h"
-#include <memory.h>
-#include <stdio.h>
 
-#ifdef __GNUC__
-#include <x86intrin.h>
 static inline uint64_t _umul128(uint64_t a, uint64_t b, uint64_t* hi)
 {
 	unsigned __int128 r = (unsigned __int128)a * (unsigned __int128)b;

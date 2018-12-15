@@ -8,7 +8,7 @@ extern "C" {
     #include "blake.h"
     #include "c11.h"
     #include "cryptonight.h"
-    #include "cryptonight_fast.h"
+    #include "cryptonight_asc.h"
     #include "fresh.h"
     #include "fugue.h"
     #include "groestl.h"

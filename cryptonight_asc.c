@@ -1,21 +1,19 @@
-// Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
-// Copyright (c) 2014-2018, The Monero Project
-// Copyright (c) 2014-2018, The Aeon Project
-// Copyright (c) 2018, The TurtleCoin Developers
-// Copyright (c) 2018, The Tax Developers
-//
-// Please see the included LICENSE file for more information.
 
-#include <assert.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <string.h>
-#include <stdio.h>
-
-#include "Common/int-util.h"
-#include "hash-ops.h"
-#include "oaes_lib.h"
-#include "variant2_int_sqrt.h"
+// Copyright (c) 2012-2013 The Cryptonote developers
+// Distributed under the MIT/X11 software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+// Portions Copyright (c) 2018 The Monero developers
+ #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include "crypto/oaes_lib.h"
+#include "crypto/c_keccak.h"
+#include "crypto/c_groestl.h"
+#include "crypto/c_blake256.h"
+#include "crypto/c_jh.h"
+#include "crypto/c_skein.h"
+#include "crypto/int-util.h"
+#include "crypto/hash-ops.h"
 
 // Standard Crypto Definitions
 #define AES_BLOCK_SIZE         16

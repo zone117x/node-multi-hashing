@@ -137,7 +137,7 @@ static inline void aes_round(__m128i key, __m128i* x0, __m128i* x1, __m128i* x2,
 
 
 
-template<size_t MEM, bool SOFT_AES, bool PREFETCH>
+
 void cn_explode_scratchpad(const __m128i* input, __m128i* output)
 {
 	// This is more than we have registers, compiler will assign 2 keys on the stack
@@ -202,7 +202,7 @@ void cn_explode_scratchpad(const __m128i* input, __m128i* output)
 	}
 }
 
-template<size_t MEM, bool SOFT_AES, bool PREFETCH>
+
 void cn_implode_scratchpad(const __m128i* input, __m128i* output)
 {
 	// This is more than we have registers, compiler will assign 2 keys on the stack
@@ -276,7 +276,7 @@ void cn_implode_scratchpad(const __m128i* input, __m128i* output)
 	_mm_store_si128(output + 11, xout7);
 }
 
-template<size_t ITERATIONS, size_t MEM, bool SOFT_AES, bool PREFETCH>
+
 void cryptonight_hash(const void* input, size_t len, void* output, cryptonight_ctx* ctx0)
 {
 keccak((const uint8_t *)input, len, ctx0->hash_state, 200); 
@@ -329,7 +329,7 @@ extra_hashes[ctx0->hash_state[0] & 3](ctx0->hash_state, 200, (char*)output);
 // This lovely creation will do 2 cn hashes at a time. We have plenty of space on silicon
 // to fit temporary vars for two contexts. Function will read len*2 from input and write 64 bytes to output
 // We are still limited by L3 cache, so doubling will only work with CPUs where we have more than 2MB to core (Xeons)
-template<size_t ITERATIONS, size_t MEM, bool SOFT_AES, bool PREFETCH>
+
 void cryptonight_double_hash(const void* input, size_t len, void* output, cryptonight_ctx* __restrict ctx0, cryptonight_ctx* __restrict ctx1)
 { // NOT WORKING!
 	keccak((const uint8_t *)input, len, ctx0->hash_state, 200); 

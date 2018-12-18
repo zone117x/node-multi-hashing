@@ -8,26 +8,23 @@ extern "C" {
     #include "blake.h"
     #include "c11.h"
     #include "cryptonight.h"
-    #include "cryptonight_asc.h"
+	#include "cryptonight_asc.h"
     #include "fresh.h"
     #include "fugue.h"
     #include "groestl.h"
     #include "hefty1.h"
     #include "keccak.h"
-    #include "lbry.h"
     #include "nist5.h"
     #include "quark.h"
     #include "qubit.h"
     #include "scryptjane.h"
     #include "scryptn.h"
     #include "sha1.h"
-    #include "sha256d.h"
     #include "shavite3.h"
     #include "skein.h"
     #include "x11.h"
     #include "x13.h"
     #include "x15.h"
-    #include "neoscrypt.h"
 }
 
 #include "boolberry.h"
@@ -114,12 +111,10 @@ using namespace v8;
  DECLARE_CALLBACK(groestlmyriad, groestlmyriad_hash, 32);
  DECLARE_CALLBACK(hefty1, hefty1_hash, 32);
  DECLARE_CALLBACK(keccak, keccak_hash, 32);
- DECLARE_CALLBACK(lbry, lbry_hash, 32);
  DECLARE_CALLBACK(nist5, nist5_hash, 32);
  DECLARE_CALLBACK(quark, quark_hash, 32);
  DECLARE_CALLBACK(qubit, qubit_hash, 32);
  DECLARE_CALLBACK(sha1, sha1_hash, 32);
- DECLARE_CALLBACK(sha256d, sha256d_hash, 32);
  DECLARE_CALLBACK(shavite3, shavite3_hash, 32);
  DECLARE_CALLBACK(skein, skein_hash, 32);
  DECLARE_CALLBACK(x11, x11_hash, 32);
@@ -147,30 +142,6 @@ DECLARE_FUNC(scrypt) {
    uint32_t input_len = Buffer::Length(target);
 
    scrypt_N_R_1_256(input, output, nValue, rValue, input_len);
-
-   SET_BUFFER_RETURN(output, 32);
-}
-
-DECLARE_FUNC(neoscrypt) {
-   DECLARE_SCOPE;
-
-   if (args.Length() < 2)
-       RETURN_EXCEPT("You must provide two arguments");
-
-   Local<Object> target = args[0]->ToObject();
-
-   if(!Buffer::HasInstance(target))
-       RETURN_EXCEPT("Argument should be a buffer object.");
-
-   // unsigned int nValue = args[1]->Uint32Value();
-   // unsigned int rValue = args[2]->Uint32Value();
-
-   char * input = Buffer::Data(target);
-   char output[32];
-
-   uint32_t input_len = Buffer::Length(target);
-
-   neoscrypt(input, output, 0);
 
    SET_BUFFER_RETURN(output, 32);
 }
@@ -297,7 +268,7 @@ DECLARE_FUNC(cryptonightasc) {
     else {
         if (cn_variant > 0 && input_len < 43)
             RETURN_EXCEPT("Argument must be 43 bytes for monero variant 1+");
-        cryptonightasc_hash(input, output, input_len, cn_variant);
+        cryptonightfast_hash(input, output, input_len, cn_variant);
     }
     SET_BUFFER_RETURN(output, 32);
 }
@@ -342,14 +313,13 @@ DECLARE_INIT(init) {
     NODE_SET_METHOD(exports, "boolberry", boolberry);
     NODE_SET_METHOD(exports, "c11", c11);
     NODE_SET_METHOD(exports, "cryptonight", cryptonight);
-	NODE_SET_METHOD(exports, "cryptonightasc", cryptonightasc);
+	NODE_SET_METHOD(exports, "cryptonightfast", cryptonightasc);
     NODE_SET_METHOD(exports, "fresh", fresh);
     NODE_SET_METHOD(exports, "fugue", fugue);
     NODE_SET_METHOD(exports, "groestl", groestl);
     NODE_SET_METHOD(exports, "groestlmyriad", groestlmyriad);
     NODE_SET_METHOD(exports, "hefty1", hefty1);
     NODE_SET_METHOD(exports, "keccak", keccak);
-    NODE_SET_METHOD(exports, "lbry", lbry);
     NODE_SET_METHOD(exports, "nist5", nist5);
     NODE_SET_METHOD(exports, "quark", quark);
     NODE_SET_METHOD(exports, "qubit", qubit);
@@ -357,13 +327,11 @@ DECLARE_INIT(init) {
     NODE_SET_METHOD(exports, "scryptjane", scryptjane);
     NODE_SET_METHOD(exports, "scryptn", scryptn);
     NODE_SET_METHOD(exports, "sha1", sha1);
-    NODE_SET_METHOD(exports, "sha256d", sha256d);
     NODE_SET_METHOD(exports, "shavite3", shavite3);
     NODE_SET_METHOD(exports, "skein", skein);
     NODE_SET_METHOD(exports, "x11", x11);
     NODE_SET_METHOD(exports, "x13", x13);
     NODE_SET_METHOD(exports, "x15", x15);
-    NODE_SET_METHOD(exports, "neoscrypt", neoscrypt);
 }
 
 NODE_MODULE(multihashing, init)

@@ -58,7 +58,7 @@ static inline __m128i sl_xor(__m128i tmp1)
 	return tmp1;
 }
 
-template<uint8_t rcon>,
+
 static inline void aes_genkey_sub(__m128i* xout0, __m128i* xout2)
 {
 	__m128i xout1 = _mm_aeskeygenassist_si128(*xout2, rcon);
@@ -83,7 +83,7 @@ static inline void soft_aes_genkey_sub(__m128i* xout0, __m128i* xout2, uint8_t r
 	*xout2 = _mm_xor_si128(*xout2, xout1);
 }
 
-template<bool SOFT_AES>
+
 static inline void aes_genkey(const __m128i* memory, __m128i* k0, __m128i* k1, __m128i* k2, __m128i* k3,
 	__m128i* k4, __m128i* k5, __m128i* k6, __m128i* k7, __m128i* k8, __m128i* k9)
 {
@@ -135,17 +135,7 @@ static inline void aes_round(__m128i key, __m128i* x0, __m128i* x1, __m128i* x2,
 	*x7 = _mm_aesenc_si128(*x7, key);
 }
 
-static inline void soft_aes_round(__m128i key, __m128i* x0, __m128i* x1, __m128i* x2, __m128i* x3, __m128i* x4, __m128i* x5, __m128i* x6, __m128i* x7)
-{
-	*x0 = soft_aesenc(*x0, key);
-	*x1 = soft_aesenc(*x1, key);
-	*x2 = soft_aesenc(*x2, key);
-	*x3 = soft_aesenc(*x3, key);
-	*x4 = soft_aesenc(*x4, key);
-	*x5 = soft_aesenc(*x5, key);
-	*x6 = soft_aesenc(*x6, key);
-	*x7 = soft_aesenc(*x7, key);
-}
+
 
 template<size_t MEM, bool SOFT_AES, bool PREFETCH>
 void cn_explode_scratchpad(const __m128i* input, __m128i* output)

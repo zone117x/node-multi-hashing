@@ -16,15 +16,11 @@
 #include "crypto/hash-ops.h"
 
 #define MEMORY         (1 << 21) /* 2 MiB */
-#define ITER           (1 << 14)
+#define ITER           (1 << 19)
 #define AES_BLOCK_SIZE  16
 #define AES_KEY_SIZE    32 /*16*/
 #define INIT_SIZE_BLK   8
 #define INIT_SIZE_BYTE (INIT_SIZE_BLK * AES_BLOCK_SIZE)
-
-#define state_index(x,div) (((*((uint64_t *)x) >> 4) & (TOTALBLOCKS /(div) - 1)) << 4)
-#define U64(x) ((uint64_t *) (x))
-#define R128(x) ((__m128i *) (x))
 
 #define VARIANT1_1(p) \
   do if (variant > 0) \
@@ -176,30 +172,22 @@ void cryptonightfast_hash(const char* input, char* output, uint32_t len, int var
         ctx->b[i] = ctx->state.k[16 + i] ^ ctx->state.k[48 + i];
     }
 
-    for (i = 0; i < ITER / 4; i++) {
-		j = state_index(a,lightFlag); 
-		_c = _mm_load_si128(R128(&hp_state[j])); 
-		_a = _mm_load_si128(R128(a)); 
-		aesb_single_round(&ctx->long_state[j * AES_BLOCK_SIZE], ctx->c, ctx->a);
-		_mm_store_si128(R128(c), _c); 
-		_mm_store_si128(R128(c1), _mm_load_si128(R128(&hp_state[j]))); 
-		j = state_index(c,lightFlag); 
-		c[0] ^= b[0]; c[1] ^= b[1];
-		_mm_store_si128(R128(&hp_state[j]), _mm_load_si128(c)); 
-		j = state_index(c,lightFlag); 
-		_mm_store_si128(R128(&hp_state[j]), _mm_load_si128(c1));
-		c1[0] ^= c[0]; c1[1] ^= c[1]; 
-		j = state_index(c1,lightFlag); 
-		_mm_store_si128(R128(&hp_state[j]), _mm_load_si128(c1));
-		p = U64(&hp_state[j]); 
-		b[0] = p[0]; b[1] = p[1]; 
-		__mul(); 
-		a[0] += hi; a[1] += lo; 
-		p = U64(&hp_state[j]); 
-		p[0] = a[0];  p[1] = a[1]; 
-		a[0] ^= b[0]; a[1] ^= b[1]; 
-		_b1 = _b; 
-		_b = _c;
+    for (i = 0; i < ITER / 2; i++) {
+        /* Dependency chain: address -> read value ------+
+         * written value <-+ hard function (AES or MUL) <+
+         * next address  <-+
+         */
+        /* Iteration 1 */
+        j = e2i(ctx->a);
+        aesb_single_round(&ctx->long_state[j * AES_BLOCK_SIZE], ctx->c, ctx->a);
+        xor_blocks_dst(ctx->c, ctx->b, &ctx->long_state[j * AES_BLOCK_SIZE]);
+	VARIANT1_1((uint8_t*)&ctx->long_state[j * AES_BLOCK_SIZE]);
+        /* Iteration 2 */
+        mul_sum_xor_dst(ctx->c, ctx->a,
+                &ctx->long_state[e2i(ctx->c) * AES_BLOCK_SIZE]);
+        copy_block(ctx->b, ctx->c);
+	VARIANT1_2((uint8_t*)
+                &ctx->long_state[e2i(ctx->c) * AES_BLOCK_SIZE]);
     }
 
     memcpy(ctx->text, ctx->state.init, INIT_SIZE_BYTE);
@@ -218,4 +206,10 @@ void cryptonightfast_hash(const char* input, char* output, uint32_t len, int var
     /*memcpy(hash, &state, 32);*/
     extra_hashes[ctx->state.hs.b[0] & 3](&ctx->state, 200, output);
     oaes_free((OAES_CTX **) &ctx->aes_ctx);
+}
+
+void cryptonightfast_fast_hash(const char* input, char* output, uint32_t len) {
+    union hash_state state;
+    hash_process(&state, (const uint8_t*) input, len);
+    memcpy(output, &state, HASH_SIZE);
 }

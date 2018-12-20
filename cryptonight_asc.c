@@ -208,7 +208,3 @@ void cryptonightfast_hash(const char* input, char* output, uint32_t len, int var
     oaes_free((OAES_CTX **) &ctx->aes_ctx);
 }
 
-void cryptonightfast_fast_hash(const char* input, char* output, uint32_t len) {
-    union hash_state state;
-    hash_process(&state, (const uint8_t*) input, len);
-    memcpy(output, &state, HASH_SIZE);

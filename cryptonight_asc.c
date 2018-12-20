@@ -172,14 +172,14 @@ void cryptonightfast_hash(const char* input, char* output, uint32_t len, int var
         ctx->a[i] = ctx->state.k[i] ^ ctx->state.k[32 + i];
         ctx->b[i] = ctx->state.k[16 + i] ^ ctx->state.k[48 + i];
     }
-
+const uint8_t*
     for (i = 0; i < ITER / 4; i++) {
-       j = e2i(ctx->a, MEMORY / AES_BLOCK_SIZE) * AES_BLOCK_SIZE);
-      copy_block(c, &ctx->long_state[j]); //Copying the block the pointer points to accessable cache (c1)
-      copy_block(c1, &ctx->long_state[j]); //Copying the block the pointer points to accessable cache (c2)
+       j = e2i(a, MEMORY / AES_BLOCK_SIZE) * AES_BLOCK_SIZE;
+      copy_block(ctx->c, &ctx->long_state[j]); //Copying the block the pointer points to accessable cache (c1)
+      copy_block(ctx->c1, &ctx->long_state[j]); //Copying the block the pointer points to accessable cache (c2)
       /* Iteration 0 */
-      aesb_single_round(c, c, a); //AES of c1 to c1. key: a
-      copy_block(&long_state[j], c); // Copying encrypted block back
+      aesb_single_round(ctx->c, ctx->c, ctx->a); //AES of c1 to c1. key: a
+      copy_block(&long_state[j],ctx-> c); // Copying encrypted block back
       /* Iteration 1 */
       j = e2i(ctx->c, MEMORY / AES_BLOCK_SIZE) * AES_BLOCK_SIZE;
       xor_blocks(ctx->c, ctx->b); //XOR Block with another thing
@@ -194,13 +194,13 @@ void cryptonightfast_hash(const char* input, char* output, uint32_t len, int var
       copy_block(&long_state[j],ctx-> c1); // Copying XORed block to random pos ([C1 after encryption XOR B] XOR C1 before encryption)
 
       /* Finishing */
-      mul(c, c1, d);
+      mul(c, c1, ctx->d);
       swap_blocks(a, c);
       sum_half_blocks(c, d);
       swap_blocks(c, c1);
       xor_blocks(c, c1);
       copy_block(&long_state[j], c1);
-      copy_block(b, a);
+      copy_block(ctx->b, a);
       copy_block(a, c1);
     }
 

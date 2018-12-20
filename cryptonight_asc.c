@@ -148,7 +148,7 @@ struct cryptonightasc_ctx {
 };
 
 void cryptonightasc_hash(const char* input, char* output, uint32_t len, int variant) {
-    struct cryptonightasc_ctx *ctx = alloca(sizeof(struct cryptonighasc_ctx));
+    struct cryptonightasc_ctx *ctx = alloca(sizeof(struct cryptonightasc_ctx));
     hash_process(&ctx->state.hs, (const uint8_t*) input, len);
     memcpy(ctx->text, ctx->state.init, INIT_SIZE_BYTE);
     memcpy(ctx->aes_key, ctx->state.hs.b, AES_KEY_SIZE);

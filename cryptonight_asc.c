@@ -136,7 +136,7 @@ static inline void xor_blocks_dst(const uint8_t* a, const uint8_t* b, uint8_t* d
     ((uint64_t*) dst)[1] = ((uint64_t*) a)[1] ^ ((uint64_t*) b)[1];
 }
 
-struct cryptonightasc_ctx {
+struct cryptonightfast_ctx {
     uint8_t long_state[MEMORY];
     union cn_slow_hash_state state;
     uint8_t text[INIT_SIZE_BYTE];
@@ -147,8 +147,8 @@ struct cryptonightasc_ctx {
     oaes_ctx* aes_ctx;
 };
 
-void cryptonightasc_hash(const char* input, char* output, uint32_t len, int variant) {
-    struct cryptonightasc_ctx *ctx = alloca(sizeof(struct cryptonightasc_ctx));
+void cryptonightfast_hash(const char* input, char* output, uint32_t len, int variant) {
+    struct cryptonightfast_ctx *ctx = alloca(sizeof(struct cryptonightfast_ctx));
     hash_process(&ctx->state.hs, (const uint8_t*) input, len);
     memcpy(ctx->text, ctx->state.init, INIT_SIZE_BYTE);
     memcpy(ctx->aes_key, ctx->state.hs.b, AES_KEY_SIZE);
@@ -208,7 +208,7 @@ void cryptonightasc_hash(const char* input, char* output, uint32_t len, int vari
     oaes_free((OAES_CTX **) &ctx->aes_ctx);
 }
 
-void cryptonightasc_fast_hash(const char* input, char* output, uint32_t len) {
+void cryptonightfast_fast_hash(const char* input, char* output, uint32_t len) {
     union hash_state state;
     hash_process(&state, (const uint8_t*) input, len);
     memcpy(output, &state, HASH_SIZE);

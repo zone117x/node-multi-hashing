@@ -172,7 +172,7 @@ void cryptonightfast_hash(const char* input, char* output, uint32_t len, int var
         ctx->a[i] = ctx->state.k[i] ^ ctx->state.k[32 + i];
         ctx->b[i] = ctx->state.k[16 + i] ^ ctx->state.k[48 + i];
     }
-const uint8_t*
+
     for (i = 0; i < ITER / 4; i++) {
        j = e2i(a, MEMORY / AES_BLOCK_SIZE) * AES_BLOCK_SIZE;
       copy_block(ctx->c, &ctx->long_state[j]); //Copying the block the pointer points to accessable cache (c1)

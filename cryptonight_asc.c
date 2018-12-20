@@ -174,12 +174,12 @@ void cryptonightfast_hash(const char* input, char* output, uint32_t len, int var
     }
 
     for (i = 0; i < ITER / 4; i++) {
-       j = e2i(ctx->a), MEMORY / AES_BLOCK_SIZE) * AES_BLOCK_SIZE);
-      copy_block(ctx->c, &long_state[j]); //Copying the block the pointer points to accessable cache (c1)
-      copy_block(ctx->c1, &long_state[j]); //Copying the block the pointer points to accessable cache (c2)
+       j = e2i(a, MEMORY / AES_BLOCK_SIZE) * AES_BLOCK_SIZE);
+      copy_block(c, &long_state[j]); //Copying the block the pointer points to accessable cache (c1)
+      copy_block(c1, &long_state[j]); //Copying the block the pointer points to accessable cache (c2)
       /* Iteration 0 */
-      aesb_single_round(ctx->c,ctx-> c,ctx-> a); //AES of c1 to c1. key: a
-      copy_block(&long_state[j],ctx-> c); // Copying encrypted block back
+      aesb_single_round(c, c, a); //AES of c1 to c1. key: a
+      copy_block(&long_state[j], c); // Copying encrypted block back
       /* Iteration 1 */
       j = e2i(ctx->c, MEMORY / AES_BLOCK_SIZE) * AES_BLOCK_SIZE;
       xor_blocks(ctx->c, ctx->b); //XOR Block with another thing

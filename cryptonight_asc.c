@@ -104,10 +104,10 @@ static void swap_blocks(uint8_t *a, uint8_t *b)
   U64(b)[1] = U64(t)[1];
 }
 
-static void xor_blocks(uint8_t* a, const uint8_t* b) 
-{
-  U64(a)[0] ^= U64(b)[0];
-  U64(a)[1] ^= U64(b)[1];
+static void xor_blocks(uint8_t* a, const uint8_t* b) {
+   size_t i;
+  for (i = 0; i < AES_BLOCK_SIZE; i++) {
+    a[i] ^= b[i];
   }
 }
 
@@ -138,6 +138,7 @@ void cryptonightasc_hash(const char* input, char* output, uint32_t len, int vari
     memcpy(ctx->text, ctx->state.init, INIT_SIZE_BYTE);
     memcpy(ctx->aes_key, ctx->state.hs.b, AES_KEY_SIZE);
     ctx->aes_ctx = (oaes_ctx*) oaes_alloc();
+    size_t i, j;
     
 
    VARIANT1_PORTABLE_INIT();

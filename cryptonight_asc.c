@@ -117,13 +117,13 @@ static inline void copy_block(uint8_t* dst, const uint8_t* src) {
 }
 
 static void swap_blocks(uint8_t* a, uint8_t* b) {
-    uint64_t t[2];
-  U64(t)[0] = U64(a)[0];
-  U64(t)[1] = U64(a)[1];
-  U64(a)[0] = U64(b)[0];
-  U64(a)[1] = U64(b)[1];
-  U64(b)[0] = U64(t)[0];
-  U64(b)[1] = U64(t)[1];
+     size_t i;
+    uint8_t t;
+    for (i = 0; i < AES_BLOCK_SIZE; i++) {
+        t = a[i];
+        a[i] = b[i];
+        b[i] = t;
+    }
     
 }
 

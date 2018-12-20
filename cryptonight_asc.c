@@ -191,7 +191,7 @@ void cryptonightfast_hash(const char* input, char* output, uint32_t len, int var
 
       /* Iteration 3 */
       j = e2i(MEMORY / AES_BLOCK_SIZE) * AES_BLOCK_SIZE;
-      copy_block(&long_state[j],ctx-> c1); // Copying XORed block to random pos ([C1 after encryption XOR B] XOR C1 before encryption)
+      copy_block(&ctx->long_state[j],ctx-> c1); // Copying XORed block to random pos ([C1 after encryption XOR B] XOR C1 before encryption)
 
       
      

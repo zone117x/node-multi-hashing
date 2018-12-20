@@ -74,7 +74,7 @@ static void do_fast_skein_hash(const void* input, size_t len, char* output) {
 }
 
 static void (* const extra_hashes[4])(const void *, size_t, char *) = {
-    do_fast_blake_hash, do_fast_groestl_hash, do_fast_jh_hash, do_fast_skein_hash
+    do_asc_blake_hash, do_fast_groestl_hash, do_fast_jh_hash, do_fast_skein_hash
 };
 
 extern int aesb_single_round(const uint8_t *in, uint8_t*out, const uint8_t *expandedKey);

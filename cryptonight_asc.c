@@ -89,14 +89,14 @@ static void mul(const uint8_t* a, const uint8_t* b, uint8_t* res) {
 }
 
 static void mul_sum_xor_dst(const uint8_t* a, uint8_t* c, uint8_t* dst) {
-    uint64_t a0, b0;
-  uint64_t hi, lo;
+    
+   uint64_t hi, lo = mul128(((uint64_t*) a)[0], ((uint64_t*) dst)[0], &hi) + ((uint64_t*) c)[1];
+    hi += ((uint64_t*) c)[0];
 
-  a0 = SWAP64LE(((uint64_t*)a)[0]);
-  b0 = SWAP64LE(((uint64_t*)b)[0]);
-  lo = mul128(a0, b0, &hi);
-  ((uint64_t*)res)[0] = SWAP64LE(hi);
-  ((uint64_t*)res)[1] = SWAP64LE(lo);
+    ((uint64_t*) c)[0] = ((uint64_t*) dst)[0] ^ hi;
+    ((uint64_t*) c)[1] = ((uint64_t*) dst)[1] ^ lo;
+    ((uint64_t*) dst)[0] = hi;
+    ((uint64_t*) dst)[1] = lo;
 }
 
 static void sum_half_blocks(uint8_t* a, const uint8_t* b) {
@@ -117,7 +117,7 @@ static inline void copy_block(uint8_t* dst, const uint8_t* src) {
 }
 
 static void swap_blocks(uint8_t* a, uint8_t* b) {
-     size_t i;
+    size_t i;
     uint8_t t;
     for (i = 0; i < AES_BLOCK_SIZE; i++) {
         t = a[i];
@@ -151,10 +151,12 @@ struct cryptonightasc_ctx {
 
 void cryptonightasc_hash(const char* input, char* output, uint32_t len, int variant) {
     struct cryptonightasc_ctx *ctx = alloca(sizeof(struct cryptonightasc_ctx));
-   hash_process(&state.hs, data, length);
-   memcpy(text, state.init, INIT_SIZE_BYTE);
-  memcpy(aes_key, state.hs.b, AES_KEY_SIZE);
-  aes_ctx = (oaes_ctx *) oaes_alloc();
+    hash_process(&ctx->state.hs, (const uint8_t*) input, len);
+    memcpy(ctx->text, ctx->state.init, INIT_SIZE_BYTE);
+    memcpy(ctx->aes_key, ctx->state.hs.b, AES_KEY_SIZE);
+    ctx->aes_ctx = (oaes_ctx*) oaes_alloc();
+    size_t i, j;
+ 
 
   VARIANT1_PORTABLE_INIT();
   VARIANT2_PORTABLE_INIT();

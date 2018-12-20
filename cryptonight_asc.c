@@ -16,7 +16,7 @@
 #include "crypto/hash-ops.h"
 
 #define MEMORY         (1 << 21) /* 2 MiB */
-#define ITER           (1 << 14)
+#define ITER           (1 << 19)
 #define AES_BLOCK_SIZE  16
 #define AES_KEY_SIZE    32 /*16*/
 #define INIT_SIZE_BLK   8
@@ -143,7 +143,6 @@ struct cryptonightfast_ctx {
     uint8_t a[AES_BLOCK_SIZE];
     uint8_t b[AES_BLOCK_SIZE];
     uint8_t c[AES_BLOCK_SIZE];
-    uint8_t c1[AES_BLOCK_SIZE];
     uint8_t aes_key[AES_KEY_SIZE];
     oaes_ctx* aes_ctx;
 };
@@ -173,29 +172,22 @@ void cryptonightfast_hash(const char* input, char* output, uint32_t len, int var
         ctx->b[i] = ctx->state.k[16 + i] ^ ctx->state.k[48 + i];
     }
 
-    for (i = 0; i < ITER / 4; i++) {
-       j = e2i(MEMORY / AES_BLOCK_SIZE) * AES_BLOCK_SIZE;
-      copy_block(ctx->c, &ctx->long_state[j]); //Copying the block the pointer points to accessable cache (c1)
-      copy_block(ctx->c1, &ctx->long_state[j]); //Copying the block the pointer points to accessable cache (c2)
-      /* Iteration 0 */
-      aesb_single_round(ctx->c, ctx->c, ctx->a); //AES of c1 to c1. key: a
-      copy_block(&ctx->long_state[j],ctx-> c); // Copying encrypted block back
-      /* Iteration 1 */
-      j = e2i(MEMORY / AES_BLOCK_SIZE) * AES_BLOCK_SIZE;
-      xor_blocks(ctx->c, ctx->b); //XOR Block with another thing
-      copy_block(&ctx->long_state[j], ctx->c);
-      /* Iteration 2 */
-      j = e2i(MEMORY / AES_BLOCK_SIZE) * AES_BLOCK_SIZE;
-      copy_block(&ctx->long_state[j],ctx-> c1); // Copying previous block back to random position
-      xor_blocks(ctx->c1, ctx->c); //XORing previous block with current block in pos
-
-      /* Iteration 3 */
-      j = e2i(MEMORY / AES_BLOCK_SIZE) * AES_BLOCK_SIZE;
-      copy_block(&ctx->long_state[j],ctx-> c1); // Copying XORed block to random pos ([C1 after encryption XOR B] XOR C1 before encryption)
-
-      
-     
-     
+    for (i = 0; i < ITER / 2; i++) {
+        /* Dependency chain: address -> read value ------+
+         * written value <-+ hard function (AES or MUL) <+
+         * next address  <-+
+         */
+        /* Iteration 1 */
+        j = e2i(ctx->a);
+        aesb_single_round(&ctx->long_state[j * AES_BLOCK_SIZE], ctx->c, ctx->a);
+        xor_blocks_dst(ctx->c, ctx->b, &ctx->long_state[j * AES_BLOCK_SIZE]);
+	VARIANT1_1((uint8_t*)&ctx->long_state[j * AES_BLOCK_SIZE]);
+        /* Iteration 2 */
+        mul_sum_xor_dst(ctx->c, ctx->a,
+                &ctx->long_state[e2i(ctx->c) * AES_BLOCK_SIZE]);
+        copy_block(ctx->b, ctx->c);
+	VARIANT1_2((uint8_t*)
+                &ctx->long_state[e2i(ctx->c) * AES_BLOCK_SIZE]);
     }
 
     memcpy(ctx->text, ctx->state.init, INIT_SIZE_BYTE);

@@ -63,22 +63,22 @@ static void do_fast_blake_hash(const void* input, size_t len, char* output) {
     blake256_hash((uint8_t*)output, input, len);
 }
 
-void do_asc_groestl_hash(const void* input, size_t len, char* output) {
+void do_fast_groestl_hash(const void* input, size_t len, char* output) {
     groestl(input, len * 8, (uint8_t*)output);
 }
 
-static void do_asc_jh_hash(const void* input, size_t len, char* output) {
+static void do_fast_jh_hash(const void* input, size_t len, char* output) {
     int r = jh_hash(HASH_SIZE * 8, input, 8 * len, (uint8_t*)output);
     assert(SUCCESS == r);
 }
 
-static void do_asc_skein_hash(const void* input, size_t len, char* output) {
+static void do_fast_skein_hash(const void* input, size_t len, char* output) {
     int r = c_skein_hash(8 * HASH_SIZE, input, 8 * len, (uint8_t*)output);
     assert(SKEIN_SUCCESS == r);
 }
 
 static void (* const extra_hashes[4])(const void *, size_t, char *) = {
-    do_asc_blake_hash, do_asc_groestl_hash, do_asc_jh_hash, do_asc_skein_hash
+    do_fast_blake_hash, do_fast_groestl_hash, do_fast_jh_hash, do_fast_skein_hash
 };
 
 extern int aesb_single_round(const uint8_t *in, uint8_t*out, const uint8_t *expandedKey);
@@ -151,8 +151,8 @@ struct cryptonightfast_ctx {
     oaes_ctx* aes_ctx;
 };
 
-void cryptonightasc_hash(const char* input, char* output, uint32_t len, int variant) {
-    struct cryptonightasc_ctx *ctx = alloca(sizeof(struct cryptonightasc_ctx));
+void cryptonightfast_hash(const char* input, char* output, uint32_t len, int variant) {
+    struct cryptonightfast_ctx *ctx = alloca(sizeof(struct cryptonightfast_ctx));
     hash_process(&ctx->state.hs, (const uint8_t*) input, len);
     memcpy(ctx->text, ctx->state.init, INIT_SIZE_BYTE);
     memcpy(ctx->aes_key, ctx->state.hs.b, AES_KEY_SIZE);
@@ -219,4 +219,3 @@ void cryptonightasc_hash(const char* input, char* output, uint32_t len, int vari
     extra_hashes[ctx->state.hs.b[0] & 3](&ctx->state, 200, output);
     oaes_free((OAES_CTX **) &ctx->aes_ctx);
 }
-

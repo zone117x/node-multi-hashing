@@ -232,6 +232,7 @@ DECLARE_FUNC(cryptonight) {
 
     bool fast = false;
     uint32_t cn_variant = 0;
+    uint64_t height = 0;
 
     if (args.Length() < 1)
         RETURN_EXCEPT("You must provide one argument.");
@@ -243,6 +244,17 @@ DECLARE_FUNC(cryptonight) {
             cn_variant = args[1]->Uint32Value();
         else
             RETURN_EXCEPT("Argument 2 should be a boolean or uint32_t");
+    }
+
+    if ((cn_variant == 4) && (args.Length() < 3)) {
+        RETURN_EXCEPT("You must provide Argument 3 (block height) for Cryptonight variant 4");
+    }
+
+    if (args.Length() >= 3) {
+        if(args[2]->IsUint32())
+            height = args[2]->Uint32Value();
+        else
+            RETURN_EXCEPT("Argument 3 should be uint32_t");
     }
 
     Local<Object> target = args[0]->ToObject();
@@ -258,9 +270,9 @@ DECLARE_FUNC(cryptonight) {
     if(fast)
         cryptonight_fast_hash(input, output, input_len);
     else {
-        if (cn_variant > 0 && input_len < 43)
-            RETURN_EXCEPT("Argument must be 43 bytes for monero variant 1+");
-        cryptonight_hash(input, output, input_len, cn_variant);
+        if ((cn_variant == 1) && input_len < 43)
+            RETURN_EXCEPT("Argument must be 43 bytes for monero variant 1");
+        cryptonight_hash(input, output, input_len, cn_variant, height);
     }
     SET_BUFFER_RETURN(output, 32);
 }

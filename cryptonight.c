@@ -16,6 +16,9 @@
 #include "crypto/hash-ops.h"
 #include "crypto/variant2_int_sqrt.h"
 
+#define hash_extra_blake(data, length, hash) blake256_hash((uint8_t*)(hash), (uint8_t*)(data), (length))
+#include "crypto/variant4_random_math.h"
+
 #define MEMORY         (1 << 21) /* 2 MiB */
 #define ITER           (1 << 20)
 #define AES_BLOCK_SIZE  16
@@ -49,8 +52,8 @@
 #define U64(p) ((uint64_t*)(p))
 
 #define VARIANT2_INIT(b, state) \
-  uint64_t division_result; \
-  uint64_t sqrt_result; \
+  uint64_t division_result = 0; \
+  uint64_t sqrt_result = 0; \
   do if (variant >= 2) \
   { \
     U64(b)[2] = state.hs.w[8] ^ state.hs.w[10]; \
@@ -59,12 +62,18 @@
     sqrt_result = state.hs.w[13]; \
   } while (0)
 
-#define VARIANT2_SHUFFLE_ADD(base_ptr, offset, a, b) \
+#define VARIANT2_SHUFFLE_ADD(base_ptr, offset, a, b, c) \
   do if (variant >= 2) \
   { \
     uint64_t* chunk1 = U64((base_ptr) + ((offset) ^ 0x10)); \
     uint64_t* chunk2 = U64((base_ptr) + ((offset) ^ 0x20)); \
     uint64_t* chunk3 = U64((base_ptr) + ((offset) ^ 0x30)); \
+    \
+    if (variant >= 4) \
+    { \
+      U64(c)[0] ^= chunk1[0] ^ chunk2[0] ^ chunk3[0]; \
+      U64(c)[1] ^= chunk1[1] ^ chunk2[1] ^ chunk3[1]; \
+    } \
     \
     const uint64_t chunk1_old[2] = { chunk1[0], chunk1[1] }; \
     \
@@ -98,7 +107,7 @@
 #endif
 
 #define VARIANT2_INTEGER_MATH(b, ptr) \
-    do if (variant >= 2) \
+    do if ((variant == 2) || (variant == 3)) \
     { \
       VARIANT2_INTEGER_MATH_DIVISION_STEP(b, ptr); \
       VARIANT2_INTEGER_MATH_SQRT_STEP_SSE2(); \
@@ -108,7 +117,7 @@
 #if defined DBL_MANT_DIG && (DBL_MANT_DIG >= 50)
   // double precision floating point type has enough bits of precision on current platform
 #define VARIANT2_INTEGER_MATH(b, ptr) \
-    do if (variant >= 2) \
+    do if ((variant == 2) || (variant == 3)) \
     { \
       VARIANT2_INTEGER_MATH_DIVISION_STEP(b, ptr); \
       VARIANT2_INTEGER_MATH_SQRT_STEP_FP64(); \
@@ -118,7 +127,7 @@
   // double precision floating point type is not good enough on current platform
   // fall back to the reference code (integer only)
 #define VARIANT2_INTEGER_MATH(b, ptr) \
-    do if (variant >= 2) \
+    do if ((variant == 2) || (variant == 3)) \
     { \
       VARIANT2_INTEGER_MATH_DIVISION_STEP(b, ptr); \
       VARIANT2_INTEGER_MATH_SQRT_STEP_REF(); \
@@ -127,11 +136,63 @@
 #endif
 
 #define VARIANT2_2() \
-  do if (variant >= 2) { \
+  do if ((variant == 2) || (variant == 3)) { \
     ((uint64_t*)(ctx->long_state + ((j * AES_BLOCK_SIZE) ^ 0x10)))[0] ^= hi; \
     ((uint64_t*)(ctx->long_state + ((j * AES_BLOCK_SIZE) ^ 0x10)))[1] ^= lo; \
     hi ^= ((uint64_t*)(ctx->long_state + ((j * AES_BLOCK_SIZE) ^ 0x20)))[0]; \
     lo ^= ((uint64_t*)(ctx->long_state + ((j * AES_BLOCK_SIZE) ^ 0x20)))[1]; \
+  } while (0)
+
+#define V4_REG_LOAD(dst, src) \
+  do { \
+    memcpy((dst), (src), sizeof(v4_reg)); \
+    if (sizeof(v4_reg) == sizeof(uint32_t)) \
+      *(dst) = SWAP32LE(*(dst)); \
+    else \
+      *(dst) = SWAP64LE(*(dst)); \
+  } while (0)
+
+#define VARIANT4_RANDOM_MATH_INIT(state) \
+  v4_reg r[9]; \
+  struct V4_Instruction code[NUM_INSTRUCTIONS_MAX + 1]; \
+  do if (variant >= 4) \
+  { \
+    for (int i = 0; i < 4; ++i) \
+      V4_REG_LOAD(r + i, (uint8_t*)(state.hs.w + 12) + sizeof(v4_reg) * i); \
+    v4_random_math_init(code, height); \
+  } while (0)
+
+#define VARIANT4_RANDOM_MATH(a, b, r, _b, _b1) \
+  do if (variant >= 4) \
+  { \
+    uint64_t tmp[2]; \
+    memcpy(tmp, b, sizeof(uint64_t)); \
+    \
+    if (sizeof(v4_reg) == sizeof(uint32_t)) \
+      tmp[0] ^= SWAP64LE((r[0] + r[1]) | ((uint64_t)(r[2] + r[3]) << 32)); \
+    else \
+      tmp[0] ^= SWAP64LE((r[0] + r[1]) ^ (r[2] + r[3])); \
+    \
+    memcpy(b, tmp, sizeof(uint64_t)); \
+    \
+    V4_REG_LOAD(r + 4, a); \
+    V4_REG_LOAD(r + 5, (uint64_t*)(a) + 1); \
+    V4_REG_LOAD(r + 6, _b); \
+    V4_REG_LOAD(r + 7, _b1); \
+    V4_REG_LOAD(r + 8, (uint64_t*)(_b1) + 1); \
+    \
+    v4_random_math(code, r); \
+    \
+    memcpy(tmp, a, sizeof(uint64_t) * 2); \
+    \
+    if (sizeof(v4_reg) == sizeof(uint32_t)) { \
+      tmp[0] ^= SWAP64LE(r[2] | ((uint64_t)(r[3]) << 32)); \
+      tmp[1] ^= SWAP64LE(r[0] | ((uint64_t)(r[1]) << 32)); \
+    } else { \
+      tmp[0] ^= SWAP64LE(r[2] ^ r[3]); \
+      tmp[1] ^= SWAP64LE(r[0] ^ r[1]); \
+    } \
+    memcpy(a, tmp, sizeof(uint64_t) * 2); \
   } while (0)
 
 #pragma pack(push, 1)
@@ -173,36 +234,9 @@ static inline size_t e2i(const uint8_t* a) {
     return (*((uint64_t*) a) / AES_BLOCK_SIZE) & (MEMORY / AES_BLOCK_SIZE - 1);
 }
 
-static void mul(const uint8_t* a, const uint8_t* b, uint8_t* res) {
-    ((uint64_t*) res)[1] = mul128(((uint64_t*) a)[0], ((uint64_t*) b)[0], (uint64_t*) res);
-}
-
-static void sum_half_blocks(uint8_t* a, const uint8_t* b) {
-    uint64_t a0, a1, b0, b1;
-
-    a0 = SWAP64LE(((uint64_t*) a)[0]);
-    a1 = SWAP64LE(((uint64_t*) a)[1]);
-    b0 = SWAP64LE(((uint64_t*) b)[0]);
-    b1 = SWAP64LE(((uint64_t*) b)[1]);
-    a0 += b0;
-    a1 += b1;
-    ((uint64_t*) a)[0] = SWAP64LE(a0);
-    ((uint64_t*) a)[1] = SWAP64LE(a1);
-}
-
 static inline void copy_block(uint8_t* dst, const uint8_t* src) {
     ((uint64_t*) dst)[0] = ((uint64_t*) src)[0];
     ((uint64_t*) dst)[1] = ((uint64_t*) src)[1];
-}
-
-static void swap_blocks(uint8_t* a, uint8_t* b) {
-    size_t i;
-    uint8_t t;
-    for (i = 0; i < AES_BLOCK_SIZE; i++) {
-        t = a[i];
-        a[i] = b[i];
-        b[i] = t;
-    }
 }
 
 static inline void xor_blocks(uint8_t* a, const uint8_t* b) {
@@ -220,13 +254,14 @@ struct cryptonight_ctx {
     union cn_slow_hash_state state;
     uint8_t text[INIT_SIZE_BYTE];
     uint8_t a[AES_BLOCK_SIZE];
+    uint8_t a1[AES_BLOCK_SIZE];
     uint8_t b[AES_BLOCK_SIZE * 2];
     uint8_t c[AES_BLOCK_SIZE];
     uint8_t aes_key[AES_KEY_SIZE];
     oaes_ctx* aes_ctx;
 };
 
-void cryptonight_hash(const char* input, char* output, uint32_t len, int variant) {
+void cryptonight_hash(const char* input, char* output, uint32_t len, int variant, uint64_t height) {
     struct cryptonight_ctx *ctx = alloca(sizeof(struct cryptonight_ctx));
     hash_process(&ctx->state.hs, (const uint8_t*) input, len);
     memcpy(ctx->text, ctx->state.init, INIT_SIZE_BYTE);
@@ -236,6 +271,7 @@ void cryptonight_hash(const char* input, char* output, uint32_t len, int variant
 
     VARIANT1_INIT();
     VARIANT2_INIT(ctx->b, ctx->state);
+    VARIANT4_RANDOM_MATH_INIT(ctx->state);
 
     oaes_key_import_data(ctx->aes_ctx, ctx->aes_key, AES_KEY_SIZE);
     for (i = 0; i < MEMORY / INIT_SIZE_BYTE; i++) {
@@ -260,7 +296,7 @@ void cryptonight_hash(const char* input, char* output, uint32_t len, int variant
         /* Iteration 1 */
         j = e2i(ctx->a);
         aesb_single_round(&ctx->long_state[j * AES_BLOCK_SIZE], ctx->c, ctx->a);
-        VARIANT2_SHUFFLE_ADD(ctx->long_state, j * AES_BLOCK_SIZE, ctx->a, ctx->b);
+        VARIANT2_SHUFFLE_ADD(ctx->long_state, j * AES_BLOCK_SIZE, ctx->a, ctx->b, ctx->c);
         xor_blocks_dst(ctx->c, ctx->b, &ctx->long_state[j * AES_BLOCK_SIZE]);
         VARIANT1_1((uint8_t*)&ctx->long_state[j * AES_BLOCK_SIZE]);
         /* Iteration 2 */
@@ -273,12 +309,14 @@ void cryptonight_hash(const char* input, char* output, uint32_t len, int variant
         t[1] = dst[1];
 
         VARIANT2_INTEGER_MATH(t, ctx->c);
+        copy_block(ctx->a1, ctx->a);
+        VARIANT4_RANDOM_MATH(ctx->a, t, r, ctx->b, ctx->b + AES_BLOCK_SIZE);
 
         uint64_t hi;
         uint64_t lo = mul128(((uint64_t*)ctx->c)[0], t[0], &hi);
 
         VARIANT2_2();
-        VARIANT2_SHUFFLE_ADD(ctx->long_state, j * AES_BLOCK_SIZE, ctx->a, ctx->b);
+        VARIANT2_SHUFFLE_ADD(ctx->long_state, j * AES_BLOCK_SIZE, ctx->a1, ctx->b, ctx->c);
 
         ((uint64_t*)ctx->a)[0] += hi;
         ((uint64_t*)ctx->a)[1] += lo;

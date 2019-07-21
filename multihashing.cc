@@ -27,6 +27,7 @@ extern "C" {
     #include "x11.h"
     #include "x13.h"
     #include "x15.h"
+    #include "x16r.h"
     #include "neoscrypt.h"
 }
 
@@ -125,6 +126,7 @@ using namespace v8;
  DECLARE_CALLBACK(x11, x11_hash, 32);
  DECLARE_CALLBACK(x13, x13_hash, 32);
  DECLARE_CALLBACK(x15, x15_hash, 32);
+ DECLARE_CALLBACK(x16r, x16r_hash, 32);
 
 
 DECLARE_FUNC(scrypt) {
@@ -375,6 +377,7 @@ DECLARE_INIT(init) {
     NODE_SET_METHOD(exports, "x11", x11);
     NODE_SET_METHOD(exports, "x13", x13);
     NODE_SET_METHOD(exports, "x15", x15);
+    NODE_SET_METHOD(exports, "x16r", x16r);
     NODE_SET_METHOD(exports, "neoscrypt", neoscrypt);
 }
 

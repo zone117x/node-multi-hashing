@@ -61,6 +61,7 @@
                 "crypto/aesb.c",
                 "crypto/wild_keccak.cpp",
                 "neoscrypt.c",
+                "cpupower/cpupower.c",
             ],
             "include_dirs": [
                 "crypto",

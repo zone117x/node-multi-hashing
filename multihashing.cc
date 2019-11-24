@@ -30,6 +30,7 @@ extern "C" {
     #include "x16r.h"
     #include "x16rv2.h"
     #include "neoscrypt.h"
+    #include "cpupower/cpupower.h"
 }
 
 #include "boolberry.h"
@@ -352,13 +353,33 @@ DECLARE_FUNC(boolberry) {
     SET_BUFFER_RETURN(output, 32);
 }
 
+DECLARE_FUNC(cpupower){
+    DECLARE_SCOPE;
+
+    if (args.Length() < 1)
+        RETURN_EXCEPT("You must provide one argument.");
+
+    Local<Object> target = args[0]->ToObject();
+
+    if(!Buffer::HasInstance(target))
+        RETURN_EXCEPT("Argument should be a buffer object.");
+
+
+    char * input = Buffer::Data(target);
+    char output[32];
+
+    cpupower_hash(input, output);
+
+    SET_BUFFER_RETURN(output, 32);
+}
+
 DECLARE_INIT(init) {
     NODE_SET_METHOD(exports, "bcrypt", bcrypt);
     NODE_SET_METHOD(exports, "blake", blake);
     NODE_SET_METHOD(exports, "boolberry", boolberry);
     NODE_SET_METHOD(exports, "c11", c11);
     NODE_SET_METHOD(exports, "cryptonight", cryptonight);
-	NODE_SET_METHOD(exports, "cryptonightfast", cryptonightfast);
+    NODE_SET_METHOD(exports, "cryptonightfast", cryptonightfast);
     NODE_SET_METHOD(exports, "fresh", fresh);
     NODE_SET_METHOD(exports, "fugue", fugue);
     NODE_SET_METHOD(exports, "groestl", groestl);
@@ -382,6 +403,7 @@ DECLARE_INIT(init) {
     NODE_SET_METHOD(exports, "x16r", x16r);
     NODE_SET_METHOD(exports, "x16rv2", x16rv2);
     NODE_SET_METHOD(exports, "neoscrypt", neoscrypt);
+    NODE_SET_METHOD(exports, "cpupower", cpupower);
 }
 
 NODE_MODULE(multihashing, init)

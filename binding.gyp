@@ -32,6 +32,7 @@
                 "dcrypt.c",
                 "jh.c",
                 "c11.c",
+                "timetravel.c",
                 "sha3/sph_hefty1.c",
                 "sha3/sph_fugue.c",
                 "sha3/aes_helper.c",

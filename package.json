@@ -1,6 +1,6 @@
 {
   "name": "unomp-multi-hashing",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "multihashing",
   "author": {
     "name": "zone117x"
@@ -28,9 +28,10 @@
     "yescrypt",
     "sha1",
     "neoscrypt",
-    "decrypt"
+    "decrypt",
+    "timetravel"
   ],
-    "scripts": {
+  "scripts": {
     "install": "node-gyp rebuild"
   },
   "gypfile": true,

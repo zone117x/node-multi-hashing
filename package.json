@@ -30,7 +30,7 @@
     "neoscrypt",
     "decrypt"
   ],
-    "scripts": {
+  "scripts": {
     "install": "node-gyp rebuild"
   },
   "gypfile": true,

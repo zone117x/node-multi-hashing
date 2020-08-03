@@ -5,8 +5,10 @@
 extern "C" {
 #endif
 
-void lyra2re_hash(const char* input, char* output);
-void lyra2re2_hash(const char* input, char* output);
+#include <stdint.h>
+
+void lyra2re_hash(const char* input, char* output, uint32_t _len);
+void lyra2rev2_hash(const char* input, char* output, uint32_t _len);
 
 #ifdef __cplusplus
 }

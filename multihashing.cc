@@ -15,6 +15,9 @@ extern "C" {
     #include "hefty1.h"
     #include "keccak.h"
     #include "lbry.h"
+    #include "lyra2.h"
+    #include "lyra2re.h"
+    #include "lyra2z.h"
     #include "nist5.h"
     #include "quark.h"
     #include "qubit.h"
@@ -24,6 +27,7 @@ extern "C" {
     #include "sha256d.h"
     #include "shavite3.h"
     #include "skein.h"
+    #include "sponge.h"
     #include "x11.h"
     #include "x13.h"
     #include "x15.h"
@@ -117,6 +121,10 @@ using namespace v8;
  DECLARE_CALLBACK(hefty1, hefty1_hash, 32);
  DECLARE_CALLBACK(keccak, keccak_hash, 32);
  DECLARE_CALLBACK(lbry, lbry_hash, 32);
+ DECLARE_CALLBACK(lyra2re, lyra2re_hash, 32);
+ DECLARE_CALLBACK(lyra2rev2, lyra2rev2_hash, 32);
+ DECLARE_CALLBACK(lyra2rev3, lyra2rev3_hash, 32);
+ DECLARE_CALLBACK(lyra2z, lyra2z_hash, 32);
  DECLARE_CALLBACK(nist5, nist5_hash, 32);
  DECLARE_CALLBACK(quark, quark_hash, 32);
  DECLARE_CALLBACK(qubit, qubit_hash, 32);
@@ -366,6 +374,10 @@ DECLARE_INIT(init) {
     NODE_SET_METHOD(exports, "hefty1", hefty1);
     NODE_SET_METHOD(exports, "keccak", keccak);
     NODE_SET_METHOD(exports, "lbry", lbry);
+    NODE_SET_METHOD(exports, "lyra2re", lyra2re);
+    NODE_SET_METHOD(exports, "lyra2rev2", lyra2rev2);
+    NODE_SET_METHOD(exports, "lyra2rev3", lyra2rev3);
+    NODE_SET_METHOD(exports, "lyra2z", lyra2z);
     NODE_SET_METHOD(exports, "nist5", nist5);
     NODE_SET_METHOD(exports, "quark", quark);
     NODE_SET_METHOD(exports, "qubit", qubit);

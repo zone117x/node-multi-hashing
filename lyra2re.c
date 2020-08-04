@@ -49,6 +49,7 @@ void lyra2re_hash(const char* input, char* output, uint32_t _len)
 
     uint32_t hashA[8], hashB[8];
 
+    sph_blake256_set_rounds(14);
     sph_blake256_init(&ctx_blake);
     sph_blake256 (&ctx_blake, input, 80);
     sph_blake256_close (&ctx_blake, hashA);
@@ -80,6 +81,7 @@ void lyra2rev2_hash(const char* input, char* output, uint32_t _len)
 
 	uint32_t hashA[8], hashB[8];
 
+	sph_blake256_set_rounds(14);
 	sph_blake256_init(&ctx_blake);
     sph_blake256(&ctx_blake, input, 80);
     sph_blake256_close (&ctx_blake, hashA);

@@ -134,13 +134,8 @@ DECLARE_FUNC(neoscrypt) {
    if(!Buffer::HasInstance(target))
        RETURN_EXCEPT("Argument should be a buffer object.");
 
-   // unsigned int nValue = args[1]->Uint32Value();
-   // unsigned int rValue = args[2]->Uint32Value();
-
    char * input = Buffer::Data(target);
    char output[32];
-
-   uint32_t input_len = Buffer::Length(target);
 
    neoscrypt(input, output, 0);
 

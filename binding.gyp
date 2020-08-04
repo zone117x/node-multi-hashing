@@ -17,6 +17,7 @@
                 "keccak.c",
                 "lbry.c",
                 "lyra2re.c",
+                "lyra2z.c",
                 "nist5.c",
                 "quark.c",
                 "qubit.c",

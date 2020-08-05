@@ -5,7 +5,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#ifndef WIN32
+#ifdef WIN32
+#include <malloc.h>
+#else
 #include <unistd.h>
 #endif
 #include "crypto/oaes_lib.h"

@@ -2,6 +2,7 @@
 #include <node_buffer.h>
 #include <v8.h>
 #include <stdint.h>
+#include <nan.h>
 
 extern "C" {
     #include "bcrypt.h"
@@ -41,62 +42,25 @@ extern "C" {
 using namespace node;
 using namespace v8;
 
-#if NODE_MAJOR_VERSION >= 4
-
-#define DECLARE_INIT(x) \
-    void x(Local<Object> exports)
-
-#define DECLARE_FUNC(x) \
-    void x(const FunctionCallbackInfo<Value>& args)
-
-#define DECLARE_SCOPE \
-    v8::Isolate* isolate = args.GetIsolate();
-
 #define SET_BUFFER_RETURN(x, len) \
-    args.GetReturnValue().Set(Buffer::Copy(isolate, x, len).ToLocalChecked());
+    info.GetReturnValue().Set(Nan::CopyBuffer(x, len).ToLocalChecked());
 
 #define SET_BOOLEAN_RETURN(x) \
-    args.GetReturnValue().Set(Boolean::New(isolate, x));
+    info.GetReturnValue().Set(Nan::To<Boolean>(x).ToChecked());
 
 #define RETURN_EXCEPT(msg) \
-    do { \
-        isolate->ThrowException(Exception::Error(String::NewFromUtf8(isolate, msg))); \
-        return; \
-    } while (0)
-
-#else
-
-#define DECLARE_INIT(x) \
-    void x(Handle<Object> exports)
+    return Nan::ThrowError(msg)
 
 #define DECLARE_FUNC(x) \
-    Handle<Value> x(const Arguments& args)
-
-#define DECLARE_SCOPE \
-    HandleScope scope
-
-#define SET_BUFFER_RETURN(x, len) \
-    do { \
-        Buffer* buff = Buffer::New(x, len); \
-        return scope.Close(buff->handle_); \
-    } while (0)
-
-#define SET_BOOLEAN_RETURN(x) \
-    return scope.Close(Boolean::New(x));
-
-#define RETURN_EXCEPT(msg) \
-    return ThrowException(Exception::Error(String::New(msg)))
-
-#endif // NODE_MAJOR_VERSION
+    NAN_METHOD(x)
 
 #define DECLARE_CALLBACK(name, hash, output_len) \
     DECLARE_FUNC(name) { \
-    DECLARE_SCOPE; \
  \
-    if (args.Length() < 1) \
+    if (info.Length() < 1) \
         RETURN_EXCEPT("You must provide one argument."); \
  \
-    Local<Object> target = args[0]->ToObject(); \
+    Local<Object> target = Nan::To<Object>(info[0]).ToLocalChecked(); \
  \
     if(!Buffer::HasInstance(target)) \
         RETURN_EXCEPT("Argument should be a buffer object."); \
@@ -140,18 +104,16 @@ using namespace v8;
 
 
 DECLARE_FUNC(scrypt) {
-   DECLARE_SCOPE;
-
-   if (args.Length() < 3)
+   if (info.Length() < 3)
        RETURN_EXCEPT("You must provide buffer to hash, N value, and R value");
 
-   Local<Object> target = args[0]->ToObject();
+   Local<Object> target = Nan::To<Object>(info[0]).ToLocalChecked();
 
    if(!Buffer::HasInstance(target))
        RETURN_EXCEPT("Argument should be a buffer object.");
 
-   unsigned int nValue = args[1]->Uint32Value();
-   unsigned int rValue = args[2]->Uint32Value();
+   unsigned int nValue = Nan::To<uint32_t>(info[1]).ToChecked();
+   unsigned int rValue = Nan::To<uint32_t>(info[2]).ToChecked();
 
    char * input = Buffer::Data(target);
    char output[32];
@@ -164,12 +126,10 @@ DECLARE_FUNC(scrypt) {
 }
 
 DECLARE_FUNC(neoscrypt) {
-   DECLARE_SCOPE;
-
-   if (args.Length() < 2)
+   if (info.Length() < 2)
        RETURN_EXCEPT("You must provide two arguments");
 
-   Local<Object> target = args[0]->ToObject();
+   Local<Object> target = Nan::To<Object>(info[0]).ToLocalChecked();
 
    if(!Buffer::HasInstance(target))
        RETURN_EXCEPT("Argument should be a buffer object.");
@@ -188,17 +148,15 @@ DECLARE_FUNC(neoscrypt) {
 }
 
 DECLARE_FUNC(scryptn) {
-   DECLARE_SCOPE;
-
-   if (args.Length() < 2)
+   if (info.Length() < 2)
        RETURN_EXCEPT("You must provide buffer to hash and N factor.");
 
-   Local<Object> target = args[0]->ToObject();
+   Local<Object> target = Nan::To<Object>(info[0]).ToLocalChecked();
 
    if(!Buffer::HasInstance(target))
        RETURN_EXCEPT("Argument should be a buffer object.");
 
-   unsigned int nFactor = args[1]->Uint32Value();
+   unsigned int nFactor = Nan::To<uint32_t>(info[1]).ToChecked();
 
    char * input = Buffer::Data(target);
    char output[32];
@@ -214,20 +172,18 @@ DECLARE_FUNC(scryptn) {
 }
 
 DECLARE_FUNC(scryptjane) {
-    DECLARE_SCOPE;
-
-    if (args.Length() < 5)
+    if (info.Length() < 5)
         RETURN_EXCEPT("You must provide two argument: buffer, timestamp as number, and nChainStarTime as number, nMin, and nMax");
 
-    Local<Object> target = args[0]->ToObject();
+    Local<Object> target = Nan::To<Object>(info[0]).ToLocalChecked();
 
     if(!Buffer::HasInstance(target))
         RETURN_EXCEPT("First should be a buffer object.");
 
-    int timestamp = args[1]->Int32Value();
-    int nChainStartTime = args[2]->Int32Value();
-    int nMin = args[3]->Int32Value();
-    int nMax = args[4]->Int32Value();
+    int timestamp = Nan::To<int32_t>(info[1]).ToChecked();
+    int nChainStartTime = Nan::To<int32_t>(info[2]).ToChecked();
+    int nMin = Nan::To<int32_t>(info[3]).ToChecked();
+    int nMax = Nan::To<int32_t>(info[4]).ToChecked();
 
     char * input = Buffer::Data(target);
     char output[32];
@@ -240,36 +196,34 @@ DECLARE_FUNC(scryptjane) {
 }
 
 DECLARE_FUNC(cryptonight) {
-    DECLARE_SCOPE;
-
     bool fast = false;
     uint32_t cn_variant = 0;
     uint64_t height = 0;
 
-    if (args.Length() < 1)
+    if (info.Length() < 1)
         RETURN_EXCEPT("You must provide one argument.");
 
-    if (args.Length() >= 2) {
-        if(args[1]->IsBoolean())
-            fast = args[1]->BooleanValue();
-        else if(args[1]->IsUint32())
-            cn_variant = args[1]->Uint32Value();
+    if (info.Length() >= 2) {
+        if(info[1]->IsBoolean())
+            fast = Nan::To<bool>(info[1]).ToChecked();
+        else if(info[1]->IsUint32())
+            cn_variant = Nan::To<uint32_t>(info[1]).ToChecked();
         else
             RETURN_EXCEPT("Argument 2 should be a boolean or uint32_t");
     }
 
-    if ((cn_variant == 4) && (args.Length() < 3)) {
+    if ((cn_variant == 4) && (info.Length() < 3)) {
         RETURN_EXCEPT("You must provide Argument 3 (block height) for Cryptonight variant 4");
     }
 
-    if (args.Length() >= 3) {
-        if(args[2]->IsUint32())
-            height = args[2]->Uint32Value();
+    if (info.Length() >= 3) {
+        if(info[2]->IsUint32())
+            height = Nan::To<uint32_t>(info[2]).ToChecked();
         else
             RETURN_EXCEPT("Argument 3 should be uint32_t");
     }
 
-    Local<Object> target = args[0]->ToObject();
+    Local<Object> target = Nan::To<Object>(info[0]).ToLocalChecked();
 
     if(!Buffer::HasInstance(target))
         RETURN_EXCEPT("Argument should be a buffer object.");
@@ -289,24 +243,22 @@ DECLARE_FUNC(cryptonight) {
     SET_BUFFER_RETURN(output, 32);
 }
 DECLARE_FUNC(cryptonightfast) {
-    DECLARE_SCOPE;
-
     bool fast = false;
     uint32_t cn_variant = 0;
 
-    if (args.Length() < 1)
+    if (info.Length() < 1)
         RETURN_EXCEPT("You must provide one argument.");
 
-    if (args.Length() >= 2) {
-        if(args[1]->IsBoolean())
-            fast = args[1]->BooleanValue();
-        else if(args[1]->IsUint32())
-            cn_variant = args[1]->Uint32Value();
+    if (info.Length() >= 2) {
+        if(info[1]->IsBoolean())
+            fast = Nan::To<bool>(info[1]).ToChecked();
+        else if(info[1]->IsUint32())
+            cn_variant = Nan::To<uint32_t>(info[1]).ToChecked();
         else
             RETURN_EXCEPT("Argument 2 should be a boolean or uint32_t");
     }
 
-    Local<Object> target = args[0]->ToObject();
+    Local<Object> target = Nan::To<Object>(info[0]).ToLocalChecked();
 
     if(!Buffer::HasInstance(target))
         RETURN_EXCEPT("Argument should be a buffer object.");
@@ -326,13 +278,11 @@ DECLARE_FUNC(cryptonightfast) {
     SET_BUFFER_RETURN(output, 32);
 }
 DECLARE_FUNC(boolberry) {
-    DECLARE_SCOPE;
-
-    if (args.Length() < 2)
+    if (info.Length() < 2)
         RETURN_EXCEPT("You must provide two arguments.");
 
-    Local<Object> target = args[0]->ToObject();
-    Local<Object> target_spad = args[1]->ToObject();
+    Local<Object> target = Nan::To<Object>(info[0]).ToLocalChecked();
+    Local<Object> target_spad = Nan::To<Object>(info[1]).ToLocalChecked();
     uint32_t height = 1;
 
     if(!Buffer::HasInstance(target))
@@ -341,9 +291,9 @@ DECLARE_FUNC(boolberry) {
     if(!Buffer::HasInstance(target_spad))
         RETURN_EXCEPT("Argument 2 should be a buffer object.");
 
-    if(args.Length() >= 3) {
-        if(args[2]->IsUint32())
-            height = args[2]->Uint32Value();
+    if(info.Length() >= 3) {
+        if(info[2]->IsUint32())
+            height = Nan::To<uint32_t>(info[2]).ToChecked();
         else
             RETURN_EXCEPT("Argument 3 should be an unsigned integer.");
     }
@@ -360,40 +310,40 @@ DECLARE_FUNC(boolberry) {
     SET_BUFFER_RETURN(output, 32);
 }
 
-DECLARE_INIT(init) {
-    NODE_SET_METHOD(exports, "bcrypt", bcrypt);
-    NODE_SET_METHOD(exports, "blake", blake);
-    NODE_SET_METHOD(exports, "boolberry", boolberry);
-    NODE_SET_METHOD(exports, "c11", c11);
-    NODE_SET_METHOD(exports, "cryptonight", cryptonight);
-	NODE_SET_METHOD(exports, "cryptonightfast", cryptonightfast);
-    NODE_SET_METHOD(exports, "fresh", fresh);
-    NODE_SET_METHOD(exports, "fugue", fugue);
-    NODE_SET_METHOD(exports, "groestl", groestl);
-    NODE_SET_METHOD(exports, "groestlmyriad", groestlmyriad);
-    NODE_SET_METHOD(exports, "hefty1", hefty1);
-    NODE_SET_METHOD(exports, "keccak", keccak);
-    NODE_SET_METHOD(exports, "lbry", lbry);
-    NODE_SET_METHOD(exports, "lyra2re", lyra2re);
-    NODE_SET_METHOD(exports, "lyra2rev2", lyra2rev2);
-    NODE_SET_METHOD(exports, "lyra2rev3", lyra2rev3);
-    NODE_SET_METHOD(exports, "lyra2z", lyra2z);
-    NODE_SET_METHOD(exports, "nist5", nist5);
-    NODE_SET_METHOD(exports, "quark", quark);
-    NODE_SET_METHOD(exports, "qubit", qubit);
-    NODE_SET_METHOD(exports, "scrypt", scrypt);
-    NODE_SET_METHOD(exports, "scryptjane", scryptjane);
-    NODE_SET_METHOD(exports, "scryptn", scryptn);
-    NODE_SET_METHOD(exports, "sha1", sha1);
-    NODE_SET_METHOD(exports, "sha256d", sha256d);
-    NODE_SET_METHOD(exports, "shavite3", shavite3);
-    NODE_SET_METHOD(exports, "skein", skein);
-    NODE_SET_METHOD(exports, "x11", x11);
-    NODE_SET_METHOD(exports, "x13", x13);
-    NODE_SET_METHOD(exports, "x15", x15);
-    NODE_SET_METHOD(exports, "x16r", x16r);
-    NODE_SET_METHOD(exports, "x16rv2", x16rv2);
-    NODE_SET_METHOD(exports, "neoscrypt", neoscrypt);
+NAN_MODULE_INIT(init) {
+    NAN_EXPORT(target, bcrypt);
+    NAN_EXPORT(target, blake);
+    NAN_EXPORT(target, boolberry);
+    NAN_EXPORT(target, c11);
+    NAN_EXPORT(target, cryptonight);
+    NAN_EXPORT(target, cryptonightfast);
+    NAN_EXPORT(target, fresh);
+    NAN_EXPORT(target, fugue);
+    NAN_EXPORT(target, groestl);
+    NAN_EXPORT(target, groestlmyriad);
+    NAN_EXPORT(target, hefty1);
+    NAN_EXPORT(target, keccak);
+    NAN_EXPORT(target, lbry);
+    NAN_EXPORT(target, lyra2re);
+    NAN_EXPORT(target, lyra2rev2);
+    NAN_EXPORT(target, lyra2rev3);
+    NAN_EXPORT(target, lyra2z);
+    NAN_EXPORT(target, nist5);
+    NAN_EXPORT(target, quark);
+    NAN_EXPORT(target, qubit);
+    NAN_EXPORT(target, scrypt);
+    NAN_EXPORT(target, scryptjane);
+    NAN_EXPORT(target, scryptn);
+    NAN_EXPORT(target, sha1);
+    NAN_EXPORT(target, sha256d);
+    NAN_EXPORT(target, shavite3);
+    NAN_EXPORT(target, skein);
+    NAN_EXPORT(target, x11);
+    NAN_EXPORT(target, x13);
+    NAN_EXPORT(target, x15);
+    NAN_EXPORT(target, x16r);
+    NAN_EXPORT(target, x16rv2);
+    NAN_EXPORT(target, neoscrypt);
 }
 
 NODE_MODULE(multihashing, init)

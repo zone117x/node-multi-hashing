@@ -332,9 +332,15 @@ yescrypt_bsty(const uint8_t * passwd, size_t passwdlen,
     const uint8_t * salt, size_t saltlen, uint64_t N, uint32_t r, uint32_t p,
     uint8_t * buf, size_t buflen)
 {
+#ifdef _WIN32
+	static __declspec(thread) int initialized = 0;
+	static __declspec(thread) yescrypt_shared_t shared;
+	static __declspec(thread) yescrypt_local_t local;
+#else
 	static __thread int initialized = 0;
 	static __thread yescrypt_shared_t shared;
 	static __thread yescrypt_local_t local;
+#endif
 	int retval;
 	if (!initialized) {
 /* "shared" could in fact be shared, but it's simpler to keep it private

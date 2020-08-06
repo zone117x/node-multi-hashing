@@ -139,7 +139,7 @@ yescrypt_init_shared(yescrypt_shared_t * shared,
 
 	half1 = half2 = *shared;
 	half1.shared1.aligned_size /= 2;
-	half2.shared1.aligned += half1.shared1.aligned_size;
+	half2.shared1.aligned = (char *)half2.shared1.aligned + half1.shared1.aligned_size;
 	half2.shared1.aligned_size = half1.shared1.aligned_size;
 	N /= 2;
 

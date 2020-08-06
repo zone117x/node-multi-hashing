@@ -67,6 +67,8 @@
                 "src/crypto/sha256.c",
                 "src/crypto/wild_keccak.cpp",
                 "src/neoscrypt.c",
+                "src/crypto/yescrypt/yescrypt-best.c",
+                "src/crypto/yescrypt/yescryptcommon.c",
             ],
             "include_dirs": [
                 "src/crypto",

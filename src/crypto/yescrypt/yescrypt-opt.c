@@ -38,8 +38,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "sha256_Y.h"
-#include "sysendian.h"
+#include "../sha256.h"
 
 #include "yescrypt-platform.c"
 
@@ -874,10 +873,10 @@ yescrypt_kdf(const yescrypt_shared_t * shared, yescrypt_local_t * local,
 		S = (uint64_t *)((uint8_t *)XY + XY_size);
 
 	if (t || flags) {
-		SHA256_CTX_Y ctx;
-		SHA256_Init_Y(&ctx);
-		SHA256_Update_Y(&ctx, passwd, passwdlen);
-		SHA256_Final_Y((uint8_t *)sha256, &ctx);
+		sha256_ctx ctx;
+		sha256_init(&ctx);
+		sha256_update(&ctx, passwd, passwdlen);
+		sha256_final((uint8_t *)sha256, &ctx);
 		passwd = (uint8_t *)sha256;
 		passwdlen = sizeof(sha256);
 	}
@@ -926,17 +925,17 @@ yescrypt_kdf(const yescrypt_shared_t * shared, yescrypt_local_t * local,
 	if ((t || flags) && buflen == sizeof(sha256)) {
 		/* Compute ClientKey */
 		{
-			HMAC_SHA256_CTX_Y ctx;
-			HMAC_SHA256_Init_Y(&ctx, buf, buflen);
-			HMAC_SHA256_Update_Y(&ctx, salt, saltlen);
-			HMAC_SHA256_Final_Y((uint8_t *)sha256, &ctx);
+			hmac_sha256_ctx ctx;
+			hmac_sha256_init(&ctx, buf, buflen);
+			hmac_sha256_update(&ctx, salt, saltlen);
+			hmac_sha256_final((uint8_t *)sha256, &ctx);
 		}
 		/* Compute StoredKey */
 		{
-			SHA256_CTX_Y ctx;
-			SHA256_Init_Y(&ctx);
-			SHA256_Update_Y(&ctx, (uint8_t *)sha256, sizeof(sha256));
-			SHA256_Final_Y(buf, &ctx);
+			sha256_ctx ctx;
+			sha256_init(&ctx);
+			sha256_update(&ctx, (uint8_t *)sha256, sizeof(sha256));
+			sha256_final(buf, &ctx);
 		}
 	}
 

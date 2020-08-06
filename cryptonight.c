@@ -5,7 +5,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef WIN32
+#include <malloc.h>
+#else
 #include <unistd.h>
+#endif
 #include "crypto/oaes_lib.h"
 #include "crypto/c_keccak.h"
 #include "crypto/c_groestl.h"

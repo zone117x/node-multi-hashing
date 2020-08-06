@@ -24,7 +24,11 @@
 #include "sponge.h"
 #include "lyra2.h"
 
-
+#ifdef _MSC_VER
+#define INLINE
+#else
+#define INLINE inline
+#endif
 
 /**
  * Initializes the Sponge State. The first 512 bits are set to zeros and the remainder 
@@ -37,7 +41,7 @@
  * 
  * @param state         The 1024-bit array to be initialized
  */
-inline void initState(uint64_t state[/*16*/]) {
+INLINE void initState(uint64_t state[/*16*/]) {
     //First 512 bis are zeros
     memset(state, 0, 64); 
     //Remainder BLOCK_LEN_BLAKE2_SAFE_BYTES are reserved to the IV
@@ -87,7 +91,7 @@ inline static void reducedBlake2bLyra(uint64_t *v) {
  * @param out        Array that will receive the data squeezed
  * @param len        The number of bytes to be squeezed into the "out" array
  */
-inline void squeeze(uint64_t *state, byte *out, unsigned int len) {
+INLINE void squeeze(uint64_t *state, byte *out, unsigned int len) {
     int fullBlocks = len / BLOCK_LEN_BYTES;
     byte *ptr = out;
     int i;
@@ -109,7 +113,7 @@ inline void squeeze(uint64_t *state, byte *out, unsigned int len) {
  * @param state The current state of the sponge 
  * @param in    The block to be absorbed (BLOCK_LEN_INT64 words)
  */
-inline void absorbBlock(uint64_t *state, const uint64_t *in) {
+INLINE void absorbBlock(uint64_t *state, const uint64_t *in) {
     //XORs the first BLOCK_LEN_INT64 words of "in" with the current state
     state[0] ^= in[0];
     state[1] ^= in[1];
@@ -135,7 +139,7 @@ inline void absorbBlock(uint64_t *state, const uint64_t *in) {
  * @param state The current state of the sponge 
  * @param in    The block to be absorbed (BLOCK_LEN_BLAKE2_SAFE_INT64 words)
  */
-inline void absorbBlockBlake2Safe(uint64_t *state, const uint64_t *in) {
+INLINE void absorbBlockBlake2Safe(uint64_t *state, const uint64_t *in) {
     //XORs the first BLOCK_LEN_BLAKE2_SAFE_INT64 words of "in" with the current state
 
 	state[0] ^= in[0];
@@ -161,7 +165,7 @@ inline void absorbBlockBlake2Safe(uint64_t *state, const uint64_t *in) {
  * @param state     The current state of the sponge 
  * @param rowOut    Row to receive the data squeezed
  */
-inline void reducedSqueezeRow0(uint64_t* state, uint64_t* rowOut, uint64_t nCols) {
+INLINE void reducedSqueezeRow0(uint64_t* state, uint64_t* rowOut, uint64_t nCols) {
     uint64_t* ptrWord = rowOut + (nCols-1)*BLOCK_LEN_INT64; //In Lyra2: pointer to M[0][C-1]
     int i;
     //M[row][C-1-col] = H.reduced_squeeze()    
@@ -196,7 +200,7 @@ inline void reducedSqueezeRow0(uint64_t* state, uint64_t* rowOut, uint64_t nCols
  * @param rowIn		Row to feed the sponge
  * @param rowOut	Row to receive the sponge's output
  */
-inline void reducedDuplexRow1(uint64_t *state, uint64_t *rowIn, uint64_t *rowOut, uint64_t nCols) {
+INLINE void reducedDuplexRow1(uint64_t *state, uint64_t *rowIn, uint64_t *rowOut, uint64_t nCols) {
     uint64_t* ptrWordIn = rowIn;				//In Lyra2: pointer to prev
     uint64_t* ptrWordOut = rowOut + (nCols-1)*BLOCK_LEN_INT64; //In Lyra2: pointer to row
     int i;
@@ -256,7 +260,7 @@ inline void reducedDuplexRow1(uint64_t *state, uint64_t *rowIn, uint64_t *rowOut
  * @param rowOut         Row receiving the output
  *
  */
-inline void reducedDuplexRowSetup(uint64_t *state, uint64_t *rowIn, uint64_t *rowInOut, uint64_t *rowOut, uint64_t nCols) {
+INLINE void reducedDuplexRowSetup(uint64_t *state, uint64_t *rowIn, uint64_t *rowInOut, uint64_t *rowOut, uint64_t nCols) {
     uint64_t* ptrWordIn = rowIn;				//In Lyra2: pointer to prev
     uint64_t* ptrWordInOut = rowInOut;				//In Lyra2: pointer to row*
     uint64_t* ptrWordOut = rowOut + (nCols-1)*BLOCK_LEN_INT64; //In Lyra2: pointer to row
@@ -330,7 +334,7 @@ inline void reducedDuplexRowSetup(uint64_t *state, uint64_t *rowIn, uint64_t *ro
  * @param rowOut         Row receiving the output
  *
  */
-inline void reducedDuplexRow(uint64_t *state, uint64_t *rowIn, uint64_t *rowInOut, uint64_t *rowOut, uint64_t nCols) {
+INLINE void reducedDuplexRow(uint64_t *state, uint64_t *rowIn, uint64_t *rowInOut, uint64_t *rowOut, uint64_t nCols) {
     uint64_t* ptrWordInOut = rowInOut; //In Lyra2: pointer to row*
     uint64_t* ptrWordIn = rowIn; //In Lyra2: pointer to prev
     uint64_t* ptrWordOut = rowOut; //In Lyra2: pointer to row

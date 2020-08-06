@@ -31,6 +31,9 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#ifdef WIN32
+#include <malloc.h>
+#endif
 
 #include "neoscrypt.h"
 
@@ -2281,8 +2284,8 @@ void neoscrypt_fastkdf(const uchar *password, uint password_len,
     uchar *A, *B, *prf_input, *prf_key, *prf_output;
 
     /* Align and set up the buffers in stack */
-    uchar stack[2 * kdf_buf_size + prf_input_size + prf_key_size
-      + prf_output_size + stack_align];
+    uchar *stack = (uchar *) alloca((2 * kdf_buf_size + prf_input_size + prf_key_size
+      + prf_output_size + stack_align) * sizeof(uchar));
     A          = (uchar *) (((size_t)stack & ~(stack_align - 1)) + stack_align);
     B          = &A[kdf_buf_size + prf_input_size];
     prf_output = &A[2 * kdf_buf_size + prf_input_size + prf_key_size];
@@ -2384,7 +2387,7 @@ void neoscrypt_fastkdf_opt(const uchar *password, const uchar *salt,
     uint *S;
 
     /* Align and set up the buffers in stack */
-    uchar stack[864 + stack_align];
+    uchar *stack = (uchar *) alloca((864 + stack_align) * sizeof(uchar));
     A = (uchar *) (((size_t)stack & ~(stack_align - 1)) + stack_align);
     B = &A[320];
     S = (uint *) &A[608];
@@ -2590,7 +2593,7 @@ static void neoscrypt_blkmix(uint *X, uint *Y, uint r, uint mixmode) {
         r = (1 << ((profile >> 5) & 0x7));
     }
 
-    uchar stack[(N + 3) * r * 2 * BLOCK_SIZE + stack_align];
+    uchar *stack = (uchar *) alloca(((N + 3) * r * 2 * BLOCK_SIZE + stack_align) * sizeof(uchar));
     /* X = r * 2 * BLOCK_SIZE */
     X = (uint *) (((size_t)stack & ~(stack_align - 1)) + stack_align);
     /* Z is a copy of X for ChaCha */
@@ -2986,7 +2989,7 @@ void neoscrypt_blake2s_4way(const uchar *input, const uchar *key, uchar *output)
     uint *T;
 
     /* Align and set up the buffer in stack */
-    uchar stack[704 + stack_align];
+    uchar *stack = (uchar *) alloca((704 + stack_align) * sizeof(uchar));
     T = (uint *) (((size_t)stack & ~(stack_align - 1)) + stack_align);
 
     /* Initialise */

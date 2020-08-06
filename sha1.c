@@ -3,6 +3,14 @@
 #include <string.h>
 #include <openssl/sha.h>
 
+#if defined(__GNUC__)
+#define ALIGN32(x) x __attribute__((aligned(32)))
+#elif defined(_MSC_VER)
+#define ALIGN32(x) __declspec(align(32)) x
+#else
+#define ALIGN32(x) x
+#endif
+
 inline void encodeb64(const unsigned char* pch, char* buff)
 {
   const char *pbase64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -33,9 +41,9 @@ inline void encodeb64(const unsigned char* pch, char* buff)
 
 void sha1_hash(const char* input, char* output, uint32_t len)
 {
-  char str[38] __attribute__((aligned(32))); // 26 + 11 + 1
-  uint32_t prehash[5] __attribute__((aligned(32)));
-  uint32_t hash[5] __attribute__((aligned(32))) = { 0 };
+  ALIGN32(char str[38]); // 26 + 11 + 1
+  ALIGN32(uint32_t prehash[5]);
+  ALIGN32(uint32_t hash[5]) = { 0 };
   int i = 0;
   SHA_CTX ctx;
   SHA1_Init(&ctx);

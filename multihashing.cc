@@ -40,6 +40,7 @@ extern "C" {
 #include "boolberry.h"
 
 using namespace node;
+using namespace Nan;
 using namespace v8;
 
 #define SET_BUFFER_RETURN(x, len) \

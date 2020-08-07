@@ -63,6 +63,7 @@
                 "crypto/c_skein.c",
                 "crypto/hash.c",
                 "crypto/aesb.c",
+                "crypto/sha256.c",
                 "crypto/wild_keccak.cpp",
                 "neoscrypt.c",
             ],

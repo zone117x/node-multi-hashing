@@ -1,65 +1,33 @@
-#ifndef SHA256_H
-#define SHA256_H
+/*-
+ * Copyright 2009 Colin Percival, 2011 ArtForz
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ * This file was originally written by Colin Percival as part of the Tarsnap
+ * online backup system.
+ */
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-#include "stdint.h"
-#else
-#include <stdint.h>
-#endif
-
-#include <string.h>
-
-static __inline uint32_t
-be32dec(const void *pp)
-{
-	const uint8_t *p = (uint8_t const *)pp;
-
-	return ((uint32_t)(p[3]) + ((uint32_t)(p[2]) << 8) +
-	    ((uint32_t)(p[1]) << 16) + ((uint32_t)(p[0]) << 24));
-}
-
-static __inline void
-be32enc(void *pp, uint32_t x)
-{
-	uint8_t * p = (uint8_t *)pp;
-
-	p[3] = x & 0xff;
-	p[2] = (x >> 8) & 0xff;
-	p[1] = (x >> 16) & 0xff;
-	p[0] = (x >> 24) & 0xff;
-}
-
-static __inline uint32_t
-le32dec(const void *pp)
-{
-	const uint8_t *p = (uint8_t const *)pp;
-
-	return ((uint32_t)(p[0]) + ((uint32_t)(p[1]) << 8) +
-	    ((uint32_t)(p[2]) << 16) + ((uint32_t)(p[3]) << 24));
-}
-
-static __inline void
-le32enc(void *pp, uint32_t x)
-{
-	uint8_t * p = (uint8_t *)pp;
-
-	p[0] = x & 0xff;
-	p[1] = (x >> 8) & 0xff;
-	p[2] = (x >> 16) & 0xff;
-	p[3] = (x >> 24) & 0xff;
-}
-
-
-typedef struct SHA256Context {
-	uint32_t state[8];
-	uint32_t count[2];
-	unsigned char buf[64];
-} SHA256_CTX;
-
-typedef struct HMAC_SHA256Context {
-	SHA256_CTX ictx;
-	SHA256_CTX octx;
-} HMAC_SHA256_CTX;
+#include "sha256.h"
 
 /*
  * Encode a length len/4 vector of (uint32_t) into a length len vector of
@@ -216,7 +184,7 @@ static unsigned char PAD[64] = {
 };
 
 /* SHA-256 initialization.  Begins a SHA-256 operation. */
-static void
+void
 SHA256_Init(SHA256_CTX * ctx)
 {
 
@@ -235,7 +203,7 @@ SHA256_Init(SHA256_CTX * ctx)
 }
 
 /* Add bytes into the hash */
-static void
+void
 SHA256_Update(SHA256_CTX * ctx, const void *in, size_t len)
 {
 	uint32_t bitlen[2];
@@ -303,7 +271,7 @@ SHA256_Pad(SHA256_CTX * ctx)
  * SHA-256 finalization.  Pads the input data, exports the hash value,
  * and clears the context state.
  */
-static void
+void
 SHA256_Final(unsigned char digest[32], SHA256_CTX * ctx)
 {
 
@@ -318,7 +286,7 @@ SHA256_Final(unsigned char digest[32], SHA256_CTX * ctx)
 }
 
 /* Initialize an HMAC-SHA256 operation with the given key. */
-static void
+void
 HMAC_SHA256_Init(HMAC_SHA256_CTX * ctx, const void * _K, size_t Klen)
 {
 	unsigned char pad[64];
@@ -354,7 +322,7 @@ HMAC_SHA256_Init(HMAC_SHA256_CTX * ctx, const void * _K, size_t Klen)
 }
 
 /* Add bytes to the HMAC-SHA256 operation. */
-static void
+void
 HMAC_SHA256_Update(HMAC_SHA256_CTX * ctx, const void *in, size_t len)
 {
 
@@ -363,7 +331,7 @@ HMAC_SHA256_Update(HMAC_SHA256_CTX * ctx, const void *in, size_t len)
 }
 
 /* Finish an HMAC-SHA256 operation. */
-static void
+void
 HMAC_SHA256_Final(unsigned char digest[32], HMAC_SHA256_CTX * ctx)
 {
 	unsigned char ihash[32];
@@ -386,7 +354,7 @@ HMAC_SHA256_Final(unsigned char digest[32], HMAC_SHA256_CTX * ctx)
  * Compute PBKDF2(passwd, salt, c, dkLen) using HMAC-SHA256 as the PRF, and
  * write the output to buf.  The value dkLen must be at most 32 * (2^32 - 1).
  */
-static void
+void
 PBKDF2_SHA256(const uint8_t * passwd, size_t passwdlen, const uint8_t * salt,
     size_t saltlen, uint64_t c, uint8_t * buf, size_t dkLen)
 {
@@ -437,4 +405,3 @@ PBKDF2_SHA256(const uint8_t * passwd, size_t passwdlen, const uint8_t * salt,
 	/* Clean PShctx, since we never called _Final on it. */
 	memset(&PShctx, 0, sizeof(HMAC_SHA256_CTX));
 }
-#endif

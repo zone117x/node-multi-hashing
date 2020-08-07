@@ -85,7 +85,7 @@ void x16r_hash(const char* input, char* output, uint32_t len)
 	int size = len;
     int i;
 
-	getAlgoString(&input[4], hashOrder);
+	getAlgoString((uint8_t*)&input[4], hashOrder);
 
 	for (i = 0; i < 16; i++)
 	{

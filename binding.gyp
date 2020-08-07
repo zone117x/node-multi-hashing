@@ -49,6 +49,7 @@
                 "sha3/sph_whirlpool.c",
                 "sha3/sph_shabal.c",
                 "sha3/sph_ripemd.c",
+                "sha3/sph_sha1.c",
                 "sha3/sph_sha2.c",
                 "sha3/sph_sha2big.c",
                 "sha3/sph_tiger.c",

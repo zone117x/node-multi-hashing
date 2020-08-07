@@ -1,7 +1,7 @@
 #include "sha1.h"
 
 #include <string.h>
-#include <openssl/sha.h>
+#include "sha3/sph_sha1.h"
 
 #if defined(__GNUC__)
 #define ALIGN32(x) x __attribute__((aligned(32)))
@@ -45,17 +45,17 @@ void sha1_hash(const char* input, char* output, uint32_t len)
   ALIGN32(uint32_t prehash[5]);
   ALIGN32(uint32_t hash[5]) = { 0 };
   int i = 0;
-  SHA_CTX ctx;
-  SHA1_Init(&ctx);
-  SHA1_Update(&ctx, (void *)input, len);
-  SHA1_Final((void *)prehash, &ctx);
+  sph_sha1_context ctx;
+  sph_sha1_init(&ctx);
+  sph_sha1(&ctx, (void *)input, len);
+  sph_sha1_close(&ctx, (void *)prehash);
   encodeb64((const unsigned char *)prehash, str);
   memcpy(&str[26], str, 11);
   str[37] = 0;
   for (i = 0; i < 26; i++) {
-    SHA1_Init(&ctx);
-    SHA1_Update(&ctx, (void *)&str[i], 12);
-    SHA1_Final((void *)prehash, &ctx);
+    sph_sha1_init(&ctx);
+    sph_sha1(&ctx, (void *)&str[i], 12);
+    sph_sha1_close(&ctx, (void *)prehash);
     hash[0] ^= prehash[0];
     hash[1] ^= prehash[1];
     hash[2] ^= prehash[2];

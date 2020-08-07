@@ -35,7 +35,7 @@
 #include "sha3/sph_blake.h"
 #include "lyra2.h"
 
-void lyra2z_hash(const char* input, char* output, uint32_t _len)
+void lyra2z_hash(const char* input, char* output, uint32_t len)
 {
     sph_blake256_context     ctx_blake;
 
@@ -43,7 +43,7 @@ void lyra2z_hash(const char* input, char* output, uint32_t _len)
 
     sph_blake256_set_rounds(14);
     sph_blake256_init(&ctx_blake);
-    sph_blake256 (&ctx_blake, input, 80);
+    sph_blake256 (&ctx_blake, input, len);
     sph_blake256_close (&ctx_blake, hashA);	
 	
 	LYRA2(hashB, 32, hashA, 32, hashA, 32, 8, 8, 8);

@@ -22,7 +22,7 @@ void lbry_hash(const char* input, char* output, uint32_t len)
 		sph_sha512_init(&ctx_sha512);
 		sph_ripemd160_init(&ctx_ripemd);
 
-		sph_sha256(&ctx_sha256, input, 112);
+		sph_sha256(&ctx_sha256, input, len);
 		sph_sha256_close(&ctx_sha256, hashA);
 
 		sph_sha256(&ctx_sha256, hashA, 32);

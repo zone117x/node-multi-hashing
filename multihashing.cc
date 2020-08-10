@@ -138,6 +138,10 @@ DECLARE_FUNC(neoscrypt) {
    char * input = Buffer::Data(target);
    char output[32];
 
+   uint32_t input_len = Buffer::Length(target);
+
+   if (input_len < 80)
+      RETURN_EXCEPT("Argument must be longer than 80 bytes");
    neoscrypt(input, output, 0);
 
    SET_BUFFER_RETURN(output, 32);

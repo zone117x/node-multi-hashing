@@ -40,6 +40,7 @@ extern "C" {
 #include "boolberry.h"
 
 using namespace node;
+using namespace Nan;
 using namespace v8;
 
 #define SET_BUFFER_RETURN(x, len) \
@@ -134,14 +135,13 @@ DECLARE_FUNC(neoscrypt) {
    if(!Buffer::HasInstance(target))
        RETURN_EXCEPT("Argument should be a buffer object.");
 
-   // unsigned int nValue = args[1]->Uint32Value();
-   // unsigned int rValue = args[2]->Uint32Value();
-
    char * input = Buffer::Data(target);
    char output[32];
 
    uint32_t input_len = Buffer::Length(target);
 
+   if (input_len < 80)
+      RETURN_EXCEPT("Argument must be longer than 80 bytes");
    neoscrypt(input, output, 0);
 
    SET_BUFFER_RETURN(output, 32);

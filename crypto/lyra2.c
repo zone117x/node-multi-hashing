@@ -46,24 +46,24 @@
 int LYRA2(void *K, uint64_t kLen, const void *pwd, uint64_t pwdlen, const void *salt, uint64_t saltlen, uint64_t timeCost, uint64_t nRows, uint64_t nCols) {
 
     //============================= Basic variables ============================//
-    int64_t row = 2; //index of row to be processed
-    int64_t prev = 1; //index of prev (last row ever computed/modified)
-    int64_t rowa = 0; //index of row* (a previous row, deterministically picked during Setup and randomly picked while Wandering)
-    int64_t tau; //Time Loop iterator
+    uint64_t row = 2; //index of row to be processed
+    uint64_t prev = 1; //index of prev (last row ever computed/modified)
+    uint64_t rowa = 0; //index of row* (a previous row, deterministically picked during Setup and randomly picked while Wandering)
+    uint64_t tau; //Time Loop iterator
     int64_t step = 1; //Visitation step (used during Setup and Wandering phases)
-    int64_t window = 2; //Visitation window (used to define which rows can be revisited during Setup)
+    uint64_t window = 2; //Visitation window (used to define which rows can be revisited during Setup)
     int64_t gap = 1; //Modifier to the step, assuming the values 1 or -1
-    int64_t i; //auxiliary iteration counter
+    uint64_t i; //auxiliary iteration counter
     //==========================================================================/
 
     //========== Initializing the Memory Matrix and pointers to it =============//
     //Tries to allocate enough space for the whole memory matrix
 
 
-    const int64_t ROW_LEN_INT64 = BLOCK_LEN_INT64 * nCols;
-    const int64_t ROW_LEN_BYTES = ROW_LEN_INT64 * 8;
+    const uint64_t ROW_LEN_INT64 = BLOCK_LEN_INT64 * nCols;
+    const uint64_t ROW_LEN_BYTES = ROW_LEN_INT64 * 8;
 
-    i = (int64_t) ((int64_t) nRows * (int64_t) ROW_LEN_BYTES);
+    i = (uint64_t) ((uint64_t) nRows * (uint64_t) ROW_LEN_BYTES);
     uint64_t *wholeMatrix = malloc(i);
     if (wholeMatrix == NULL) {
       return -1;
@@ -168,7 +168,7 @@ int LYRA2(void *K, uint64_t kLen, const void *pwd, uint64_t pwdlen, const void *
     row = 0; //Resets the visitation to the first row of the memory matrix
     for (tau = 1; tau <= timeCost; tau++) {
     	//Step is approximately half the number of all rows of the memory matrix for an odd tau; otherwise, it is -1
-    	step = (tau % 2 == 0) ? -1 : nRows / 2 - 1;
+        step = (tau % 2 == 0) ? -1 : (int64_t)nRows / 2 - 1;
     	do {
   	    //Selects a pseudorandom index row*
   	    //------------------------------------------------------------------------------------------
@@ -215,24 +215,24 @@ int LYRA2(void *K, uint64_t kLen, const void *pwd, uint64_t pwdlen, const void *
 int LYRA2_old(void *K, uint64_t kLen, const void *pwd, uint64_t pwdlen, const void *salt, uint64_t saltlen, uint64_t timeCost, uint64_t nRows, uint64_t nCols) {
 
     //============================= Basic variables ============================//
-    int64_t row = 2; //index of row to be processed
-    int64_t prev = 1; //index of prev (last row ever computed/modified)
-    int64_t rowa = 0; //index of row* (a previous row, deterministically picked during Setup and randomly picked while Wandering)
-    int64_t tau; //Time Loop iterator
+    uint64_t row = 2; //index of row to be processed
+    uint64_t prev = 1; //index of prev (last row ever computed/modified)
+    uint64_t rowa = 0; //index of row* (a previous row, deterministically picked during Setup and randomly picked while Wandering)
+    uint64_t tau; //Time Loop iterator
     int64_t step = 1; //Visitation step (used during Setup and Wandering phases)
-    int64_t window = 2; //Visitation window (used to define which rows can be revisited during Setup)
+    uint64_t window = 2; //Visitation window (used to define which rows can be revisited during Setup)
     int64_t gap = 1; //Modifier to the step, assuming the values 1 or -1
-    int64_t i; //auxiliary iteration counter
+    uint64_t i; //auxiliary iteration counter
     //==========================================================================/
 
     //========== Initializing the Memory Matrix and pointers to it =============//
     //Tries to allocate enough space for the whole memory matrix
 
 
-    const int64_t ROW_LEN_INT64 = BLOCK_LEN_INT64 * nCols;
-    const int64_t ROW_LEN_BYTES = ROW_LEN_INT64 * 8;
+    const uint64_t ROW_LEN_INT64 = BLOCK_LEN_INT64 * nCols;
+    const uint64_t ROW_LEN_BYTES = ROW_LEN_INT64 * 8;
 
-    i = (int64_t) ((int64_t) nRows * (int64_t) ROW_LEN_BYTES);
+    i = (uint64_t) ((uint64_t) nRows * (uint64_t) ROW_LEN_BYTES);
     uint64_t *wholeMatrix = malloc(i);
     if (wholeMatrix == NULL) {
       return -1;
@@ -337,7 +337,7 @@ int LYRA2_old(void *K, uint64_t kLen, const void *pwd, uint64_t pwdlen, const vo
     row = 0; //Resets the visitation to the first row of the memory matrix
     for (tau = 1; tau <= timeCost; tau++) {
     	//Step is approximately half the number of all rows of the memory matrix for an odd tau; otherwise, it is -1
-    	step = (tau % 2 == 0) ? -1 : nRows / 2 - 1;
+        step = (tau % 2 == 0) ? -1 : (int64_t)nRows / 2 - 1;
     	do {
   	    //Selects a pseudorandom index row*
   	    //------------------------------------------------------------------------------------------
@@ -403,24 +403,24 @@ int LYRA2_old(void *K, uint64_t kLen, const void *pwd, uint64_t pwdlen, const vo
 int LYRA2_3(void *K, uint64_t kLen, const void *pwd, uint64_t pwdlen, const void *salt, uint64_t saltlen, uint64_t timeCost, uint64_t nRows, uint64_t nCols) {
 
     //============================= Basic variables ============================//
-    int64_t row = 2; //index of row to be processed
-    int64_t prev = 1; //index of prev (last row ever computed/modified)
-    int64_t rowa = 0; //index of row* (a previous row, deterministically picked during Setup and randomly picked while Wandering)
-    int64_t tau; //Time Loop iterator
+    uint64_t row = 2; //index of row to be processed
+    uint64_t prev = 1; //index of prev (last row ever computed/modified)
+    uint64_t rowa = 0; //index of row* (a previous row, deterministically picked during Setup and randomly picked while Wandering)
+    uint64_t tau; //Time Loop iterator
     int64_t step = 1; //Visitation step (used during Setup and Wandering phases)
-    int64_t window = 2; //Visitation window (used to define which rows can be revisited during Setup)
+    uint64_t window = 2; //Visitation window (used to define which rows can be revisited during Setup)
     int64_t gap = 1; //Modifier to the step, assuming the values 1 or -1
-    int64_t i; //auxiliary iteration counter
+    uint64_t i; //auxiliary iteration counter
     //==========================================================================/
 
     //========== Initializing the Memory Matrix and pointers to it =============//
     //Tries to allocate enough space for the whole memory matrix
 
 
-    const int64_t ROW_LEN_INT64 = BLOCK_LEN_INT64 * nCols;
-    const int64_t ROW_LEN_BYTES = ROW_LEN_INT64 * 8;
+    const uint64_t ROW_LEN_INT64 = BLOCK_LEN_INT64 * nCols;
+    const uint64_t ROW_LEN_BYTES = ROW_LEN_INT64 * 8;
 
-    i = (int64_t) ((int64_t) nRows * (int64_t) ROW_LEN_BYTES);
+    i = (uint64_t) ((uint64_t) nRows * (uint64_t) ROW_LEN_BYTES);
     uint64_t *wholeMatrix = malloc(i);
     if (wholeMatrix == NULL) {
       return -1;
@@ -527,7 +527,7 @@ int LYRA2_3(void *K, uint64_t kLen, const void *pwd, uint64_t pwdlen, const void
     row = 0; //Resets the visitation to the first row of the memory matrix
     for (tau = 1; tau <= timeCost; tau++) {
     	//Step is approximately half the number of all rows of the memory matrix for an odd tau; otherwise, it is -1
-    	step = (tau % 2 == 0) ? -1 : nRows / 2 - 1;
+        step = (tau % 2 == 0) ? -1 : (int64_t)nRows / 2 - 1;
     	do {
   	    //Selects a pseudorandom index row*
   	    //------------------------------------------hg7------------------------------------------------

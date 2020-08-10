@@ -60,7 +60,7 @@ namespace crypto
     uint8_t temp[144];
     size_t i, rsiz, rsizw;
 
-    rsiz = sizeof(state_t_m) == mdlen ? HASH_DATA_AREA : 200 - 2 * mdlen;
+    rsiz = sizeof(state_t_m) == mdlen ? (size_t)HASH_DATA_AREA : 200 - 2 * mdlen;
     rsizw = rsiz / 8;
 
     memset(st, 0, sizeof(st));
@@ -93,9 +93,9 @@ namespace crypto
   {
     state_t_m st;
     uint8_t temp[144];
-    uint64_t rsiz, rsizw;
+    size_t rsiz, rsizw;
 
-    rsiz = sizeof(state_t_m) == mdlen ? HASH_DATA_AREA : 200 - 2 * mdlen;
+    rsiz = sizeof(state_t_m) == mdlen ? (size_t)HASH_DATA_AREA : 200 - 2 * mdlen;
     rsizw = rsiz / 8;
     memset(&st[0], 0, 25*sizeof(st[0]));
     

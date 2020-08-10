@@ -36,7 +36,7 @@ void c11_hash(const char* input, char* output, uint32_t len)
     uint32_t hashA[16], hashB[16];
 
     sph_blake512_init(&ctx_blake);
-    sph_blake512 (&ctx_blake, input, 80);
+    sph_blake512 (&ctx_blake, input, len);
     sph_blake512_close (&ctx_blake, hashA);
 
     sph_bmw512_init(&ctx_bmw);

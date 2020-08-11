@@ -11,7 +11,7 @@
 #define ALIGN32(x) x
 #endif
 
-inline void encodeb64(const unsigned char* pch, char* buff)
+static inline void encodeb64(const unsigned char* pch, char* buff)
 {
   const char *pbase64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
   int mode = 0, left = 0;

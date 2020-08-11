@@ -34,6 +34,7 @@
 #include <stdint.h>
 #endif
 
+#include "../sha3/sph_types.h"
 #include <string.h>
 
 static __inline uint32_t

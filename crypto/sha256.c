@@ -58,8 +58,8 @@ be32dec_vect(uint32_t *dst, const unsigned char *src, size_t len)
 /* Elementary functions used by SHA256 */
 #define Ch(x, y, z)	((x & (y ^ z)) ^ z)
 #define Maj(x, y, z)	((x & (y | z)) | (y & z))
-#define SHR(x, n)	(x >> n)
-#define ROTR(x, n)	((x >> n) | (x << (32 - n)))
+#define SHR(x, n)	SPH_T32((x) >> n)
+#define ROTR		SPH_ROTR32
 #define S0(x)		(ROTR(x, 2) ^ ROTR(x, 13) ^ ROTR(x, 22))
 #define S1(x)		(ROTR(x, 6) ^ ROTR(x, 11) ^ ROTR(x, 25))
 #define s0(x)		(ROTR(x, 7) ^ ROTR(x, 18) ^ SHR(x, 3))
@@ -74,11 +74,32 @@ be32dec_vect(uint32_t *dst, const unsigned char *src, size_t len)
 
 /* Adjusted round function for rotating state */
 #define RNDr(S, W, i, k)			\
-	RND(S[(64 - i) % 8], S[(65 - i) % 8],	\
-	    S[(66 - i) % 8], S[(67 - i) % 8],	\
-	    S[(68 - i) % 8], S[(69 - i) % 8],	\
-	    S[(70 - i) % 8], S[(71 - i) % 8],	\
+	RND(S[(64 - (i)) % 8], S[(65 - (i)) % 8],	\
+	    S[(66 - (i)) % 8], S[(67 - (i)) % 8],	\
+	    S[(68 - (i)) % 8], S[(69 - (i)) % 8],	\
+	    S[(70 - (i)) % 8], S[(71 - (i)) % 8],	\
 	    W[i] + k)
+
+#ifndef UNROLL
+static const uint32_t K[64] = {
+	SPH_C32(0x428a2f98), SPH_C32(0x71374491), SPH_C32(0xb5c0fbcf), SPH_C32(0xe9b5dba5),
+	SPH_C32(0x3956c25b), SPH_C32(0x59f111f1), SPH_C32(0x923f82a4), SPH_C32(0xab1c5ed5),
+	SPH_C32(0xd807aa98), SPH_C32(0x12835b01), SPH_C32(0x243185be), SPH_C32(0x550c7dc3),
+	SPH_C32(0x72be5d74), SPH_C32(0x80deb1fe), SPH_C32(0x9bdc06a7), SPH_C32(0xc19bf174),
+	SPH_C32(0xe49b69c1), SPH_C32(0xefbe4786), SPH_C32(0x0fc19dc6), SPH_C32(0x240ca1cc),
+	SPH_C32(0x2de92c6f), SPH_C32(0x4a7484aa), SPH_C32(0x5cb0a9dc), SPH_C32(0x76f988da),
+	SPH_C32(0x983e5152), SPH_C32(0xa831c66d), SPH_C32(0xb00327c8), SPH_C32(0xbf597fc7),
+	SPH_C32(0xc6e00bf3), SPH_C32(0xd5a79147), SPH_C32(0x06ca6351), SPH_C32(0x14292967),
+	SPH_C32(0x27b70a85), SPH_C32(0x2e1b2138), SPH_C32(0x4d2c6dfc), SPH_C32(0x53380d13),
+	SPH_C32(0x650a7354), SPH_C32(0x766a0abb), SPH_C32(0x81c2c92e), SPH_C32(0x92722c85),
+	SPH_C32(0xa2bfe8a1), SPH_C32(0xa81a664b), SPH_C32(0xc24b8b70), SPH_C32(0xc76c51a3),
+	SPH_C32(0xd192e819), SPH_C32(0xd6990624), SPH_C32(0xf40e3585), SPH_C32(0x106aa070),
+	SPH_C32(0x19a4c116), SPH_C32(0x1e376c08), SPH_C32(0x2748774c), SPH_C32(0x34b0bcb5),
+	SPH_C32(0x391c0cb3), SPH_C32(0x4ed8aa4a), SPH_C32(0x5b9cca4f), SPH_C32(0x682e6ff3),
+	SPH_C32(0x748f82ee), SPH_C32(0x78a5636f), SPH_C32(0x84c87814), SPH_C32(0x8cc70208),
+	SPH_C32(0x90befffa), SPH_C32(0xa4506ceb), SPH_C32(0xbef9a3f7), SPH_C32(0xc67178f2),
+};
+#endif
 
 /*
  * SHA256 block compression function.  The 256-bit state is transformed via
@@ -101,70 +122,83 @@ sha256_transform(uint32_t * state, const unsigned char block[64])
 	memcpy(S, state, 32);
 
 	/* 3. Mix. */
-	RNDr(S, W, 0, 0x428a2f98);
-	RNDr(S, W, 1, 0x71374491);
-	RNDr(S, W, 2, 0xb5c0fbcf);
-	RNDr(S, W, 3, 0xe9b5dba5);
-	RNDr(S, W, 4, 0x3956c25b);
-	RNDr(S, W, 5, 0x59f111f1);
-	RNDr(S, W, 6, 0x923f82a4);
-	RNDr(S, W, 7, 0xab1c5ed5);
-	RNDr(S, W, 8, 0xd807aa98);
-	RNDr(S, W, 9, 0x12835b01);
-	RNDr(S, W, 10, 0x243185be);
-	RNDr(S, W, 11, 0x550c7dc3);
-	RNDr(S, W, 12, 0x72be5d74);
-	RNDr(S, W, 13, 0x80deb1fe);
-	RNDr(S, W, 14, 0x9bdc06a7);
-	RNDr(S, W, 15, 0xc19bf174);
-	RNDr(S, W, 16, 0xe49b69c1);
-	RNDr(S, W, 17, 0xefbe4786);
-	RNDr(S, W, 18, 0x0fc19dc6);
-	RNDr(S, W, 19, 0x240ca1cc);
-	RNDr(S, W, 20, 0x2de92c6f);
-	RNDr(S, W, 21, 0x4a7484aa);
-	RNDr(S, W, 22, 0x5cb0a9dc);
-	RNDr(S, W, 23, 0x76f988da);
-	RNDr(S, W, 24, 0x983e5152);
-	RNDr(S, W, 25, 0xa831c66d);
-	RNDr(S, W, 26, 0xb00327c8);
-	RNDr(S, W, 27, 0xbf597fc7);
-	RNDr(S, W, 28, 0xc6e00bf3);
-	RNDr(S, W, 29, 0xd5a79147);
-	RNDr(S, W, 30, 0x06ca6351);
-	RNDr(S, W, 31, 0x14292967);
-	RNDr(S, W, 32, 0x27b70a85);
-	RNDr(S, W, 33, 0x2e1b2138);
-	RNDr(S, W, 34, 0x4d2c6dfc);
-	RNDr(S, W, 35, 0x53380d13);
-	RNDr(S, W, 36, 0x650a7354);
-	RNDr(S, W, 37, 0x766a0abb);
-	RNDr(S, W, 38, 0x81c2c92e);
-	RNDr(S, W, 39, 0x92722c85);
-	RNDr(S, W, 40, 0xa2bfe8a1);
-	RNDr(S, W, 41, 0xa81a664b);
-	RNDr(S, W, 42, 0xc24b8b70);
-	RNDr(S, W, 43, 0xc76c51a3);
-	RNDr(S, W, 44, 0xd192e819);
-	RNDr(S, W, 45, 0xd6990624);
-	RNDr(S, W, 46, 0xf40e3585);
-	RNDr(S, W, 47, 0x106aa070);
-	RNDr(S, W, 48, 0x19a4c116);
-	RNDr(S, W, 49, 0x1e376c08);
-	RNDr(S, W, 50, 0x2748774c);
-	RNDr(S, W, 51, 0x34b0bcb5);
-	RNDr(S, W, 52, 0x391c0cb3);
-	RNDr(S, W, 53, 0x4ed8aa4a);
-	RNDr(S, W, 54, 0x5b9cca4f);
-	RNDr(S, W, 55, 0x682e6ff3);
-	RNDr(S, W, 56, 0x748f82ee);
-	RNDr(S, W, 57, 0x78a5636f);
-	RNDr(S, W, 58, 0x84c87814);
-	RNDr(S, W, 59, 0x8cc70208);
-	RNDr(S, W, 60, 0x90befffa);
-	RNDr(S, W, 61, 0xa4506ceb);
-	RNDr(S, W, 62, 0xbef9a3f7);
-	RNDr(S, W, 63, 0xc67178f2);
+#ifdef UNROLL
+	RNDr(S, W, 0, SPH_C32(0x428a2f98));
+	RNDr(S, W, 1, SPH_C32(0x71374491));
+	RNDr(S, W, 2, SPH_C32(0xb5c0fbcf));
+	RNDr(S, W, 3, SPH_C32(0xe9b5dba5));
+	RNDr(S, W, 4, SPH_C32(0x3956c25b));
+	RNDr(S, W, 5, SPH_C32(0x59f111f1));
+	RNDr(S, W, 6, SPH_C32(0x923f82a4));
+	RNDr(S, W, 7, SPH_C32(0xab1c5ed5));
+	RNDr(S, W, 8, SPH_C32(0xd807aa98));
+	RNDr(S, W, 9, SPH_C32(0x12835b01));
+	RNDr(S, W, 10, SPH_C32(0x243185be));
+	RNDr(S, W, 11, SPH_C32(0x550c7dc3));
+	RNDr(S, W, 12, SPH_C32(0x72be5d74));
+	RNDr(S, W, 13, SPH_C32(0x80deb1fe));
+	RNDr(S, W, 14, SPH_C32(0x9bdc06a7));
+	RNDr(S, W, 15, SPH_C32(0xc19bf174));
+	RNDr(S, W, 16, SPH_C32(0xe49b69c1));
+	RNDr(S, W, 17, SPH_C32(0xefbe4786));
+	RNDr(S, W, 18, SPH_C32(0x0fc19dc6));
+	RNDr(S, W, 19, SPH_C32(0x240ca1cc));
+	RNDr(S, W, 20, SPH_C32(0x2de92c6f));
+	RNDr(S, W, 21, SPH_C32(0x4a7484aa));
+	RNDr(S, W, 22, SPH_C32(0x5cb0a9dc));
+	RNDr(S, W, 23, SPH_C32(0x76f988da));
+	RNDr(S, W, 24, SPH_C32(0x983e5152));
+	RNDr(S, W, 25, SPH_C32(0xa831c66d));
+	RNDr(S, W, 26, SPH_C32(0xb00327c8));
+	RNDr(S, W, 27, SPH_C32(0xbf597fc7));
+	RNDr(S, W, 28, SPH_C32(0xc6e00bf3));
+	RNDr(S, W, 29, SPH_C32(0xd5a79147));
+	RNDr(S, W, 30, SPH_C32(0x06ca6351));
+	RNDr(S, W, 31, SPH_C32(0x14292967));
+	RNDr(S, W, 32, SPH_C32(0x27b70a85));
+	RNDr(S, W, 33, SPH_C32(0x2e1b2138));
+	RNDr(S, W, 34, SPH_C32(0x4d2c6dfc));
+	RNDr(S, W, 35, SPH_C32(0x53380d13));
+	RNDr(S, W, 36, SPH_C32(0x650a7354));
+	RNDr(S, W, 37, SPH_C32(0x766a0abb));
+	RNDr(S, W, 38, SPH_C32(0x81c2c92e));
+	RNDr(S, W, 39, SPH_C32(0x92722c85));
+	RNDr(S, W, 40, SPH_C32(0xa2bfe8a1));
+	RNDr(S, W, 41, SPH_C32(0xa81a664b));
+	RNDr(S, W, 42, SPH_C32(0xc24b8b70));
+	RNDr(S, W, 43, SPH_C32(0xc76c51a3));
+	RNDr(S, W, 44, SPH_C32(0xd192e819));
+	RNDr(S, W, 45, SPH_C32(0xd6990624));
+	RNDr(S, W, 46, SPH_C32(0xf40e3585));
+	RNDr(S, W, 47, SPH_C32(0x106aa070));
+	RNDr(S, W, 48, SPH_C32(0x19a4c116));
+	RNDr(S, W, 49, SPH_C32(0x1e376c08));
+	RNDr(S, W, 50, SPH_C32(0x2748774c));
+	RNDr(S, W, 51, SPH_C32(0x34b0bcb5));
+	RNDr(S, W, 52, SPH_C32(0x391c0cb3));
+	RNDr(S, W, 53, SPH_C32(0x4ed8aa4a));
+	RNDr(S, W, 54, SPH_C32(0x5b9cca4f));
+	RNDr(S, W, 55, SPH_C32(0x682e6ff3));
+	RNDr(S, W, 56, SPH_C32(0x748f82ee));
+	RNDr(S, W, 57, SPH_C32(0x78a5636f));
+	RNDr(S, W, 58, SPH_C32(0x84c87814));
+	RNDr(S, W, 59, SPH_C32(0x8cc70208));
+	RNDr(S, W, 60, SPH_C32(0x90befffa));
+	RNDr(S, W, 61, SPH_C32(0xa4506ceb));
+	RNDr(S, W, 62, SPH_C32(0xbef9a3f7));
+	RNDr(S, W, 63, SPH_C32(0xc67178f2));
+#else
+	for (i = 0; i < 64; i+=8) {
+		RNDr(S, W, i, K[i]);
+		RNDr(S, W, i+1, K[i+1]);
+		RNDr(S, W, i+2, K[i+2]);
+		RNDr(S, W, i+3, K[i+3]);
+		RNDr(S, W, i+4, K[i+4]);
+		RNDr(S, W, i+5, K[i+5]);
+		RNDr(S, W, i+6, K[i+6]);
+		RNDr(S, W, i+7, K[i+7]);
+	}
+#endif
 
 	/* 4. Mix local working variables into global state */
 	for (i = 0; i < 8; i++)
@@ -176,13 +210,6 @@ sha256_transform(uint32_t * state, const unsigned char block[64])
 	t0 = t1 = 0;
 }
 
-static unsigned char PAD[64] = {
-	0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-};
-
 /* SHA-256 initialization.  Begins a SHA-256 operation. */
 void
 sha256_init(sha256_ctx * ctx)
@@ -192,14 +219,14 @@ sha256_init(sha256_ctx * ctx)
 	ctx->count[0] = ctx->count[1] = 0;
 
 	/* Magic initialization constants */
-	ctx->state[0] = 0x6A09E667;
-	ctx->state[1] = 0xBB67AE85;
-	ctx->state[2] = 0x3C6EF372;
-	ctx->state[3] = 0xA54FF53A;
-	ctx->state[4] = 0x510E527F;
-	ctx->state[5] = 0x9B05688C;
-	ctx->state[6] = 0x1F83D9AB;
-	ctx->state[7] = 0x5BE0CD19;
+	ctx->state[0] = SPH_C32(0x6A09E667);
+	ctx->state[1] = SPH_C32(0xBB67AE85);
+	ctx->state[2] = SPH_C32(0x3C6EF372);
+	ctx->state[3] = SPH_C32(0xA54FF53A);
+	ctx->state[4] = SPH_C32(0x510E527F);
+	ctx->state[5] = SPH_C32(0x9B05688C);
+	ctx->state[6] = SPH_C32(0x1F83D9AB);
+	ctx->state[7] = SPH_C32(0x5BE0CD19);
 }
 
 /* Add bytes into the hash */
@@ -207,11 +234,10 @@ void
 sha256_update(sha256_ctx * ctx, const void *in, size_t len)
 {
 	uint32_t bitlen[2];
-	uint32_t r;
 	const unsigned char *src = in;
 
 	/* Number of bytes left in the buffer from previous updates */
-	r = (ctx->count[1] >> 3) & 0x3f;
+	uint32_t r = (ctx->count[1] >> 3) & 0x3f;
 
 	/* Convert the length into a number of bits */
 	bitlen[1] = ((uint32_t)len) << 3;
@@ -249,18 +275,22 @@ sha256_update(sha256_ctx * ctx, const void *in, size_t len)
 static void
 sha256_pad(sha256_ctx * ctx)
 {
-	unsigned char len[8];
-	uint32_t r, plen;
-
+	const unsigned char PAD[64] = {
+		0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	};
 	/*
 	 * Convert length to a vector of bytes -- we do this now rather
 	 * than later because the length will change after we pad.
 	 */
+	unsigned char len[8];
 	be32enc_vect(len, ctx->count, 8);
 
 	/* Add 1--64 bytes so that the resulting length is 56 mod 64 */
-	r = (ctx->count[1] >> 3) & 0x3f;
-	plen = (r < 56) ? (56 - r) : (120 - r);
+	uint32_t r = (ctx->count[1] >> 3) & 0x3f;
+	uint32_t plen = (r < 56) ? (56 - r) : (120 - r);
 	sha256_update(ctx, PAD, (size_t)plen);
 
 	/* Add the terminating bit-count */

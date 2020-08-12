@@ -114,11 +114,13 @@ extern "C"{
 
 #include "hamsi_helper.c"
 
+#ifdef USE_SPH_HAMSI224
 static const sph_u32 IV224[] = {
     SPH_C32(0xc3967a67), SPH_C32(0xc3bc6c20), SPH_C32(0x4bc3bcc3),
     SPH_C32(0xa7c3bc6b), SPH_C32(0x2c204b61), SPH_C32(0x74686f6c),
     SPH_C32(0x69656b65), SPH_C32(0x20556e69)
 };
+#endif
 
 /*
  * This version is the one used in the Hamsi submission package for
@@ -132,12 +134,15 @@ static const sph_u32 IV224[] = {
 };
  */
 
+#ifdef USE_SPH_HAMSI256
 static const sph_u32 IV256[] = {
     SPH_C32(0x76657273), SPH_C32(0x69746569), SPH_C32(0x74204c65),
     SPH_C32(0x7576656e), SPH_C32(0x2c204465), SPH_C32(0x70617274),
     SPH_C32(0x656d656e), SPH_C32(0x7420456c)
 };
+#endif
 
+#ifdef USE_SPH_HAMSI384
 static const sph_u32 IV384[] = {
     SPH_C32(0x656b7472), SPH_C32(0x6f746563), SPH_C32(0x686e6965),
     SPH_C32(0x6b2c2043), SPH_C32(0x6f6d7075), SPH_C32(0x74657220),
@@ -146,6 +151,7 @@ static const sph_u32 IV384[] = {
     SPH_C32(0x43727970), SPH_C32(0x746f6772), SPH_C32(0x61706879),
     SPH_C32(0x2c204b61)
 };
+#endif
 
 static const sph_u32 IV512[] = {
     SPH_C32(0x73746565), SPH_C32(0x6c706172), SPH_C32(0x6b204172),
@@ -316,6 +322,7 @@ static const sph_u32 alpha_f[] = {
         c0 = (sc->h[0] ^= s0); \
     } while (0)
 
+#if defined(USE_SPH_HAMSI224) || defined(USE_SPH_HAMSI256) || defined(USE_SPH_HAMSI384)
 static void
 hamsi_small(sph_hamsi_small_context *sc, const unsigned char *buf, size_t num)
 {
@@ -424,6 +431,7 @@ hamsi_small_close(sph_hamsi_small_context *sc,
     for (u = 0; u < out_size_w32; u ++)
         sph_enc32be(out + (u << 2), sc->h[u]);
 }
+#endif
 
 #define DECL_STATE_BIG \
     sph_u32 c0, c1, c2, c3, c4, c5, c6, c7; \
@@ -742,6 +750,7 @@ hamsi_big_close(sph_hamsi_big_context *sc,
     }
 }
 
+#ifdef USE_SPH_HAMSI224
 /* see sph_hamsi.h */
 void
 sph_hamsi224_init(void *cc)
@@ -771,7 +780,9 @@ sph_hamsi224_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst)
     hamsi_small_close(cc, ub, n, dst, 7);
     hamsi_small_init(cc, IV224);
 }
+#endif
 
+#ifdef USE_SPH_HAMSI256
 /* see sph_hamsi.h */
 void
 sph_hamsi256_init(void *cc)
@@ -801,7 +812,9 @@ sph_hamsi256_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst)
     hamsi_small_close(cc, ub, n, dst, 8);
     hamsi_small_init(cc, IV256);
 }
+#endif
 
+#ifdef USE_SPH_HAMSI384
 /* see sph_hamsi.h */
 void
 sph_hamsi384_init(void *cc)
@@ -831,6 +844,7 @@ sph_hamsi384_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst)
     hamsi_big_close(cc, ub, n, dst, 12);
     hamsi_big_init(cc, IV384);
 }
+#endif
 
 /* see sph_hamsi.h */
 void

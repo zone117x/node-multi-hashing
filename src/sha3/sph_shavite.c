@@ -148,6 +148,8 @@ static const sph_u32 IV512[] = {
 		(k3) = kt; \
 	} while (0)
 
+#if defined(USE_SPH_SHAVITE224) || defined(USE_SPH_SHAVITE256)
+
 #if SPH_SMALL_FOOTPRINT_SHAVITE
 
 /*
@@ -718,6 +720,7 @@ c256(sph_shavite_small_context *sc, const void *msg)
 	sc->h[0x7] ^= p7;
 }
 
+#endif
 #endif
 
 #if SPH_SMALL_FOOTPRINT_SHAVITE
@@ -1475,6 +1478,7 @@ c512(sph_shavite_big_context *sc, const void *msg)
 
 #endif
 
+#if defined(USE_SPH_SHAVITE224) || defined(USE_SPH_SHAVITE256)
 static void
 shavite_small_init(sph_shavite_small_context *sc, const sph_u32 *iv)
 {
@@ -1549,6 +1553,7 @@ shavite_small_close(sph_shavite_small_context *sc,
 	for (u = 0; u < out_size_w32; u ++)
 		sph_enc32le((unsigned char *)dst + (u << 2), sc->h[u]);
 }
+#endif
 
 static void
 shavite_big_init(sph_shavite_big_context *sc, const sph_u32 *iv)
@@ -1639,6 +1644,7 @@ shavite_big_close(sph_shavite_big_context *sc,
 		sph_enc32le((unsigned char *)dst + (u << 2), sc->h[u]);
 }
 
+#ifdef USE_SPH_SHAVITE224
 /* see sph_shavite.h */
 void
 sph_shavite224_init(void *cc)
@@ -1668,7 +1674,9 @@ sph_shavite224_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst)
 	shavite_small_close(cc, ub, n, dst, 7);
 	shavite_small_init(cc, IV224);
 }
+#endif
 
+#ifdef USE_SPH_SHAVITE256
 /* see sph_shavite.h */
 void
 sph_shavite256_init(void *cc)
@@ -1698,7 +1706,9 @@ sph_shavite256_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst)
 	shavite_small_close(cc, ub, n, dst, 8);
 	shavite_small_init(cc, IV256);
 }
+#endif
 
+#ifdef USE_SPH_SHAVITE384
 /* see sph_shavite.h */
 void
 sph_shavite384_init(void *cc)
@@ -1728,6 +1738,7 @@ sph_shavite384_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst)
 	shavite_big_close(cc, ub, n, dst, 12);
 	shavite_big_init(cc, IV384);
 }
+#endif
 
 /* see sph_shavite.h */
 void

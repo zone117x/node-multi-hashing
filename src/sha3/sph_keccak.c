@@ -1701,11 +1701,16 @@ keccak_core(sph_keccak_context *kc, const void *data, size_t len, size_t lim)
 
 #endif
 
+#ifdef USE_SPH_KECCAK224
 DEFCLOSE(28, 144)
+#endif
 DEFCLOSE(32, 136)
+#ifdef USE_SPH_KECCAK384
 DEFCLOSE(48, 104)
+#endif
 DEFCLOSE(64, 72)
 
+#ifdef USE_SPH_KECCAK224
 /* see sph_keccak.h */
 void
 sph_keccak224_init(void *cc)
@@ -1733,6 +1738,7 @@ sph_keccak224_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst)
 {
 	keccak_close28(cc, ub, n, dst);
 }
+#endif
 
 /* see sph_keccak.h */
 void
@@ -1762,6 +1768,7 @@ sph_keccak256_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst)
 	keccak_close32(cc, ub, n, dst);
 }
 
+#ifdef USE_SPH_KECCAK384
 /* see sph_keccak.h */
 void
 sph_keccak384_init(void *cc)
@@ -1789,6 +1796,7 @@ sph_keccak384_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst)
 {
 	keccak_close48(cc, ub, n, dst);
 }
+#endif
 
 /* see sph_keccak.h */
 void

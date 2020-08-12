@@ -800,6 +800,7 @@ fugue2_core(sph_fugue_context *sc, const void *data, size_t len)
 	WRITE_STATE_SMALL(sc);
 }
 
+#ifdef USE_SPH_FUGUE384
 static void
 fugue3_core(sph_fugue_context *sc, const void *data, size_t len)
 {
@@ -859,6 +860,7 @@ fugue3_core(sph_fugue_context *sc, const void *data, size_t len)
 	CORE_EXIT
 	WRITE_STATE_BIG(sc);
 }
+#endif
 
 static void
 fugue4_core(sph_fugue_context *sc, const void *data, size_t len)
@@ -1000,6 +1002,7 @@ fugue2_close(sph_fugue_context *sc, unsigned ub, unsigned n,
 	}
 }
 
+#ifdef USE_SPH_FUGUE384
 static void
 fugue3_close(sph_fugue_context *sc, unsigned ub, unsigned n, void *dst)
 {
@@ -1046,6 +1049,7 @@ fugue3_close(sph_fugue_context *sc, unsigned ub, unsigned n, void *dst)
 	sph_enc32be(out + 44, S[27]);
 	sph_fugue384_init(sc);
 }
+#endif
 
 static void
 fugue4_close(sph_fugue_context *sc, unsigned ub, unsigned n, void *dst)
@@ -1114,6 +1118,7 @@ sph_fugue224_init(void *cc)
 	fugue_init(cc, 23, IV224, 7);
 }
 
+#ifdef USE_SPH_FUGUE224
 void
 sph_fugue224(void *cc, const void *data, size_t len)
 {
@@ -1131,6 +1136,7 @@ sph_fugue224_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst)
 {
 	fugue2_close(cc, ub, n, dst, 7);
 }
+#endif
 
 void
 sph_fugue256_init(void *cc)
@@ -1156,6 +1162,7 @@ sph_fugue256_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst)
 	fugue2_close(cc, ub, n, dst, 8);
 }
 
+#ifdef USE_SPH_FUGUE384
 void
 sph_fugue384_init(void *cc)
 {
@@ -1179,6 +1186,7 @@ sph_fugue384_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst)
 {
 	fugue3_close(cc, ub, n, dst);
 }
+#endif
 
 void
 sph_fugue512_init(void *cc)

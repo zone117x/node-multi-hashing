@@ -1130,6 +1130,7 @@ sph_skein256_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst)
 }
 #endif
 
+#ifdef USE_SPH_SKEIN224
 /* see sph_skein.h */
 void
 sph_skein224_init(void *cc)
@@ -1158,6 +1159,7 @@ sph_skein224_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst)
 	skein_big_close(cc, ub, n, dst, 28);
 	sph_skein224_init(cc);
 }
+#endif
 
 /* see sph_skein.h */
 void
@@ -1195,6 +1197,7 @@ sph_skein384_init(void *cc)
 	skein_big_init(cc, IV384);
 }
 
+#ifdef USE_SPH_SKEIN384
 /* see sph_skein.h */
 void
 sph_skein384(void *cc, const void *data, size_t len)
@@ -1216,6 +1219,7 @@ sph_skein384_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst)
 	skein_big_close(cc, ub, n, dst, 48);
 	sph_skein384_init(cc);
 }
+#endif
 
 /* see sph_skein.h */
 void

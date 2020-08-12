@@ -85,7 +85,7 @@ be32dec_vect(uint32_t *dst, const unsigned char *src, size_t len)
  * the 512-bit input block to produce a new state.
  */
 static void
-SHA256_Transform(uint32_t * state, const unsigned char block[64])
+sha256_transform(uint32_t * state, const unsigned char block[64])
 {
 	uint32_t W[64];
 	uint32_t S[8];
@@ -185,7 +185,7 @@ static unsigned char PAD[64] = {
 
 /* SHA-256 initialization.  Begins a SHA-256 operation. */
 void
-SHA256_Init(SHA256_CTX * ctx)
+sha256_init(sha256_ctx * ctx)
 {
 
 	/* Zero bits processed so far */
@@ -204,7 +204,7 @@ SHA256_Init(SHA256_CTX * ctx)
 
 /* Add bytes into the hash */
 void
-SHA256_Update(SHA256_CTX * ctx, const void *in, size_t len)
+sha256_update(sha256_ctx * ctx, const void *in, size_t len)
 {
 	uint32_t bitlen[2];
 	uint32_t r;
@@ -230,13 +230,13 @@ SHA256_Update(SHA256_CTX * ctx, const void *in, size_t len)
 
 	/* Finish the current block */
 	memcpy(&ctx->buf[r], src, 64 - r);
-	SHA256_Transform(ctx->state, ctx->buf);
+	sha256_transform(ctx->state, ctx->buf);
 	src += 64 - r;
 	len -= 64 - r;
 
 	/* Perform complete blocks */
 	while (len >= 64) {
-		SHA256_Transform(ctx->state, src);
+		sha256_transform(ctx->state, src);
 		src += 64;
 		len -= 64;
 	}
@@ -247,7 +247,7 @@ SHA256_Update(SHA256_CTX * ctx, const void *in, size_t len)
 
 /* Add padding and terminating bit-count. */
 static void
-SHA256_Pad(SHA256_CTX * ctx)
+sha256_pad(sha256_ctx * ctx)
 {
 	unsigned char len[8];
 	uint32_t r, plen;
@@ -261,10 +261,10 @@ SHA256_Pad(SHA256_CTX * ctx)
 	/* Add 1--64 bytes so that the resulting length is 56 mod 64 */
 	r = (ctx->count[1] >> 3) & 0x3f;
 	plen = (r < 56) ? (56 - r) : (120 - r);
-	SHA256_Update(ctx, PAD, (size_t)plen);
+	sha256_update(ctx, PAD, (size_t)plen);
 
 	/* Add the terminating bit-count */
-	SHA256_Update(ctx, len, 8);
+	sha256_update(ctx, len, 8);
 }
 
 /*
@@ -272,11 +272,11 @@ SHA256_Pad(SHA256_CTX * ctx)
  * and clears the context state.
  */
 void
-SHA256_Final(unsigned char digest[32], SHA256_CTX * ctx)
+sha256_final(unsigned char digest[32], sha256_ctx * ctx)
 {
 
 	/* Add padding */
-	SHA256_Pad(ctx);
+	sha256_pad(ctx);
 
 	/* Write the hash */
 	be32enc_vect(digest, ctx->state, 32);
@@ -287,7 +287,7 @@ SHA256_Final(unsigned char digest[32], SHA256_CTX * ctx)
 
 /* Initialize an HMAC-SHA256 operation with the given key. */
 void
-HMAC_SHA256_Init(HMAC_SHA256_CTX * ctx, const void * _K, size_t Klen)
+hmac_sha256_init(hmac_sha256_ctx * ctx, const void * _K, size_t Klen)
 {
 	unsigned char pad[64];
 	unsigned char khash[32];
@@ -296,26 +296,26 @@ HMAC_SHA256_Init(HMAC_SHA256_CTX * ctx, const void * _K, size_t Klen)
 
 	/* If Klen > 64, the key is really SHA256(K). */
 	if (Klen > 64) {
-		SHA256_Init(&ctx->ictx);
-		SHA256_Update(&ctx->ictx, K, Klen);
-		SHA256_Final(khash, &ctx->ictx);
+		sha256_init(&ctx->ictx);
+		sha256_update(&ctx->ictx, K, Klen);
+		sha256_final(khash, &ctx->ictx);
 		K = khash;
 		Klen = 32;
 	}
 
 	/* Inner SHA256 operation is SHA256(K xor [block of 0x36] || data). */
-	SHA256_Init(&ctx->ictx);
+	sha256_init(&ctx->ictx);
 	memset(pad, 0x36, 64);
 	for (i = 0; i < Klen; i++)
 		pad[i] ^= K[i];
-	SHA256_Update(&ctx->ictx, pad, 64);
+	sha256_update(&ctx->ictx, pad, 64);
 
 	/* Outer SHA256 operation is SHA256(K xor [block of 0x5c] || hash). */
-	SHA256_Init(&ctx->octx);
+	sha256_init(&ctx->octx);
 	memset(pad, 0x5c, 64);
 	for (i = 0; i < Klen; i++)
 		pad[i] ^= K[i];
-	SHA256_Update(&ctx->octx, pad, 64);
+	sha256_update(&ctx->octx, pad, 64);
 
 	/* Clean the stack. */
 	memset(khash, 0, 32);
@@ -323,27 +323,27 @@ HMAC_SHA256_Init(HMAC_SHA256_CTX * ctx, const void * _K, size_t Klen)
 
 /* Add bytes to the HMAC-SHA256 operation. */
 void
-HMAC_SHA256_Update(HMAC_SHA256_CTX * ctx, const void *in, size_t len)
+hmac_sha256_update(hmac_sha256_ctx * ctx, const void *in, size_t len)
 {
 
 	/* Feed data to the inner SHA256 operation. */
-	SHA256_Update(&ctx->ictx, in, len);
+	sha256_update(&ctx->ictx, in, len);
 }
 
 /* Finish an HMAC-SHA256 operation. */
 void
-HMAC_SHA256_Final(unsigned char digest[32], HMAC_SHA256_CTX * ctx)
+hmac_sha256_final(unsigned char digest[32], hmac_sha256_ctx * ctx)
 {
 	unsigned char ihash[32];
 
 	/* Finish the inner SHA256 operation. */
-	SHA256_Final(ihash, &ctx->ictx);
+	sha256_final(ihash, &ctx->ictx);
 
 	/* Feed the inner hash to the outer SHA256 operation. */
-	SHA256_Update(&ctx->octx, ihash, 32);
+	sha256_update(&ctx->octx, ihash, 32);
 
 	/* Finish the outer SHA256 operation. */
-	SHA256_Final(digest, &ctx->octx);
+	sha256_final(digest, &ctx->octx);
 
 	/* Clean the stack. */
 	memset(ihash, 0, 32);
@@ -358,7 +358,7 @@ void
 PBKDF2_SHA256(const uint8_t * passwd, size_t passwdlen, const uint8_t * salt,
     size_t saltlen, uint64_t c, uint8_t * buf, size_t dkLen)
 {
-	HMAC_SHA256_CTX PShctx, hctx;
+	hmac_sha256_ctx PShctx, hctx;
 	size_t i;
 	uint8_t ivec[4];
 	uint8_t U[32];
@@ -368,8 +368,8 @@ PBKDF2_SHA256(const uint8_t * passwd, size_t passwdlen, const uint8_t * salt,
 	size_t clen;
 
 	/* Compute HMAC state after processing P and S. */
-	HMAC_SHA256_Init(&PShctx, passwd, passwdlen);
-	HMAC_SHA256_Update(&PShctx, salt, saltlen);
+	hmac_sha256_init(&PShctx, passwd, passwdlen);
+	hmac_sha256_update(&PShctx, salt, saltlen);
 
 	/* Iterate through the blocks. */
 	for (i = 0; i * 32 < dkLen; i++) {
@@ -377,18 +377,18 @@ PBKDF2_SHA256(const uint8_t * passwd, size_t passwdlen, const uint8_t * salt,
 		be32enc(ivec, (uint32_t)(i + 1));
 
 		/* Compute U_1 = PRF(P, S || INT(i)). */
-		memcpy(&hctx, &PShctx, sizeof(HMAC_SHA256_CTX));
-		HMAC_SHA256_Update(&hctx, ivec, 4);
-		HMAC_SHA256_Final(U, &hctx);
+		memcpy(&hctx, &PShctx, sizeof(hmac_sha256_ctx));
+		hmac_sha256_update(&hctx, ivec, 4);
+		hmac_sha256_final(U, &hctx);
 
 		/* T_i = U_1 ... */
 		memcpy(T, U, 32);
 
 		for (j = 2; j <= c; j++) {
 			/* Compute U_j. */
-			HMAC_SHA256_Init(&hctx, passwd, passwdlen);
-			HMAC_SHA256_Update(&hctx, U, 32);
-			HMAC_SHA256_Final(U, &hctx);
+			hmac_sha256_init(&hctx, passwd, passwdlen);
+			hmac_sha256_update(&hctx, U, 32);
+			hmac_sha256_final(U, &hctx);
 
 			/* ... xor U_j ... */
 			for (k = 0; k < 32; k++)
@@ -403,5 +403,5 @@ PBKDF2_SHA256(const uint8_t * passwd, size_t passwdlen, const uint8_t * salt,
 	}
 
 	/* Clean PShctx, since we never called _Final on it. */
-	memset(&PShctx, 0, sizeof(HMAC_SHA256_CTX));
+	memset(&PShctx, 0, sizeof(hmac_sha256_ctx));
 }

@@ -81,19 +81,19 @@ typedef struct SHA256Context {
 	uint32_t state[8];
 	uint32_t count[2];
 	unsigned char buf[64];
-} SHA256_CTX;
+} sha256_ctx;
 
 typedef struct HMAC_SHA256Context {
-	SHA256_CTX ictx;
-	SHA256_CTX octx;
-} HMAC_SHA256_CTX;
+	sha256_ctx ictx;
+	sha256_ctx octx;
+} hmac_sha256_ctx;
 
-void	SHA256_Init(SHA256_CTX *);
-void	SHA256_Update(SHA256_CTX *, const void *, size_t);
-void	SHA256_Final(unsigned char [32], SHA256_CTX *);
-void	HMAC_SHA256_Init(HMAC_SHA256_CTX *, const void *, size_t);
-void	HMAC_SHA256_Update(HMAC_SHA256_CTX *, const void *, size_t);
-void	HMAC_SHA256_Final(unsigned char [32], HMAC_SHA256_CTX *);
+void	sha256_init(sha256_ctx *);
+void	sha256_update(sha256_ctx *, const void *, size_t);
+void	sha256_final(unsigned char [32], sha256_ctx *);
+void	hmac_sha256_init(hmac_sha256_ctx *, const void *, size_t);
+void	hmac_sha256_update(hmac_sha256_ctx *, const void *, size_t);
+void	hmac_sha256_final(unsigned char [32], hmac_sha256_ctx *);
 
 /**
  * PBKDF2_SHA256(passwd, passwdlen, salt, saltlen, c, buf, dkLen):

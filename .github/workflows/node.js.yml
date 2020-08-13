@@ -12,7 +12,22 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [0.10.x, 4.x, 6.x, 8.x, 10.x, 12.x, 14.x]
+        node-version: [0.10.x, 4.x, 6.x]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: npm i
+
+  job2:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [8.x, 10.x, 12.x, 14.x]
 
     steps:
     - uses: actions/checkout@v2
@@ -23,7 +38,7 @@ jobs:
     - run: npm i
     - run: SETS=set3 npm test
 
-  job2:
+  job3:
     runs-on: windows-latest
 
     strategy:

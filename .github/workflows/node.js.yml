@@ -21,7 +21,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm i
-    - run: npm test
+    - run: SETS=set3 npm test
 
   job2:
     runs-on: windows-latest
@@ -38,3 +38,5 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm i
     - run: npm test
+      env:
+        SETS: set3

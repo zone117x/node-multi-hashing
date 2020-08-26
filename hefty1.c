@@ -9,7 +9,7 @@
 void hefty1_hash(const char* input, char* output, uint32_t len)
 {
     HEFTY1_CTX              ctx_hefty1;
-    SHA256_CTX              ctx_sha256;
+    sha256_ctx              ctx_sha256;
     sph_keccak512_context   ctx_keccak;
     sph_groestl512_context  ctx_groestl;
     sph_blake512_context    ctx_blake;
@@ -24,10 +24,10 @@ void hefty1_hash(const char* input, char* output, uint32_t len)
     HEFTY1_Update(&ctx_hefty1, (const void*) input, len);
     HEFTY1_Final((unsigned char*) &hash32_1, &ctx_hefty1); // 1
     
-    SHA256_Init(&ctx_sha256);
-    SHA256_Update(&ctx_sha256, (const void*) input, len);
-    SHA256_Update(&ctx_sha256, (unsigned char*) &hash32_1, 32); // 1
-    SHA256_Final((unsigned char*) &hash32_2, &ctx_sha256); // 2
+    sha256_init(&ctx_sha256);
+    sha256_update(&ctx_sha256, (const void*) input, len);
+    sha256_update(&ctx_sha256, (unsigned char*) &hash32_1, 32); // 1
+    sha256_final((unsigned char*) &hash32_2, &ctx_sha256); // 2
     
     sph_keccak512_init(&ctx_keccak);
     sph_keccak512(&ctx_keccak, (const void*) input, len);

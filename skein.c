@@ -18,9 +18,9 @@ void skein_hash(const char* input, char* output, uint32_t len)
     sph_skein512(&ctx_skien, input, len);
     sph_skein512_close(&ctx_skien, &temp);
     
-    SHA256_CTX ctx_sha256;
-    SHA256_Init(&ctx_sha256);
-    SHA256_Update(&ctx_sha256, &temp, 64);
-    SHA256_Final((unsigned char*) output, &ctx_sha256);
+    sha256_ctx ctx_sha256;
+    sha256_init(&ctx_sha256);
+    sha256_update(&ctx_sha256, &temp, 64);
+    sha256_final((unsigned char*) output, &ctx_sha256);
 }
 

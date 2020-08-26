@@ -277,5 +277,12 @@ scrypt_ensure_zero(void *p, size_t len) {
 #endif
 }
 
+#ifdef __APPLE__
+static size_t
+detect_cpu(void) {
+	size_t cpu_flags = 0;
+	return cpu_flags;
+}
+#else
 #include "scrypt-jane-portable-x86.h"
-
+#endif

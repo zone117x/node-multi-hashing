@@ -10,6 +10,10 @@
         "type": "git",
         "url": "https://github.com/zone117x/node-multi-hashing.git"
     },
+    "scripts": {
+        "build": "node-gyp rebuild",
+        "test": "mocha --require babel-register --gc-global tests/test.vectors.js"
+    },
     "dependencies": {
         "bindings": "*",
         "nan": "^2.14.1"
@@ -28,5 +32,9 @@
         "shavite",
         "fugue",
         "sha1"
-    ]
+    ],
+    "devDependencies": {
+        "babel-register": "^6.26.0",
+        "mocha": "^7.1.1"
+    }
 }

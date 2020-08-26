@@ -1,6 +1,6 @@
 {
     "name": "multi-hashing",
-    "version": "0.0.9",
+    "version": "1.0.0",
     "main": "multihashing",
     "author": {
         "name": "Matthew Little",
@@ -36,5 +36,18 @@
     "devDependencies": {
         "babel-register": "^6.26.0",
         "mocha": "^7.1.1"
+    },
+    "release": {
+        "branches": [
+            "master"
+        ],
+        "plugins": [
+            "@semantic-release/commit-analyzer",
+            "@semantic-release/release-notes-generator",
+            "@semantic-release/npm",
+            "@semantic-release/github",
+            "@semantic-release/changelog",
+            "@semantic-release/git"
+        ]
     }
 }

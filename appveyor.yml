@@ -12,6 +12,7 @@ install:
 
   # install modules
   - npm install
+  - npm run test
 
 # Post-install test scripts.
 test_script:

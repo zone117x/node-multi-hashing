@@ -68,7 +68,7 @@ if (!vectors["hex"]) {
 var results = {};
 
 describe("Basic algo tests with " + set + "-vectors", function() {
-  this.timeout(10000);
+  this.timeout(60000);
 
   algos.push("@");
   algos.forEach(function(algo) {

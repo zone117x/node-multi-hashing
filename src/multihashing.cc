@@ -137,6 +137,8 @@ DECLARE_FUNC(neoscrypt) {
    if(!Buffer::HasInstance(target))
        RETURN_EXCEPT("Argument should be a buffer object.");
 
+   uint32_t profile = Nan::To<uint32_t>(info[1]).ToChecked();
+
    char * input = Buffer::Data(target);
    char output[32];
 
@@ -144,7 +146,7 @@ DECLARE_FUNC(neoscrypt) {
 
    if (input_len < 80)
       RETURN_EXCEPT("Argument must be longer than 80 bytes");
-   neoscrypt(input, output, 0);
+   neoscrypt(input, output, profile);
 
    SET_BUFFER_RETURN(output, 32);
 }

@@ -18,7 +18,9 @@
  * SUCH DAMAGE.
  */
 
+#ifndef _WIN32
 #include <sys/mman.h>
+#endif
 #include "yescrypt.h"
 #define HUGEPAGE_THRESHOLD		(12 * 1024 * 1024)
 

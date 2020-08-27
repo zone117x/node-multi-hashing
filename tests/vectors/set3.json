@@ -3,7 +3,7 @@
     "description": "120-bytes strings",
     "date": "Wed Aug 12 09:24:38 UTC 2020",
     "license": "CCL0",
-    "updated": "Wed Aug 12 2020 20:25:29 GMT+0900 (KST)"
+    "updated": "Thu Aug 27 2020 17:30:18 GMT+0900 (KST)"
   },
   "strings": [
     "The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over",
@@ -488,5 +488,17 @@
     "bb659535797bc799f4ccb386ecd08ab1ff0a21cd5fb8ca619a4860f251cfa745",
     "9118bfabf10c3003b9faa1271524a86f276c2cc19bc86967dbd412b18c6f1d57",
     "cce7a1cebc7dcfb5820759adc6acbb05d21430337c26db16cb6281d39f3e227b"
+  ],
+  "yescrypt": [
+    "9aa7576efef53bb72fc61380140c1549823a48177afd857f485ea69c93b50a6b",
+    "51b005ae7a9907b8b63bb818d0b031da8e04908f30fc5b2885ba95512c2933a2",
+    "de093e78156647acd7435f81dc3726693581c8a4d12756f0a06e4c95fa7e0a74",
+    "8c05ed21ce1c93d46ec23cee887b909e54a702d58118804e7cf63e25efc2df91",
+    "90def9923f4b73c724dde1a33c6e5a6976c01c821add09284b73758b5585dcab",
+    "03caf4f4825b540e8f9c539883b7b107ec625effdf300d5b153097ca6265b376",
+    "b994c1ae14080e78c9f0456d74709f353014cb35a6c0727179df7403f6305abf",
+    "13ddc75e821335a5ebc48d61826ae5bac70c3ddfe9f5016af5f88c89416f1bdc",
+    "a3a6d21e75cfe0b525afc7c5fe3d7fc3ef600aca631e98eee7a26179278ac975",
+    "38f47e6bf26c0ab9777bcd3eb75118354679db489b53dd5be68ea8a8b2d88887"
   ]
 }

@@ -3002,6 +3002,7 @@ groestl_big_close(sph_groestl_big_context *sc,
 	groestl_big_init(sc, (unsigned)out_len << 3);
 }
 
+#ifdef USE_SPH_GROESTL224
 /* see sph_groestl.h */
 void
 sph_groestl224_init(void *cc)
@@ -3029,6 +3030,7 @@ sph_groestl224_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst)
 {
 	groestl_small_close(cc, ub, n, dst, 28);
 }
+#endif
 
 /* see sph_groestl.h */
 void
@@ -3058,6 +3060,7 @@ sph_groestl256_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst)
 	groestl_small_close(cc, ub, n, dst, 32);
 }
 
+#ifdef USE_SPH_GROESTL384
 /* see sph_groestl.h */
 void
 sph_groestl384_init(void *cc)
@@ -3085,6 +3088,7 @@ sph_groestl384_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst)
 {
 	groestl_big_close(cc, ub, n, dst, 48);
 }
+#endif
 
 /* see sph_groestl.h */
 void

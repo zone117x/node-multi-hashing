@@ -999,6 +999,7 @@ blake64_close(sph_blake_big_context *sc,
 
 #endif
 
+#ifdef USE_SPH_BLAKE224
 /* see sph_blake.h */
 void
 sph_blake224_init(void *cc)
@@ -1027,6 +1028,7 @@ sph_blake224_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst)
 	blake32_close(cc, ub, n, dst, 7);
 	sph_blake224_init(cc);
 }
+#endif
 
 /* see sph_blake.h */
 void

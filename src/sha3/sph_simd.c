@@ -992,6 +992,7 @@ compress_small(sph_simd_small_context *sc, int last)
 #define D3   (sc->state[15])
 #endif
 
+#if defined(USE_SPH_SIMD224) || defined(USE_SPH_SIMD256) || defined(USE_SPH_SIMD384)
 static void
 compress_small(sph_simd_small_context *sc, int last)
 {
@@ -1071,6 +1072,7 @@ compress_small(sph_simd_small_context *sc, int last)
 	WRITE_STATE_SMALL(sc);
 #endif
 }
+#endif
 
 #if SPH_SIMD_NOCOPY
 #undef A0
@@ -1557,6 +1559,7 @@ static const u32 IV512[] = {
 	C32(0x8FA14956), C32(0x21BF9BD3), C32(0xB94D0943), C32(0x6FFDDC22)
 };
 
+#if defined(USE_SPH_SIMD224) || defined(USE_SPH_SIMD256) || defined(USE_SPH_SIMD384)
 static void
 init_small(void *cc, const u32 *iv)
 {
@@ -1567,6 +1570,7 @@ init_small(void *cc, const u32 *iv)
 	sc->count_low = sc->count_high = 0;
 	sc->ptr = 0;
 }
+#endif
 
 static void
 init_big(void *cc, const u32 *iv)
@@ -1579,6 +1583,7 @@ init_big(void *cc, const u32 *iv)
 	sc->ptr = 0;
 }
 
+#if defined(USE_SPH_SIMD224) || defined(USE_SPH_SIMD256) || defined(USE_SPH_SIMD384)
 static void
 update_small(void *cc, const void *data, size_t len)
 {
@@ -1603,6 +1608,7 @@ update_small(void *cc, const void *data, size_t len)
 		}
 	}
 }
+#endif
 
 static void
 update_big(void *cc, const void *data, size_t len)
@@ -1629,6 +1635,7 @@ update_big(void *cc, const void *data, size_t len)
 	}
 }
 
+#if defined(USE_SPH_SIMD224) || defined(USE_SPH_SIMD256) || defined(USE_SPH_SIMD384)
 static void
 encode_count_small(unsigned char *dst,
 	u32 low, u32 high, size_t ptr, unsigned n)
@@ -1639,6 +1646,7 @@ encode_count_small(unsigned char *dst,
 	sph_enc32le(dst, low);
 	sph_enc32le(dst + 4, high);
 }
+#endif
 
 static void
 encode_count_big(unsigned char *dst,
@@ -1651,6 +1659,7 @@ encode_count_big(unsigned char *dst,
 	sph_enc32le(dst + 4, high);
 }
 
+#if defined(USE_SPH_SIMD224) || defined(USE_SPH_SIMD256) || defined(USE_SPH_SIMD384)
 static void
 finalize_small(void *cc, unsigned ub, unsigned n, void *dst, size_t dst_len)
 {
@@ -1672,6 +1681,7 @@ finalize_small(void *cc, unsigned ub, unsigned n, void *dst, size_t dst_len)
 	for (d = dst, u = 0; u < dst_len; u ++)
 		sph_enc32le(d + (u << 2), sc->state[u]);
 }
+#endif
 
 static void
 finalize_big(void *cc, unsigned ub, unsigned n, void *dst, size_t dst_len)
@@ -1695,6 +1705,7 @@ finalize_big(void *cc, unsigned ub, unsigned n, void *dst, size_t dst_len)
 		sph_enc32le(d + (u << 2), sc->state[u]);
 }
 
+#ifdef USE_SPH_SIMD224
 void
 sph_simd224_init(void *cc)
 {
@@ -1719,7 +1730,9 @@ sph_simd224_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst)
 	finalize_small(cc, ub, n, dst, 7);
 	sph_simd224_init(cc);
 }
+#endif
 
+#ifdef USE_SPH_SIMD256
 void
 sph_simd256_init(void *cc)
 {
@@ -1744,7 +1757,9 @@ sph_simd256_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst)
 	finalize_small(cc, ub, n, dst, 8);
 	sph_simd256_init(cc);
 }
+#endif
 
+#ifdef USE_SPH_SIMD384
 void
 sph_simd384_init(void *cc)
 {
@@ -1769,6 +1784,7 @@ sph_simd384_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst)
 	finalize_big(cc, ub, n, dst, 12);
 	sph_simd384_init(cc);
 }
+#endif
 
 void
 sph_simd512_init(void *cc)

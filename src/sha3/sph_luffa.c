@@ -1055,6 +1055,7 @@ static const sph_u32 RC44[8] = {
 
 #endif
 
+#if defined(USE_SPH_LUFFA224) || defined(USE_SPH_LUFFA256)
 static void
 luffa3(sph_luffa224_context *sc, const void *data, size_t len)
 {
@@ -1124,7 +1125,9 @@ luffa3_close(sph_luffa224_context *sc, unsigned ub, unsigned n,
 	if (out_size_w32 > 7)
 		sph_enc32be(out + 28, V07 ^ V17 ^ V27);
 }
+#endif
 
+#ifdef USE_SPH_LUFFA384
 static void
 luffa4(sph_luffa384_context *sc, const void *data, size_t len)
 {
@@ -1204,6 +1207,7 @@ luffa4_close(sph_luffa384_context *sc, unsigned ub, unsigned n, void *dst)
 		}
 	}
 }
+#endif
 
 static void
 luffa5(sph_luffa512_context *sc, const void *data, size_t len)
@@ -1289,6 +1293,7 @@ luffa5_close(sph_luffa512_context *sc, unsigned ub, unsigned n, void *dst)
 	}
 }
 
+#ifdef USE_SPH_LUFFA224
 /* see sph_luffa.h */
 void
 sph_luffa224_init(void *cc)
@@ -1321,7 +1326,9 @@ sph_luffa224_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst)
 	luffa3_close(cc, ub, n, dst, 7);
 	sph_luffa224_init(cc);
 }
+#endif
 
+#ifdef USE_SPH_LUFFA256
 /* see sph_luffa.h */
 void
 sph_luffa256_init(void *cc)
@@ -1354,7 +1361,9 @@ sph_luffa256_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst)
 	luffa3_close(cc, ub, n, dst, 8);
 	sph_luffa256_init(cc);
 }
+#endif
 
+#ifdef USE_SPH_LUFFA384
 /* see sph_luffa.h */
 void
 sph_luffa384_init(void *cc)
@@ -1387,6 +1396,7 @@ sph_luffa384_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst)
 	luffa4_close(cc, ub, n, dst);
 	sph_luffa384_init(cc);
 }
+#endif
 
 /* see sph_luffa.h */
 void

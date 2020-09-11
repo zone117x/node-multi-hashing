@@ -129,7 +129,14 @@ describe("Basic algo tests with " + set + "-vectors", function() {
         return;
       }
 
-      if (algo == 'cryptonight') {
+      if (algo == 'argon2d' || algo == 'argon2i' || algo == 'argon2id') {
+        //var tValue = 2, mValue = 500, pValue = 8; // argon2d_dyn_hash
+        var tValue = 1, mValue = 250, pValue = 4; // argon2d_crds_gate
+        results[algo] = buffers.map(function(buf, i) {
+          var ret = multiHashing[algo](buf, tValue, mValue, pValue);
+          return ret.toString('hex');
+	});
+      } else if (algo == 'cryptonight') {
         console.log("      * " + algo);
         results[algo] = {};
         for (var variant = 0; variant <= 4; ++variant) {

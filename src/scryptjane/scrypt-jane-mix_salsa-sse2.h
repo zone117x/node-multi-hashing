@@ -1,5 +1,5 @@
 /* x86 */
-#if defined(X86ASM_SSE2) && (!defined(SCRYPT_CHOOSE_COMPILETIME) || !defined(SCRYPT_SALSA_INCLUDED))
+#if defined(X86ASM_SSE2) && (!defined(SCRYPT_CHOOSE_COMPILETIME) || !defined(SCRYPT_SALSA_INCLUDED)) && !defined(CPU_X86_FORCE_INTRINSICS)
 
 #define SCRYPT_SALSA_SSE2
 
@@ -24,7 +24,7 @@ asm_naked_fn(scrypt_ChunkMix_sse2)
 	a2(movdqa xmm1,[ecx+esi+16])
 	a2(movdqa xmm2,[ecx+esi+32])
 	a2(movdqa xmm3,[ecx+esi+48])
-	a1(jz scrypt_ChunkMix_sse2_no_xor1)
+	aj(jz scrypt_ChunkMix_sse2_no_xor1)
 	a2(pxor xmm0,[ecx+eax+0])
 	a2(pxor xmm1,[ecx+eax+16])
 	a2(pxor xmm2,[ecx+eax+32])
@@ -38,7 +38,7 @@ asm_naked_fn(scrypt_ChunkMix_sse2)
 		a2(pxor xmm1,[esi+ecx+16])
 		a2(pxor xmm2,[esi+ecx+32])
 		a2(pxor xmm3,[esi+ecx+48])
-		a1(jz scrypt_ChunkMix_sse2_no_xor2)
+		aj(jz scrypt_ChunkMix_sse2_no_xor2)
 		a2(pxor xmm0,[eax+ecx+0])
 		a2(pxor xmm1,[eax+ecx+16])
 		a2(pxor xmm2,[eax+ecx+32])
@@ -113,7 +113,7 @@ asm_naked_fn(scrypt_ChunkMix_sse2)
 			a2(pxor xmm0, xmm4)
 			a3(pshufd xmm3, xmm3, 0x39)
 			a2(pxor xmm0, xmm5)
-			a1(ja scrypt_salsa_sse2_loop)
+			aj(ja scrypt_salsa_sse2_loop)
 		a2(paddd xmm0,[esp+0])
 		a2(paddd xmm1,[esp+16])
 		a2(paddd xmm2,xmm6)
@@ -130,13 +130,13 @@ asm_naked_fn(scrypt_ChunkMix_sse2)
 		a2(movdqa [eax+32],xmm2)
 		a2(movdqa [eax+48],xmm3)
 		a2(mov eax,[ebp+28])
-		a1(jne scrypt_ChunkMix_sse2_loop)
+		aj(jne scrypt_ChunkMix_sse2_loop)
 	a2(mov esp,ebp)
 	a1(pop ebp)
 	a1(pop esi)
 	a1(pop edi)
 	a1(pop ebx)
-	a1(ret 16)
+	aret(16)
 asm_naked_fn_end(scrypt_ChunkMix_sse2)
 
 #endif
@@ -144,7 +144,7 @@ asm_naked_fn_end(scrypt_ChunkMix_sse2)
 
 
 /* x64 */
-#if defined(X86_64ASM_SSE2) && (!defined(SCRYPT_CHOOSE_COMPILETIME) || !defined(SCRYPT_SALSA_INCLUDED))
+#if defined(X86_64ASM_SSE2) && (!defined(SCRYPT_CHOOSE_COMPILETIME) || !defined(SCRYPT_SALSA_INCLUDED)) && !defined(CPU_X86_FORCE_INTRINSICS)
 
 #define SCRYPT_SALSA_SSE2
 
@@ -160,7 +160,7 @@ asm_naked_fn(scrypt_ChunkMix_sse2)
 	a2(movdqa xmm1,[rax+16])
 	a2(movdqa xmm2,[rax+32])
 	a2(movdqa xmm3,[rax+48])
-	a1(jz scrypt_ChunkMix_sse2_no_xor1)
+	aj(jz scrypt_ChunkMix_sse2_no_xor1)
 	a2(pxor xmm0,[r9+0])
 	a2(pxor xmm1,[r9+16])
 	a2(pxor xmm2,[r9+32])
@@ -174,7 +174,7 @@ asm_naked_fn(scrypt_ChunkMix_sse2)
 		a2(pxor xmm1,[rsi+r9+16])
 		a2(pxor xmm2,[rsi+r9+32])
 		a2(pxor xmm3,[rsi+r9+48])
-		a1(jz scrypt_ChunkMix_sse2_no_xor2)
+		aj(jz scrypt_ChunkMix_sse2_no_xor2)
 		a2(pxor xmm0,[rdx+r9+0])
 		a2(pxor xmm1,[rdx+r9+16])
 		a2(pxor xmm2,[rdx+r9+32])
@@ -249,7 +249,7 @@ asm_naked_fn(scrypt_ChunkMix_sse2)
 			a2(pxor xmm0, xmm4)
 			a3(pshufd xmm3, xmm3, 0x39)
 			a2(pxor xmm0, xmm5)
-			a1(ja scrypt_salsa_sse2_loop)
+			aj(ja scrypt_salsa_sse2_loop)
 		a2(paddd xmm0,xmm8)
 		a2(paddd xmm1,xmm9)
 		a2(paddd xmm2,xmm10)
@@ -265,7 +265,7 @@ asm_naked_fn(scrypt_ChunkMix_sse2)
 		a2(movdqa [rax+16],xmm1)
 		a2(movdqa [rax+32],xmm2)
 		a2(movdqa [rax+48],xmm3)		
-		a1(jne scrypt_ChunkMix_sse2_loop)
+		aj(jne scrypt_ChunkMix_sse2_loop)
 	a1(ret)
 asm_naked_fn_end(scrypt_ChunkMix_sse2)
 
@@ -277,7 +277,7 @@ asm_naked_fn_end(scrypt_ChunkMix_sse2)
 
 #define SCRYPT_SALSA_SSE2
 
-static void NOINLINE
+static void NOINLINE asm_calling_convention
 scrypt_ChunkMix_sse2(uint32_t *Bout/*[chunkBytes]*/, uint32_t *Bin/*[chunkBytes]*/, uint32_t *Bxor/*[chunkBytes]*/, uint32_t r) {
 	uint32_t i, blocksPerChunk = r * 2, half = 0;
 	xmmi *xmmp,x0,x1,x2,x3,x4,x5,t0,t1,t2,t3;
@@ -426,7 +426,7 @@ scrypt_ChunkMix_sse2(uint32_t *Bout/*[chunkBytes]*/, uint32_t *Bin/*[chunkBytes]
 		 4  9 14  3
 	*/
 
-	static void STDCALL
+	static void asm_calling_convention
 	salsa_core_tangle_sse2(uint32_t *blocks, size_t count) {
 		uint32_t t;
 		while (count--) {

@@ -424,6 +424,4 @@ NAN_MODULE_INIT(init) {
     NAN_EXPORT(target, yescrypt);
 }
 
-NODE_MODULE_INIT() {
-   init(exports);
-}
+NAN_MODULE_WORKER_ENABLED(multihashing, init);

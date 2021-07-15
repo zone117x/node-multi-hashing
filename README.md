@@ -1,9 +1,7 @@
 node-multi-hashing
 ===============
 
-[![Build Status](https://travis-ci.org/zone117x/node-multi-hashing.png?branch=master)](https://travis-ci.org/zone117x/node-multi-hashing)
-
-[![NPM](https://nodei.co/npm/multi-hashing.png?downloads=true&stars=true)](https://nodei.co/npm/multi-hashing/)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/zone117x/node-multi-hashing/Node.js%20CI)](https://github.com/zone117x/node-multi-hashing/actions) [![npm](https://img.shields.io/npm/v/multi-hashing)](https://www.npmjs.com/package/multi-hashing)
 
 Cryptocurrency hashing functions for node.js.
 

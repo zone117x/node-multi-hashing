@@ -1,7 +1,7 @@
 {
     "name": "multi-hashing",
     "version": "1.0.0",
-    "main": "multihashing",
+    "main": "index.js",
     "author": {
         "name": "Matthew Little",
         "email": "zone117x@gmail.com"

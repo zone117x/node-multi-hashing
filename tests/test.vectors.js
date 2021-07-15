@@ -28,7 +28,7 @@ if (process.env.SETS) {
 // or disable all skips
 // SKIP=x mocha -gc ...
 //
-var skipalgos = [ 'bcrypt' ]; // disable bcrypt for now
+var skipalgos = [ 'bcrypt', 'scryptjane' ]; // disable bcrypt for now
 if (process.env.SKIPS) {
   skipalgos = process.env.SKIPS.split(",");
 }

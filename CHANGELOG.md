@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/zone117x/node-multi-hashing/compare/v1.0.0...v1.0.1) (2021-07-15)
+
+
+### Bug Fixes
+
+* DEP0128 DeprecationWarning: Invalid 'main' field ([27dd90e](https://github.com/zone117x/node-multi-hashing/commit/27dd90e7476e71774bea5b50888f4df8d3b604a3))
+
 # 1.0.0 (2020-08-26)
 
 

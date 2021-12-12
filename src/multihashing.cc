@@ -418,7 +418,7 @@ DECLARE_FUNC(kawpow) {
     }
 
     for (int i = 0; i < 8; ++i)
-        std::cout << &nonce[i] << " ";
+        std::cout << ((unsigned char *)&nonce)[i] << " ";
     std::cout << std::endl << std::endl;
 
     nonce = be64toh(nonce);

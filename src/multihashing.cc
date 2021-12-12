@@ -5,6 +5,7 @@
 #include <nan.h>
 
 #include <iostream>
+#include <iomanip> 
 
 extern "C" {
     #include "bcrypt.h"
@@ -428,20 +429,20 @@ DECLARE_FUNC(kawpow) {
     std::cout << "Height: " << height << "\n";
     std::cout << "Nonce: " << nonce << "\n";
     for (int i = 0; i < 32; ++i)
-        cout << hex << setfill('0') << setw(2) << header_hash[i] << " ";
-    cout << endl << endl;
+        std::cout << std::hex << std::setfill('0') << std::setw(2) << header_hash[i] << " ";
+    std::cout << std::endl << std::endl;
 
     auto context = ethash::create_epoch_context_full(ethash::get_epoch_number(height));
     const auto result = progpow::k_hash_full(*context, height, hash, nonce);
 
 
     for (int i = 0; i < 32; ++i)
-        cout << hex << setfill('0') << setw(2) << result.final_hash.bytes[i] << " ";
-    cout << endl << endl;
+        std::cout << std::hex << std::setfill('0') << std::setw(2) << result.final_hash.bytes[i] << " ";
+    std::cout << std::endl << std::endl;
 
     for (int i = 0; i < 32; ++i)
-        cout << hex << setfill('0') << setw(2) << result.mix_hash.bytes[i] << " ";
-    cout << endl << endl;
+        std::cout << std::hex << std::setfill('0') << std::setw(2) << result.mix_hash.bytes[i] << " ";
+    std::cout << std::endl << std::endl;
 
     std::memcpy(output, result.final_hash.bytes, 32);
     std::memcpy(&output[32], result.mix_hash.bytes, 32);

@@ -414,11 +414,6 @@ DECLARE_FUNC(kawpow) {
     char *nonce_data = Buffer::Data(obj2);
     
     std::memcpy((uint8_t *)&nonce, nonce_data, 8);
-
-    for (int i = 0; i < 8; ++i)
-        std::cout << std::to_string(((unsigned char *)&nonce)[i]) << " ";
-    std::cout << std::endl << std::endl;
-
     nonce = be64toh(nonce);
 
     uint8_t *header_hash = (uint8_t *)Buffer::Data(obj1);
@@ -430,23 +425,8 @@ DECLARE_FUNC(kawpow) {
 
     char output[64];
 
-    std::cout << "Height: " << height << "\n";
-    std::cout << "Nonce: " << nonce << "\n";
-    for (int i = 0; i < 32; ++i)
-        std::cout << std::to_string(header_hash[i]) << " ";
-    std::cout << std::endl << std::endl;
-
     auto context = ethash::create_epoch_context(ethash::get_epoch_number(height));
     const auto result = progpow::k_hash(*context, height, hash, nonce);
-
-
-    for (int i = 0; i < 32; ++i)
-        std::cout << std::to_string(result.final_hash.bytes[i]) << " ";
-    std::cout << std::endl << std::endl;
-
-    for (int i = 0; i < 32; ++i)
-        std::cout << std::to_string(result.mix_hash.bytes[i]) << " ";
-    std::cout << std::endl << std::endl;
 
     std::memcpy(output, result.final_hash.bytes, 32);
     std::memcpy(&output[32], result.mix_hash.bytes, 32);

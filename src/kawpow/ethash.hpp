@@ -23,7 +23,7 @@
 
 namespace ethash
 {
-//constexpr auto revision = ETHASH_REVISION;
+constexpr auto revision = ETHASH_REVISION;
 
 static constexpr int epoch_length = ETHASH_EPOCH_LENGTH;
 static constexpr int light_cache_item_size = ETHASH_LIGHT_CACHE_ITEM_SIZE;
@@ -126,7 +126,7 @@ inline result hash(
     return ethash_hash(&context, &header_hash, nonce);
 }
 
-//result hash(const epoch_context_full& context, const hash256& header_hash, uint64_t nonce) noexcept;
+result hash(const epoch_context_full& context, const hash256& header_hash, uint64_t nonce) noexcept;
 
 inline bool verify_final_hash(const hash256& header_hash, const hash256& mix_hash, uint64_t nonce,
     const hash256& boundary) noexcept

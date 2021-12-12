@@ -417,6 +417,10 @@ DECLARE_FUNC(kawpow) {
         nonce |= nonce_data[i];
     }
 
+    for (int i = 0; i < 8; ++i)
+        std::cout << &nonce[i] << " ";
+    std::cout << std::endl << std::endl;
+
     nonce = be64toh(nonce);
 
     char *header_hash = Buffer::Data(obj1);

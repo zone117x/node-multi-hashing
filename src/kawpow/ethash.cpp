@@ -303,7 +303,7 @@ inline hash256 hash_kernel(
 }
 }  // namespace
 
-result hash(const epoch_context_full& context, const hash256& header_hash, uint64_t nonce) noexcept
+result e_hash_full(const epoch_context_full& context, const hash256& header_hash, uint64_t nonce) noexcept
 {
     static const auto lazy_lookup = [](const epoch_context& ctx, uint32_t index) noexcept
     {
@@ -323,26 +323,26 @@ result hash(const epoch_context_full& context, const hash256& header_hash, uint6
     return {hash_final(seed, mix_hash), mix_hash};
 }
 
-search_result search_light(const epoch_context& context, const hash256& header_hash,
+search_result e_search_light(const epoch_context& context, const hash256& header_hash,
     const hash256& boundary, uint64_t start_nonce, size_t iterations) noexcept
 {
     const uint64_t end_nonce = start_nonce + iterations;
     for (uint64_t nonce = start_nonce; nonce < end_nonce; ++nonce)
     {
-        result r = hash(context, header_hash, nonce);
+        result r = e_hash(context, header_hash, nonce);
         if (is_less_or_equal(r.final_hash, boundary))
             return {r, nonce};
     }
     return {};
 }
 
-search_result search(const epoch_context_full& context, const hash256& header_hash,
+search_result e_search(const epoch_context_full& context, const hash256& header_hash,
     const hash256& boundary, uint64_t start_nonce, size_t iterations) noexcept
 {
     const uint64_t end_nonce = start_nonce + iterations;
     for (uint64_t nonce = start_nonce; nonce < end_nonce; ++nonce)
     {
-        result r = hash(context, header_hash, nonce);
+        result r = e_hash(context, header_hash, nonce);
         if (is_less_or_equal(r.final_hash, boundary))
             return {r, nonce};
     }

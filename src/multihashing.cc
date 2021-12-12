@@ -428,7 +428,7 @@ DECLARE_FUNC(kawpow) {
 
     nonce = be64toh(nonce);
 
-    uint8_t *header_hash = Buffer::Data(obj1);
+    uint8_t *header_hash = (uint8_t *)Buffer::Data(obj1);
     ethash::hash256 hash = {};
     for (int i = 0; i < 32; i++)
     {

@@ -418,7 +418,7 @@ DECLARE_FUNC(kawpow) {
     ethash::hash256 hash = {};
     for (int i = 0; i < 32; i++)
     {
-        hash[i] = header_hash[i];
+        hash.bytes[i] = header_hash[i];
     }
 
     char output[64];
@@ -426,8 +426,8 @@ DECLARE_FUNC(kawpow) {
     auto context = ethash::create_epoch_context_full(ethash::get_epoch_number(height));
     const auto result = progpow::k_hash_full(*context, height, hash, nonce);
 
-    std::memcpy(output, result.final_hash, 32);
-    std::memcpy(&output[32], result.mix_hash, 32);
+    std::memcpy(output, result.final_hash.bytes, 32);
+    std::memcpy(&output[32], result.mix_hash.bytes, 32);
 
     SET_BUFFER_RETURN(output, 64);
 }

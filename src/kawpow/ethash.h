@@ -24,7 +24,7 @@ extern "C" {
  * The Ethash algorithm revision implemented as specified in the Ethash spec
  * https://github.com/ethereum/wiki/wiki/Ethash.
  */
-#define ETHASH_REVISION "23"
+//#define ETHASH_REVISION "23"
 
 #define ETHASH_EPOCH_LENGTH 7500
 #define ETHASH_LIGHT_CACHE_ITEM_SIZE 64

@@ -23,7 +23,7 @@
 
 namespace ethash
 {
-constexpr auto revision = ETHASH_REVISION;
+//constexpr auto revision = ETHASH_REVISION;
 
 static constexpr int epoch_length = ETHASH_EPOCH_LENGTH;
 static constexpr int light_cache_item_size = ETHASH_LIGHT_CACHE_ITEM_SIZE;

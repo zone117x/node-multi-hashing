@@ -38,6 +38,7 @@
                 "src/kawpow/keccakf800.c",
                 "src/kawpow/keccakf1600.c",
                 "src/kawpow/managed.cpp",
+                "src/kawpow/primes.c",
                 "src/crypto/argon2/argon2.c",
                 "src/crypto/argon2/core.c",
                 "src/crypto/argon2/encoding.c",

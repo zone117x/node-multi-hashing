@@ -410,11 +410,11 @@ DECLARE_FUNC(kawpow) {
     char *nonce_data = Buffer::Data(obj2);
     for (int i = 0; i < 8; i++)
     {
-        nonce << 8;
+        nonce <<= 8;
         nonce &= nonce_data[i];
     }
 
-    char *header_hash = Buffer::Data(obj1);
+    uint8_t *header_hash = Buffer::Data(obj1);
     char output[64];
 
     auto context = ethash::create_epoch_context_full(ethash::get_epoch_number(height));

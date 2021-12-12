@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <iomanip> 
+#include <string>
 
 extern "C" {
     #include "bcrypt.h"
@@ -418,7 +419,7 @@ DECLARE_FUNC(kawpow) {
     }
 
     for (int i = 0; i < 8; ++i)
-        std::cout << ((unsigned char *)&nonce)[i] << " ";
+        std::cout << std::to_string(((unsigned char *)&nonce)[i]) << " ";
     std::cout << std::endl << std::endl;
 
     nonce = be64toh(nonce);
@@ -435,7 +436,7 @@ DECLARE_FUNC(kawpow) {
     std::cout << "Height: " << height << "\n";
     std::cout << "Nonce: " << nonce << "\n";
     for (int i = 0; i < 32; ++i)
-        std::cout << std::hex << std::setfill('0') << std::setw(2) << header_hash[i] << " ";
+        std::cout << std::to_string(header_hash[i]) << " ";
     std::cout << std::endl << std::endl;
 
     auto context = ethash::create_epoch_context_full(ethash::get_epoch_number(height));
@@ -443,11 +444,11 @@ DECLARE_FUNC(kawpow) {
 
 
     for (int i = 0; i < 32; ++i)
-        std::cout << std::hex << std::setfill('0') << std::setw(2) << result.final_hash.bytes[i] << " ";
+        std::cout << std::to_string(result.final_hash.bytes[i]) << " ";
     std::cout << std::endl << std::endl;
 
     for (int i = 0; i < 32; ++i)
-        std::cout << std::hex << std::setfill('0') << std::setw(2) << result.mix_hash.bytes[i] << " ";
+        std::cout << std::to_string(result.mix_hash.bytes[i]) << " ";
     std::cout << std::endl << std::endl;
 
     std::memcpy(output, result.final_hash.bytes, 32);

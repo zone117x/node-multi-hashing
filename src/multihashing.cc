@@ -414,7 +414,7 @@ DECLARE_FUNC(kawpow) {
     for (int i = 0; i < 8; i++)
     {
         nonce <<= 8;
-        nonce &= nonce_data[i];
+        nonce |= nonce_data[i];
     }
 
     char *header_hash = Buffer::Data(obj1);

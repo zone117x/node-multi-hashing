@@ -405,22 +405,19 @@ DECLARE_FUNC(kawpow) {
     else
         RETURN_EXCEPT("Argument 3 (height) should be an unsigned integer.");
 
-    uint64_t nonce;
+    uint64_t nonce = 0;
 
     char *nonce_data = Buffer::Data(obj2);
-    nonce = nonce_data[7] & 
-            nonce_data[6] << 8 &
-            nonce_data[5] << (8 * 2) &
-            nonce_data[4] << (8 * 3) &
-            nonce_data[3] << (8 * 4) &
-            nonce_data[2] << (8 * 5) &
-            nonce_data[1] << (8 * 6) &
-            nonce_data[0] << (8 * 7);
+    for (int i = 0; i < 8; i++)
+    {
+        nonce << 8;
+        nonce &= nonce_data[i];
+    }
 
     char *header_hash = Buffer::Data(obj1);
     char output[64];
 
-    auto context = ethash::ethash_create_epoch_context_full(ethash::get_epoch_number(height));
+    auto context = ethash::create_epoch_context_full(ethash::get_epoch_number(height));
     const auto result = progpow::k_hash_full(*context, height, header_hash, nonce);
 
     std::memcpy(output, result.final_hash, 32);

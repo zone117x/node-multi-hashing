@@ -37,9 +37,9 @@ extern "C" {
     #include "neoscrypt.h"
     #include "crypto/argon2/argon2.h"
     #include "crypto/yescrypt/yescrypt.h"
-    #include "kawpow.hpp"
 }
 
+#include "kawpow.hpp"
 #include "boolberry.h"
 
 using namespace node;

@@ -410,7 +410,6 @@ DECLARE_FUNC(kawpow) {
     char *nonce_data = Buffer::Data(obj2);
     
     std::memcpy((uint8_t *)&nonce, nonce_data, 8);
-    nonce = be64toh(nonce);
 
     uint8_t *header_hash = (uint8_t *)Buffer::Data(obj1);
     ethash::hash256 hash = {};

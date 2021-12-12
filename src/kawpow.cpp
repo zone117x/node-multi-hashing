@@ -287,6 +287,9 @@ hash256 hash_mix(
 result k_hash(const epoch_context& context, int block_number, const hash256& header_hash,
     uint64_t nonce) noexcept
 {
+    
+    nonce = be::uint64(nonce);
+
     uint32_t hash_seed[2];  // KISS99 initiator
 
     uint32_t state2[8];

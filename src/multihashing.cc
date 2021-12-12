@@ -411,7 +411,7 @@ DECLARE_FUNC(kawpow) {
     for (int i = 0; i < 8; i++)
     {
         nonce <<= 8;
-        nonce &= nonce_data[7-i];
+        nonce &= nonce_data[i];
     }
 
     char *header_hash = Buffer::Data(obj1);
@@ -423,8 +423,23 @@ DECLARE_FUNC(kawpow) {
 
     char output[64];
 
+    std::cout << "Height: " << height << "\n";
+    std::cout << "Nonce: " << nonce << "\n";
+    for (int i = 0; i < 32; ++i)
+        cout << hex << setfill('0') << setw(2) << header_hash[i] << " ";
+    cout << endl << endl;
+
     auto context = ethash::create_epoch_context_full(ethash::get_epoch_number(height));
     const auto result = progpow::k_hash_full(*context, height, hash, nonce);
+
+
+    for (int i = 0; i < 32; ++i)
+        cout << hex << setfill('0') << setw(2) << result.final_hash.bytes[i] << " ";
+    cout << endl << endl;
+
+    for (int i = 0; i < 32; ++i)
+        cout << hex << setfill('0') << setw(2) << result.mix_hash.bytes[i] << " ";
+    cout << endl << endl;
 
     std::memcpy(output, result.final_hash.bytes, 32);
     std::memcpy(&output[32], result.mix_hash.bytes, 32);

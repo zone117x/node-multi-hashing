@@ -424,7 +424,7 @@ DECLARE_FUNC(kawpow) {
     char output[64];
 
     auto context = ethash::create_epoch_context_full(ethash::get_epoch_number(height));
-    const auto result = progpow::k_hash_full(*context, height, hash, nonce);
+    const auto result = k_hash_full(*context, height, hash, nonce);
 
     std::memcpy(output, result.final_hash.bytes, 32);
     std::memcpy(&output[32], result.mix_hash.bytes, 32);

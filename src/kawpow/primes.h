@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "kawpow/ethash.h"
+#include "ethash.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "kawpow/builtins.h"
-#include "kawpow/attributes.h"
+#include "builtins.h"
+#include "attributes.h"
 
 #include <stdint.h>
 

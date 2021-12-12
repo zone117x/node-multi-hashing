@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "kawpow/ethash.hpp"
+#include "ethash.hpp"
 
 #if _WIN32
 

@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include "kawpow/ethash.hpp"
+#include "ethash.hpp"
 
-#include "kawpow/endianness.hpp"
+#include "endianness.hpp"
 
 #include <memory>
 #include <vector>

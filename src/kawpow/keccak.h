@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "kawpow/hash_types.h"
+#include "hash_types.h"
 
 #include <stddef.h>
 

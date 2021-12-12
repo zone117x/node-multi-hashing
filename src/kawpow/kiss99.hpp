@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "kawpow/attributes.h"
+#include "attributes.h"
 #include <stdint.h>
 
 /**

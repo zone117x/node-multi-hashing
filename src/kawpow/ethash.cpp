@@ -4,12 +4,12 @@
 
 #include "ethash-internal.hpp"
 
-#include "kawpow/attributes.h"
-#include "kawpow/bit_manipulation.h"
-#include "kawpow/endianness.hpp"
-#include "kawpow/primes.h"
+#include "attributes.h"
+#include "bit_manipulation.h"
+#include "endianness.hpp"
+#include "primes.h"
 #include "keccak.hpp"
-#include "kawpow.hpp"
+#include "../kawpow.hpp"
 
 #include <cassert>
 #include <cstdlib>

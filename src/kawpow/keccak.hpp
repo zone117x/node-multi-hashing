@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "kawpow/keccak.h"
-#include "kawpow/hash_types.hpp"
+#include "keccak.h"
+#include "hash_types.hpp"
 
 namespace ethash
 {

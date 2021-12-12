@@ -412,15 +412,8 @@ DECLARE_FUNC(kawpow) {
     uint64_t nonce = 0;
 
     char *nonce_data = Buffer::Data(obj2);
-    for (int i = 0; i < 8; i++)
-    {
-        for (int i = 0; i < 8; ++i)
-            std::cout << std::to_string(((unsigned char *)&nonce)[i]) << " ";
-        std::cout << std::endl << std::endl;
-
-        nonce <<= 8;
-        nonce |= nonce_data[i];
-    }
+    
+    std::memcpy((uint8_t *)&nonce, nonce_data, 8);
 
     for (int i = 0; i < 8; ++i)
         std::cout << std::to_string(((unsigned char *)&nonce)[i]) << " ";

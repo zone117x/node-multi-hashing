@@ -436,8 +436,8 @@ DECLARE_FUNC(kawpow) {
         std::cout << std::to_string(header_hash[i]) << " ";
     std::cout << std::endl << std::endl;
 
-    auto context = ethash::create_epoch_context_full(ethash::get_epoch_number(height));
-    const auto result = progpow::k_hash_full(*context, height, hash, nonce);
+    auto context = ethash::create_epoch_context(ethash::get_epoch_number(height));
+    const auto result = progpow::k_hash(*context, height, hash, nonce);
 
 
     for (int i = 0; i < 32; ++i)

@@ -390,20 +390,32 @@ DECLARE_FUNC(kawpow) {
     Local<Object> obj1 = Nan::To<Object>(info[0]).ToLocalChecked();
     Local<Object> obj2 = Nan::To<Object>(info[1]).ToLocalChecked();
     uint32_t height = 1;
-    uint64_t nonce = 0;
     if(!Buffer::HasInstance(obj1))
         RETURN_EXCEPT("Argument 1 (header hash) should be a buffer object.");
     uint32_t obj1_len = Buffer::Length(obj1);
     if (obj1_len != 32)
         RETURN_EXCEPT("The header hash should be 32 bytes.");
-    if(info[1]->IsUint64())
-        nonce = Nan::To<uint64_t>(info[1]).ToChecked();
-    else
-        RETURN_EXCEPT("Argument 2 (nonce) should be an unsigned integer.");
+    if(!Buffer::HasInstance(obj2))
+        RETURN_EXCEPT("Argument 2 (nonce) should be a buffer object.");
+    uint32_t obj2_len = Buffer::Length(obj2);
+    if (obj2_len != 8)
+        RETURN_EXCEPT("The nonce should be 8 bytes.");
     if(info[2]->IsUint32())
         height = Nan::To<uint32_t>(info[2]).ToChecked();
     else
         RETURN_EXCEPT("Argument 3 (height) should be an unsigned integer.");
+
+    uint64_t nonce;
+
+    char *nonce_data = Buffer::Data(obj2);
+    nonce = nonce_data[7] & 
+            nonce_data[6] << 8 &
+            nonce_data[5] << (8 * 2) &
+            nonce_data[4] << (8 * 3) &
+            nonce_data[3] << (8 * 4) &
+            nonce_data[2] << (8 * 5) &
+            nonce_data[1] << (8 * 6) &
+            nonce_data[0] << (8 * 7);
 
     char *header_hash = Buffer::Data(obj1);
     char output[64];

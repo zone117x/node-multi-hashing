@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <nan.h>
 
+#include <iostream>
+
 extern "C" {
     #include "bcrypt.h"
     #include "blake.h"

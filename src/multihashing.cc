@@ -414,6 +414,10 @@ DECLARE_FUNC(kawpow) {
     char *nonce_data = Buffer::Data(obj2);
     for (int i = 0; i < 8; i++)
     {
+        for (int i = 0; i < 8; ++i)
+            std::cout << std::to_string(((unsigned char *)&nonce)[i]) << " ";
+        std::cout << std::endl << std::endl;
+
         nonce <<= 8;
         nonce |= nonce_data[i];
     }
@@ -424,7 +428,7 @@ DECLARE_FUNC(kawpow) {
 
     nonce = be64toh(nonce);
 
-    char *header_hash = Buffer::Data(obj1);
+    uint8_t *header_hash = Buffer::Data(obj1);
     ethash::hash256 hash = {};
     for (int i = 0; i < 32; i++)
     {

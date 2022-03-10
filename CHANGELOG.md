@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/zone117x/node-multi-hashing/compare/v1.0.1...v1.0.2) (2022-03-10)
+
+
+### Bug Fixes
+
+* nodejs v16.x support ([#100](https://github.com/zone117x/node-multi-hashing/issues/100)) ([927e960](https://github.com/zone117x/node-multi-hashing/commit/927e9600d05cc734ca21ffcbc0a10d166bb4a66f))
+
 ## [1.0.1](https://github.com/zone117x/node-multi-hashing/compare/v1.0.0...v1.0.1) (2021-07-15)
 
 

@@ -39,6 +39,7 @@ extern "C" {
     #include "crypto/yescrypt/yescrypt.h"
 }
 
+#include "kawpow.hpp"
 #include "boolberry.h"
 
 using namespace node;
@@ -383,6 +384,50 @@ DECLARE_FUNC(boolberry) {
 
     SET_BUFFER_RETURN(output, 32);
 }
+DECLARE_FUNC(kawpow) {
+    if (info.Length() < 3)
+        RETURN_EXCEPT("You must provide 3 arguments.");
+    Local<Object> obj1 = Nan::To<Object>(info[0]).ToLocalChecked();
+    Local<Object> obj2 = Nan::To<Object>(info[1]).ToLocalChecked();
+    uint32_t height = 1;
+    if(!Buffer::HasInstance(obj1))
+        RETURN_EXCEPT("Argument 1 (header hash) should be a buffer object.");
+    uint32_t obj1_len = Buffer::Length(obj1);
+    if (obj1_len != 32)
+        RETURN_EXCEPT("The header hash should be 32 bytes.");
+    if(!Buffer::HasInstance(obj2))
+        RETURN_EXCEPT("Argument 2 (nonce) should be a buffer object.");
+    uint32_t obj2_len = Buffer::Length(obj2);
+    if (obj2_len != 8)
+        RETURN_EXCEPT("The nonce should be 8 bytes.");
+    if(info[2]->IsUint32())
+        height = Nan::To<uint32_t>(info[2]).ToChecked();
+    else
+        RETURN_EXCEPT("Argument 3 (height) should be an unsigned integer.");
+
+    uint64_t nonce = 0;
+
+    char *nonce_data = Buffer::Data(obj2);
+    
+    std::memcpy((uint8_t *)&nonce, nonce_data, 8);
+
+    uint8_t *header_hash = (uint8_t *)Buffer::Data(obj1);
+    ethash::hash256 hash = {};
+    for (int i = 0; i < 32; i++)
+    {
+        hash.bytes[i] = header_hash[i];
+    }
+
+    char output[64];
+
+    auto context = ethash::create_epoch_context(ethash::get_epoch_number(height));
+    const auto result = progpow::k_hash(*context, height, hash, nonce);
+
+    std::memcpy(output, result.final_hash.bytes, 32);
+    std::memcpy(&output[32], result.mix_hash.bytes, 32);
+
+    SET_BUFFER_RETURN(output, 64);
+}
 
 NAN_MODULE_INIT(init) {
     NAN_EXPORT(target, argon2d);
@@ -391,6 +436,7 @@ NAN_MODULE_INIT(init) {
     NAN_EXPORT(target, bcrypt);
     NAN_EXPORT(target, blake);
     NAN_EXPORT(target, boolberry);
+    NAN_EXPORT(target, kawpow);
     NAN_EXPORT(target, c11);
     NAN_EXPORT(target, cryptonight);
     NAN_EXPORT(target, cryptonightfast);
